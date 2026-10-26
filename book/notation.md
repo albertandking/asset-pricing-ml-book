@@ -37,15 +37,17 @@
 
 于是全部股票的收益可以一次写出：
 
-$$
+```{math}
+:enumerated: false
 \underbrace{\mathbf r_t}_{N\times 1} = \underbrace{\bv\alpha_t}_{N\times 1} + \underbrace{\mathbf B_t}_{N\times K}\,\underbrace{\mathbf f_t}_{K\times 1} + \underbrace{\bv\varepsilon_t}_{N\times 1} .
-$$
+```
 
 这与逐只股票的写法是同一个模型。$\mathbf B_t$ 的第 $i$ 行是
 
-$$
+```{math}
+:enumerated: false
 \tilde{\mathbf z}_{i,t-1}'\,\bv\Gamma = \left(\bv\Gamma'\tilde{\mathbf z}_{i,t-1}\right)' = \bv\beta_{i,t}' ,
-$$
+```
 
 所以 $\mathbf B_t\mathbf f_t$ 的第 $i$ 个元素就是 $\bv\beta_{i,t}'\mathbf f_t$。
 
@@ -78,7 +80,7 @@ $$
 | $\bv\Sigma_f$ | `params.factor_cov` | `(K, K)` |
 | $\mathbf b$ | `mkt.sdf_weights` | `(K,)` |
 
-**解方程而不求逆。** 公式中的 $\bv\Sigma_f^{-1}\bv\mu$、$(\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf y$ 在代码中用 `np.linalg.solve(Sigma_f, mu)` 与 `np.linalg.lstsq(X, y)` 计算，而不是先用 `np.linalg.inv` 求出逆矩阵再相乘：直接解线性方程组的计算量更小，在矩阵接近奇异时舍入误差也小得多。只有需要逆矩阵本身时（例如最小二乘系数的协方差矩阵 $s^2(\mathbf X'\mathbf X)^{-1}$），才通过 `solve(A, I)` 得到它。更多的矩阵代数与矩阵微积分工具见附录 A。
+**解方程而不求逆。** 公式中的 $\bv\Sigma_f^{-1}\bv\mu$、$(\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf y$ 在代码中用 `np.linalg.solve(Sigma_f, mu)` 与 `np.linalg.lstsq(X, y)` 计算，而不是先用 `np.linalg.inv` 求出逆矩阵再相乘：直接解线性方程组的计算量更小，在矩阵接近奇异时舍入误差也小得多。只有需要逆矩阵本身时（例如最小二乘系数的协方差矩阵 $\hat\sigma_\varepsilon^2(\mathbf X'\mathbf X)^{-1}$），才通过 `solve(A, I)` 得到它。更多的矩阵代数与矩阵微积分工具见附录 A。
 
 ## 下标与维度
 
@@ -160,12 +162,12 @@ $$
 |---|---|---|
 | $\delta$ | 主观贴现因子（Campbell 等文献的惯例） | 定价误差系数因此记为 $\bv\theta$，不用 $\delta$ |
 | $\rho$ | Campbell–Shiller 对数线性化常数；相关系数 | 特征持续性因此记为 $\phi$ |
-| $s_t$ | Campbell–Cochrane 模型中的（对数）盈余消费比 | 异质性波动率因此记为 $\sigma_\varepsilon$；最小二乘的残差方差估计仍写作 $s^2$，只在局部使用 |
+| $s_t$ | Campbell–Cochrane 模型中的（对数）盈余消费比 | 异质性波动率因此记为 $\sigma_\varepsilon$；最小二乘的残差方差估计记作 $\hat\sigma_\varepsilon^2$，不用 $s^2$ |
 | $x_{t+1}$ | 支付 | 带常数项的特征向量记为 $\tilde{\mathbf z}_{i,t-1}$，不用 $x$ |
 | $P_t$ 与 $p_t$ | 大写为价格水平，小写为对数价格 | 同理，小写 $d_t$、$c_t$、$r_t$ 为对数；面板中的 $r_{i,t}$ 是水平超额收益，是明确声明的例外 |
 | $\bv\lambda$ | 因子风险溢价 | 第四部分的正则化（惩罚）系数记为 $\kappa$，或在该章另行声明，不用 $\lambda$ |
-| $u_t$、$u_{i,t}$ | $u_t$ 为因子的标准化冲击；$u_{i,t}$ 为习题中时间序列回归的残差 | 两者由下标区分，不改 |
-| $e_{i,t}$ 与 $\varepsilon_{i,t}$ | $\mathbf e_{i,t}$ 为特征的更新冲击；$\varepsilon_{i,t}$ 为收益的异质性冲击 | 注意区分 |
+| $\mathbf u_t$、$u_{i,t}$ | $\mathbf u_t$ 为因子的标准化冲击向量；$u_{i,t}$ 为习题中时间序列回归的残差（标量） | 两者由字体与下标区分，不改 |
+| $\mathbf e_{i,t}$ 与 $\varepsilon_{i,t}$ | $\mathbf e_{i,t}$ 为特征的更新冲击；$\varepsilon_{i,t}$ 为收益的异质性冲击 | 注意区分 |
 | $\mathbf c$ | 第 0 章中遗漏变量偏误的系数向量 | 只在第 0 章局部使用；粗体，与标量的对数消费 $c_t$ 不同 |
 
 ## 与 `apsim` 代码字段的对应
