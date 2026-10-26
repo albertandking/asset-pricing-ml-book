@@ -1,0 +1,20 @@
+/* 屏幕阅读：英文和数字 Arial，中文微软雅黑；macOS 回退到苹方、冬青黑体 */
+html,
+body,
+article {
+  font-family: Arial, "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif !important;
+}
+
+/* 代码：英文 Consolas，中文回退到微软雅黑或苹方 */
+code,
+pre,
+kbd,
+samp {
+  font-family: Consolas, "Microsoft YaHei", "PingFang SC", monospace !important;
+}
+
+/* 中文正文行距略放宽 */
+article p,
+article li {
+  line-height: 1.85;
+}

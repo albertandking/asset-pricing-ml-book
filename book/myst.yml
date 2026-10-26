@@ -1,0 +1,25 @@
+version: 1
+project:
+  title: 资产定价与机器学习：从理论到 A 股实证
+  subtitle: 自包含教材
+  bibliography:
+    - references.bib
+  math:
+    '\E': '\mathbb{E}'
+    '\Var': '\operatorname{Var}'
+    '\Cov': '\operatorname{Cov}'
+    '\R': '\mathbb{R}'
+  numbering:
+    equation: true
+    figure: true
+    table: true
+  toc:
+    - file: index.md
+    - file: notation.md
+    - title: 第零部分　准备
+      children:
+        - file: part0/ch00-guide.md
+site:
+  template: book-theme
+  options:
+    style: _static/custom.css
