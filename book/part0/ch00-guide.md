@@ -511,9 +511,11 @@ assert np.allclose(gap_a, [0, 0.01, 0])                                    # 每
        +-------+-------+-------+-------+-------+
  t=T   | r_1,T | r_2,T | r_3,T | . . . | r_N,T |  <- 第 T 期横截面回归，得 g_T
        +-------+-------+-------+-------+-------+
- 时间 t            ^
-（纵向）           |
+ |                 ^
+ v t               |
                    +-- 股票 2 的时间序列回归：沿这一列跑，得 a_2 与 beta_2
+
+ 纵向为时间 t，横向为股票 i
 
  Fama-MacBeth：对 g_1 至 g_T 求时间平均，并用它们的波动计算标准误
  混合回归：把表中全部 N x T 个格子放进同一个回归，只得到一组系数
@@ -623,7 +625,7 @@ Fama–MacBeth 是一套程序，而不是一种新的回归 [@fama1973risk]。�
 
 下面在同一份模拟数据上跑全部四种回归。参数取默认值（$N = 500$、$T = 240$、默认 $\bv\Gamma$、$\bv\theta = \mathbf 0$），种子为 2026。默认 $\bv\Gamma$ 下 $\bv\beta_{i,t} = (1,\ 0.5\, z_{1,i,t-1},\ 0.5\, z_{2,i,t-1})'$，各问题的理论值都可以直接写出。
 
-**(a) 时间序列回归。** 对每只股票把 $r_{i,t}$ 对 $(1, \mathbf f_t')'$ 回归。由[习题 %s](#ex-ch0-ts)，斜率的总体值是 $\E[\bv\beta_{i,t}]$，即 $\bv\Gamma$ 第 0 行的转置 $(1, 0, 0)'$，所以 $\hat{\bv\beta}_i$ 的横截面平均应接近它；而单只股票的 $\hat{\bv\beta}_i$ 应接近这只股票在样本期内的平均载荷 $T^{-1}\sum_t\bv\beta_{i,t}$，误差的量级由回归标准误给出。代码用一次 `lstsq` 解出 $N$ 个回归：右端是 $T\times N$ 的数组时，`lstsq` 对每一列分别求解，系数数组的第 $i$ 列为 $(\hat a_i, \hat{\bv\beta}_i')'$。
+**(a) 时间序列回归。** 对每只股票把 $r_{i,t}$ 对 $(1, \mathbf f_t')'$ 回归。由[习题 %s](#ex-ch0-ts)，斜率的总体值是 $\E[\bv\beta_{i,t}]$，即 $\bv\Gamma$ 第 0 行的转置 $(1, 0, 0)'$，所以 $\hat{\bv\beta}_i$ 的横截面平均应接近它；而单只股票的 $\hat{\bv\beta}_i$ 应接近这只股票在样本期内的平均载荷 $T^{-1}\sum_t\bv\beta_{i,t}$，误差的量级由回归标准误给出。后一句是给定这只股票特征路径的条件说法，成立的前提是载荷与因子的实现值独立（本模拟器满足；真实数据中，例如条件 CAPM 里载荷随市场状态变化，就会破坏它）；$T \to \infty$ 时特征路径的平均趋于 0，平均载荷趋于 $\E[\bv\beta_{i,t}] = (1, 0, 0)'$，两种说法一致。代码用一次 `lstsq` 解出 $N$ 个回归：右端是 $T\times N$ 的数组时，`lstsq` 对每一列分别求解，系数数组的第 $i$ 列为 $(\hat a_i, \hat{\bv\beta}_i')'$。
 
 ```{code-cell} python
 # 同一份模拟数据：默认参数（N = 500、T = 240、θ = 0），下面四种回归都用它
@@ -702,15 +704,20 @@ print(pd.DataFrame({"理论值 Γμ": truth_rg, "本样本 Γf̄": sample_rg, "F
 noise_rg = rg.params.idio_vol / np.sqrt(N_rg * T_rg)                       # 横截面噪声平均 T 期后的量级 σ_ε/√(NT)
 assert np.all(np.abs(gbar_rg - truth_rg) < 3 * se_fm_rg)                   # 与 Γμ 的偏离在 3 倍 FM 标准误以内
 assert np.all(np.abs(gbar_rg - sample_rg) < 4 * noise_rg)                  # ḡ 与 Γf̄ 只差平均后的横截面噪声
-assert np.all((se_fm_rg / se_factor_rg > 0.85) & (se_fm_rg / se_factor_rg < 1.2))   # 标准误主要来自因子的波动
+# 理论比值：ĝ_t 的方差 = 因子部分 + 横截面噪声 σ_ε²/N（Z̃'Z̃/N ≈ I），比值约为 √(1 + (σ_ε²/N) / V)，V 为因子部分的方差
+ratio_theory_rg = np.sqrt(1 + rg.params.idio_vol ** 2 / N_rg / (se_factor_rg ** 2 * T_rg))   # 约 (1.004, 1.043, 1.043)
+print("标准误 / 因子部分的理论值：", ratio_theory_rg.round(3))
+# T = 240 时，样本标准差的相对抽样误差约 1/√(2T) ≈ 0.046，阈值 0.12 约为 2.6 倍
+assert np.all(np.abs(se_fm_rg / se_factor_rg - ratio_theory_rg) < 0.12)
 
 # 每期回归的 t 值：业界“t 值序列”的统计口径
 print(pd.DataFrame({"每期 |t| 的均值": np.abs(tstat_rg).mean(axis=0), "t > 2 的比例": (tstat_rg > 2).mean(axis=0),
                     "t < −2 的比例": (tstat_rg < -2).mean(axis=0)}, index=["常数", "z1", "z2"]).round(3).to_string())
 assert np.all((tstat_rg[:, 1:] > 2).mean(axis=0) > 0.15) and np.all((tstat_rg[:, 1:] < -2).mean(axis=0) > 0.15)
+assert np.all((np.abs(tstat_rg[:, 1:]) > 2).mean(axis=0) > 0.5)               # z1、z2：多数期 |t| > 2
 ```
 
-三列系数与对应因子的相关系数都在 0.9 以上（由 `assert` 保证），与[因子、特征、载荷的关系](#sec-ch0-fcl)的结论一致。FM 估计 $\bar{\mathbf g}$ 与理论值 $\bv\Gamma\bv\mu$ 的偏离都在 3 倍 FM 标准误以内；它与本样本的 $\bv\Gamma\bar{\mathbf f}$ 更接近，差别不到 $4\sigma_\varepsilon/\sqrt{NT}$；FM 标准误与只由因子波动算出的 $[\bv\Gamma\bv\Sigma_f\bv\Gamma']_{jj}^{1/2}/\sqrt T$ 之比在 0.85～1.2 之间（均由 `assert` 保证）。后一点的含义是：在这个模拟中，FM 估计的不确定性几乎全部来自因子收益的时间序列波动，横截面噪声 $\sigma_\varepsilon/\sqrt N$ 只占很小一部分，增加股票数几乎不能缩小它，增加期数才能。常数项的 FM 估计几乎就是因子 1 的样本均值（只差平均后的横截面噪声），240 个月中它的标准误约为 $0.05/\sqrt{240} \approx 0.32\%$，与误区二算出的数字相同。
+三列系数与对应因子的相关系数都在 0.9 以上（由 `assert` 保证），与[因子、特征、载荷的关系](#sec-ch0-fcl)的结论一致。FM 估计 $\bar{\mathbf g}$ 与理论值 $\bv\Gamma\bv\mu$ 的偏离都在 3 倍 FM 标准误以内；它与本样本的 $\bv\Gamma\bar{\mathbf f}$ 更接近，差别不到 $4\sigma_\varepsilon/\sqrt{NT}$；FM 标准误与只由因子波动算出的 $[\bv\Gamma\bv\Sigma_f\bv\Gamma']_{jj}^{1/2}/\sqrt T$ 之比，与计入横截面噪声后的理论值（常数项约 1.004，$z_1$、$z_2$ 约 1.04）相差不到 0.12（均由 `assert` 保证）。后一点的含义是：在这个模拟中，FM 估计的不确定性主要来自因子收益的时间序列波动，横截面噪声 $\sigma_\varepsilon/\sqrt N$ 只占一小部分，增加股票数几乎不能缩小它，增加期数才能。常数项的 FM 估计几乎就是因子 1 的样本均值（只差平均后的横截面噪声），240 个月中它的标准误约为 $0.05/\sqrt{240} \approx 0.32\%$，与误区二算出的数字相同。
 
 **(d) 混合回归。** 把全部 $NT$ 个观测放进一个 OLS，给出点估计与同方差标准误，并与 Fama–MacBeth 比较。代码还核对上文的恒等式 $\hat{\mathbf g}^{\mathrm P} = \sum_t\mathbf W_t\hat{\mathbf g}_t$：`np.einsum("tni,tnj->tij", X, X)` 对每一期 $t$ 把 $n$（股票）求和，得到逐期的 $\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}$（这里只取前三列）。最后核对“结论 1”：只有一个特征、每期标准化时二者完全相等，有两个特征时则不再完全相等。
 
@@ -752,9 +759,10 @@ z1_std, z2_std = standardize(Z12_rg[:, :, 0]), standardize(Z12_rg[:, :, 1])
 gap_one, gap_two = pooled_minus_fm([z1_std]), pooled_minus_fm([z1_std, z2_std])
 print(f"每期标准化后，混合回归与 FM 之差的最大绝对值：一个特征 {gap_one:.1e}，两个特征 {gap_two:.1e}")
 assert gap_one < 1e-12 and gap_two > 1e-8                                  # 前者只是舍入误差，后者不为 0
+assert gap_two < 0.5 * se_fm_rg.min()                                      # 但差别远小于 FM 标准误
 ```
 
-混合回归与 Fama–MacBeth 的点估计相差不到 FM 标准误的一半，而且恒等式 $\hat{\mathbf g}^{\mathrm P} = \sum_t\mathbf W_t\hat{\mathbf g}_t$ 精确成立；只有一个标准化特征时二者之差只是舍入误差，有两个标准化特征时二者不再相等，但差别很小（均由 `assert` 保证，数值见上方输出）。本模拟器中特征相互独立、每期股票数相同，$\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}/N$ 各期都接近 $\mathbf I$，这正是结论 2 中“二者接近”的情形；真实数据中特征相关、股票数逐年增加，不能想当然地认为二者接近。
+混合回归与 Fama–MacBeth 的点估计相差不到 FM 标准误的一半，而且恒等式 $\hat{\mathbf g}^{\mathrm P} = \sum_t\mathbf W_t\hat{\mathbf g}_t$ 精确成立；只有一个标准化特征时二者之差只是舍入误差，有两个标准化特征时二者不再相等，但差别不到 FM 标准误的一半（均由 `assert` 保证，数值见上方输出）。本模拟器中特征相互独立、每期股票数相同，$\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}/N$ 各期都接近 $\mathbf I$，这正是结论 2 中“二者接近”的情形；真实数据中特征相关、股票数逐年增加，不能想当然地认为二者接近。
 
 标准误则差别很大：三个系数的 FM 标准误都超过同方差标准误的 2 倍（由 `assert` 保证，比值见上方输出），常数项相差最多，因为它的系数随 $f_{1,t}$ 波动，而 $\sigma_1 = 0.05$ 最大。哪一个标准误是对的？单次模拟回答不了，要靠重复模拟：用 200 个不同的种子各生成一份数据（为节省时间取 $N = 200$、$T = 120$），记下每次的混合回归估计及两种标准误，再把标准误的平均值与估计值在 200 次重复中的实际标准差比较。
 
@@ -797,13 +805,18 @@ lam_t_rg = np.array([np.linalg.lstsq(B_hat1_rg, R_rg[t], rcond=None)[0] for t in
 lam_bar_rg = lam_t_rg.mean(axis=0)                                         # λ̄: (K,)
 lam_se_rg = lam_t_rg.std(axis=0, ddof=1) / np.sqrt(T_rg - h_rg)
 
-# 对照：第二步改用后半段的真实平均载荷
-B_true2_rg = B_rg[h_rg:].mean(axis=0)                                      # (N, K)
-lam_o_rg = np.array([np.linalg.lstsq(B_true2_rg, R_rg[t], rcond=None)[0] for t in range(h_rg, T_rg)])  # (T-h, K)
-lam_o_bar, lam_o_se = lam_o_rg.mean(axis=0), lam_o_rg.std(axis=0, ddof=1) / np.sqrt(T_rg - h_rg)
-print(pd.DataFrame({"真值 λ = μ": mu_rg, "后半段因子均值": F_rg[h_rg:].mean(axis=0),
-                    "两步法 λ̄": lam_bar_rg, "其 FM 标准误": lam_se_rg, "对照 λ̄": lam_o_bar, "对照的 FM 标准误": lam_o_se},
-                   index=["因子 1", "因子 2", "因子 3"]).round(4).to_string())
+# 对照：第二步改用每期的真实载荷 B_t。θ = 0 时 r_t = B_t f_t + ε_t，所以 λ̂_t = f_t + (B_t'B_t)⁻¹B_t'ε_t，
+# 其时间平均应等于后半段的因子样本均值 f̄，只差平均后的横截面噪声
+lam_o_rg = np.array([np.linalg.lstsq(B_rg[t], R_rg[t], rcond=None)[0] for t in range(h_rg, T_rg)])   # (N, K) 对 (N,)：(T-h, K)
+lam_o_bar = lam_o_rg.mean(axis=0)                                          # (K,)
+f_bar2_rg = F_rg[h_rg:].mean(axis=0)                                       # 后半段因子样本均值 f̄：(K,)
+BtB_inv_rg = np.mean([np.linalg.solve(B_rg[t].T @ B_rg[t], np.eye(K_rg)) for t in range(h_rg, T_rg)], axis=0)   # (B_t'B_t)⁻¹ 的平均：(K, K)
+noise_se_rg = rg.params.idio_vol * np.sqrt(np.diag(BtB_inv_rg) / (T_rg - h_rg))   # 横截面噪声平均后的标准误：(K,)
+B_true2_rg = B_rg[h_rg:].mean(axis=0)                                      # 后半段的真实平均载荷：(N, K)，下面用来计算相关系数
+print(pd.DataFrame({"真值 λ = μ": mu_rg, "后半段因子均值 f̄": f_bar2_rg,
+                    "两步法 λ̄": lam_bar_rg, "其 FM 标准误": lam_se_rg, "(μ − λ̄)/标准误": (mu_rg - lam_bar_rg) / lam_se_rg,
+                    "对照 λ̄": lam_o_bar, "对照 − f̄": lam_o_bar - f_bar2_rg, "横截面噪声标准误": noise_se_rg},
+                   index=["因子 1", "因子 2", "因子 3"]).round(5).to_string())
 
 # β̂_i 含有多少关于载荷的信息：对因子 2、3，与前半段、后半段真实平均载荷的横截面相关系数
 corr_first = np.array([np.corrcoef(B_hat1_rg[:, k], B_rg[:h_rg, :, k].mean(axis=0))[0, 1] for k in (1, 2)])
@@ -812,18 +825,20 @@ print("β̂ 与前半段平均载荷的相关系数：", corr_first.round(3), "�
 
 assert np.all((corr_first > 0.35) & (corr_first < 0.65))                   # 估计误差：β̂ 只部分反映同期的平均载荷
 assert np.all(np.abs(corr_second) < 0.15)                                  # 载荷时变：β̂ 几乎不含后半段载荷的信息（N = 500 时相关系数的抽样误差约 0.045）
-assert np.all(np.abs(lam_bar_rg[1:]) < 0.5 * mu_rg[1:])                    # 因子 2、3 的 λ̄ 不到真值的一半
+# 因子 2、3：λ̄ 比真值低 2 倍标准误以上。若两步法无偏，这样的单侧偏离概率约 2.3%，所以它是“显著偏低”的证据
+assert np.all(lam_bar_rg[1:] < mu_rg[1:] - 2 * lam_se_rg[1:])
 assert abs(lam_bar_rg[0] - mu_rg[0]) < 3 * lam_se_rg[0]                    # 因子 1：在 3 倍标准误以内
-assert np.all(np.abs(lam_o_bar - mu_rg) < 3 * lam_o_se)                    # 对照：三个分量都在 3 倍标准误以内
-assert np.all(lam_o_se[1:] > np.asarray(rg.params.factor_vol)[1:] / np.sqrt(T_rg - h_rg))   # 但标准误大于 σ_k/√(T/2)
+# 对照：给定 B_t 与 f_t，噪声均值为 0、标准误为 noise_se_rg；3 倍标准误对应双侧约 0.3% 的误报概率
+assert np.all(np.abs(lam_o_bar - f_bar2_rg) < 3 * noise_se_rg)
+assert np.all(noise_se_rg < 0.3 * mu_rg)                                   # 噪声标准误远小于真值，对照才有区分力
 ```
 
-结果如实报告如下。因子 1 的 $\bar\lambda_1$ 与真值的偏离在 3 倍标准误以内；但因子 2、3 的 $\bar\lambda_2$、$\bar\lambda_3$ 都不到真值的一半（均由 `assert` 保证，数值见上方输出）。两步法在这里基本失败了，原因有两个，最后一行输出把它们分开了：
+结果如实报告如下。因子 1 的 $\bar\lambda_1$ 与真值的偏离在 3 倍标准误以内；但因子 2、3 的 $\bar\lambda_2$、$\bar\lambda_3$ 远低于真值，比真值低 2 倍标准误以上（均由 `assert` 保证，数值见上方输出）。两步法在这里基本失败了，原因有两个，最后一行输出把它们分开了：
 
 - **估计误差。** 对因子 2、3，$\hat{\bv\beta}_i$ 与前半段真实平均载荷的相关系数只在 0.35～0.65 之间：单只股票 120 个月的载荷估计，标准误约为 0.3，比平均载荷在股票之间的差别还大，$\hat{\bv\beta}_i$ 中很大一部分是噪声。用带噪声的解释变量做回归，斜率偏向 0，这就是变量误差问题。
-- **载荷时变。** $\hat{\bv\beta}_i$ 与后半段真实平均载荷的相关系数绝对值小于 0.15，几乎为 0（均由 `assert` 保证）。$\phi = 0.9$ 时特征的半衰期只有约 6.6 个月（$0.9^{6.6} \approx 0.5$），前 120 个月的平均特征几乎不能预测后 120 个月的平均特征，前半段估计的载荷对后半段也就几乎没有信息。因子 1 不受影响，是因为所有股票对它的载荷恒为 1，不随时间变化。
+- **载荷时变。** $\hat{\bv\beta}_i$ 与后半段真实平均载荷的相关系数绝对值小于 0.15，几乎为 0（均由 `assert` 保证）。$\phi = 0.9$ 时特征的半衰期只有约 6.6 个月（$0.9^{6.6} \approx 0.5$），前 120 个月的平均特征几乎不能预测后 120 个月的平均特征，前半段估计的载荷对后半段也就几乎没有信息。因子 1 基本不受影响，是因为所有股票对它的载荷恒为 1，不随时间变化。
 
-对照组的三个分量都在真值的 3 倍标准误以内：解释变量换成真实载荷后，看不到明显的偏误。但因子 2、3 的标准误仍大于只由因子波动决定的 $\sigma_k/\sqrt{T/2}$（由 `assert` 保证）：120 个月的平均载荷在股票之间的离散度不大，每期的横截面斜率估计得并不精确。这个模拟器有意让载荷随特征快速变化，把两步法的两个弱点都放大了；在载荷更稳定的情形下，问题会轻一些，但变量误差始终存在。处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
+对照组把第二步的解释变量换成每期的真实载荷 $\mathbf B_t$。此时 $\hat{\bv\lambda}_t = \mathbf f_t + (\mathbf B_t'\mathbf B_t)^{-1}\mathbf B_t'\bv\varepsilon_t$，它的时间平均应等于后半段的因子样本均值 $\bar{\mathbf f}$，只差平均后的横截面噪声；这个噪声的标准误不到真值的 0.3 倍，所以对照有足够的区分力。结果三个分量与 $\bar{\mathbf f}$ 之差都在 3 倍噪声标准误以内（均由 `assert` 保证，数值见上方输出）：解释变量换成真实载荷后，第二步准确地恢复了本样本的因子收益。这里的基准是 $\bar{\mathbf f}$ 而不是 $\bv\mu$：二者之差是因子样本均值的抽样误差，任何方法都无法消除。两步法失败，因此不在横截面回归本身，而在于解释变量 $\hat{\bv\beta}_i$。还要说明，用前半段估计一次 $\hat{\bv\beta}_i$、在后 120 期固定不变，是本示意的设计选择；实践中通常用滚动窗口（例如过去 60 个月）逐期重估载荷。在本模拟器中，滚动重估能缓解载荷时变造成的错位，但单只股票的估计误差依然很大，变量误差问题不能因此消除。这个模拟器有意让载荷随特征快速变化，把两步法的两个弱点都放大了；在载荷更稳定的情形下，问题会轻一些，但变量误差始终存在。处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
 
 #### 第 0 章中已经用到这些回归的地方
 
@@ -841,7 +856,7 @@ assert np.all(lam_o_se[1:] > np.asarray(rg.params.factor_vol)[1:] / np.sqrt(T_rg
 
 - **Barra 的因子收益就是横截面回归的系数。** 每期把股票收益对行业哑变量与标准化的风格暴露做横截面回归，系数就是当期的“因子收益”，即本节的 $\hat{\mathbf g}_t$（[因子收益](#glossary-factor-return)、[风险模型](#glossary-risk-model)）。
 - **IC 对应横截面相关。** 第 $t$ 期的 IC 是信号与收益的横截面相关系数，与一元横截面回归的斜率只差一个比例 $\hat\sigma_{r,t}/\hat\sigma_{z,t}$；在一定前提下，IC 均值乘以收益的横截面标准差约为 Fama–MacBeth 的点估计，ICIR 乘以 $\sqrt T$ 约为 Fama–MacBeth 的 $t$ 值（精确关系与成立条件见 [IC](#glossary-ic)）。
-- **单因子测试的“回归法”本质上是 Fama–MacBeth 的思路。** 卖方金工报告检验一个因子时，常每期把下期收益对因子值做横截面回归，并控制行业与市值（或者先对因子值做行业、市值[中性化](#glossary-neutralization)），得到“因子收益”序列与每期的 $t$ 值序列，再报告三类统计量：因子收益序列的均值及其 $t$ 值，这正是 FM 估计量与 FM $t$ 值；$t$ 值序列绝对值的均值；$|t| > 2$ 的期数比例。后两类统计的是**每期**横截面回归的 $t$ 值，与 FM $t$ 值不是一回事。上面 (c) 的输出给出了一个例子：$z_1$、$z_2$ 的每期 $t$ 值大于 2 与小于 $-2$ 的期数都超过 15%（由 `assert` 保证），因为每期系数随 $f_{2,t}$、$f_{3,t}$ 正负波动；它们只说明“这个特征每期都与收益有很强的关系，方向时正时负”，平均补偿是否为正，要看 FM $t$ 值。有的报告还会用市值平方根加权的 WLS、用排序代替原始因子值，或者对收益做行业调整。
+- **单因子测试的“回归法”本质上是 Fama–MacBeth 的思路。** 卖方金工报告检验一个因子时，常每期把下期收益对因子值做横截面回归，并控制行业与市值（或者先对因子值做行业、市值[中性化](#glossary-neutralization)），得到“因子收益”序列与每期的 $t$ 值序列，再报告三类统计量：因子收益序列的均值及其 $t$ 值，这正是 FM 估计量与 FM $t$ 值；$t$ 值序列绝对值的均值；$|t| > 2$ 的期数比例。后两类统计的是**每期**横截面回归的 $t$ 值，与 FM $t$ 值不是一回事。上面 (c) 的输出给出了一个例子：$z_1$、$z_2$ 的每期 $|t| > 2$ 的期数都超过一半，其中 $t$ 值大于 2 与小于 $-2$ 的期数都超过 15%（均由 `assert` 保证），因为每期系数随 $f_{2,t}$、$f_{3,t}$ 正负波动；它们只说明“这个特征在多数期与收益有很强的关系，方向时正时负”，平均补偿是否为正，要看 FM $t$ 值。有的报告还会用市值平方根加权的 WLS、用排序代替原始因子值，或者对收益做行业调整。
 
 这些口径在学术与业界的差别，整理在术语对照页的[横截面回归与 Fama–MacBeth](#glossary-fm) 条目中。
 

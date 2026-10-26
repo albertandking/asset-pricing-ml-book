@@ -129,7 +129,8 @@
 | $\alpha_{i,t}$ | 定价误差（错误定价） | $\alpha_{i,t} = \E_{t-1}[m_t r_{i,t}]$ 在本书模型中等于 $\bv\theta' \mathbf z_{i,t-1}$；`panel["alpha"]` |
 | $\varepsilon_{i,t}$ | 异质性冲击 | $\varepsilon_{i,t} \sim N(0, \sigma_\varepsilon^2)$ |
 | $\mathbf g_t \in \Real^{L+1}$ | 第 $t$ 期收益对 $\tilde{\mathbf z}_{i,t-1}$ 的横截面系数，$\mathbf g_t = \bv\Gamma\mathbf f_t + (0, \bv\theta')'$ | $\hat{\mathbf g}_t$ 为第 $t$ 期的最小二乘估计，分量 $\hat g_{j,t}$，$j = 0, \dots, L$；见第 0 章 0.2 节“因子、特征、载荷的关系” |
-| $a_i$、$\hat a_i$；$\hat{\bv\beta}_i \in \Real^K$ | 股票 $i$ 时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 的截距（标量）与常数斜率（载荷）的估计 | 载荷时变时，$\hat{\bv\beta}_i$ 估计样本期内的平均载荷；$\hat{\mathbf B} \in \Real^{N\times K}$ 的第 $i$ 行为 $\hat{\bv\beta}_i'$；见第 0 章[几种回归](#sec-ch0-regs) |
+| $\bv\beta_i \in \Real^K$ | 时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 中股票 $i$ 的常数载荷（不带下标 $t$） | 即第 0 章习题“时间序列回归的截距”中的 $\mathbf h_i$；本书模型中总体值为 $\E[\bv\beta_{i,t}]$ |
+| $a_i$、$\hat a_i$；$\hat{\bv\beta}_i \in \Real^K$ | 股票 $i$ 时间序列回归的截距（标量）及其估计，常数载荷 $\bv\beta_i$ 的估计 | 载荷时变、且载荷与因子的实现值独立时（本模拟器满足，真实数据中条件 CAPM 一类的设定会破坏它），给定特征路径，$\hat{\bv\beta}_i$ 估计样本期内的平均载荷；$\hat{\mathbf B} \in \Real^{N\times K}$ 的第 $i$ 行为 $\hat{\bv\beta}_i'$；见第 0 章[几种回归](#sec-ch0-regs) |
 | $\mathbf F \in \Real^{T\times K}$ | 因子按期堆叠，第 $t$ 行为 $\mathbf f_t'$ | 时间序列回归的设计矩阵为 $[\mathbf 1_T, \mathbf F]$；`factors.to_numpy()` |
 | $\bar{\mathbf g} \in \Real^{L+1}$ | Fama–MacBeth 点估计 $T^{-1}\sum_t\hat{\mathbf g}_t$ | 标准误逐分量为 $\hat g_{j,t}$ 的时间序列标准差除以 $\sqrt T$；见第 0 章[几种回归](#sec-ch0-regs) |
 | $\lambda_{0,t}$、$\hat{\bv\lambda}_t \in \Real^K$、$\bar{\bv\lambda}$ | 第 $t$ 期收益对载荷估计值横截面回归的截距与斜率（每单位载荷的实现补偿），及斜率的时间平均 | 两步法的第二步；$\bar{\bv\lambda}$ 估计风险溢价 $\bv\lambda$ |
@@ -175,6 +176,7 @@
 | $\bv\lambda$ | 因子风险溢价 | 第四部分的正则化（惩罚）系数记为 $\kappa$，或在该章另行声明，不用 $\lambda$ |
 | $\mathbf u_t$、$u_{i,t}$ | $\mathbf u_t$ 为因子的标准化冲击向量；$u_{i,t}$ 为回归残差（标量；时间序列、横截面与混合回归通用，见第 0 章 0.2 节“几种回归”与习题） | 两者由字体与下标区分，不改 |
 | $\mathbf e_{i,t}$ 与 $\varepsilon_{i,t}$ | $\mathbf e_{i,t}$ 为特征的更新冲击；$\varepsilon_{i,t}$ 为收益的异质性冲击 | 注意区分 |
+| $\mathbf W_t$ | 第 0 章中混合回归与 Fama–MacBeth 关系式里的 $(L+1)\times(L+1)$ 权重矩阵 | 只在第 0 章局部使用；第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关 |
 | $\mathbf c$ | 第 0 章中遗漏变量偏误的系数向量 | 只在第 0 章局部使用；粗体，与标量的对数消费 $c_t$ 不同 |
 
 ## 与 `apsim` 代码字段的对应
