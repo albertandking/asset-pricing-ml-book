@@ -18,6 +18,7 @@ project:
   toc:
     - file: index.md
     - file: notation.md
+    - file: glossary.md
     - title: 第零部分　准备
       children:
         - file: part0/ch00-guide.md

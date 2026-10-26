@@ -490,6 +490,8 @@ assert np.all(np.abs(gap_a.mean(axis=0) - [0, 0.01, 0]) < 3 * se_a)
 
 三列系数与对应的 $(f_{1,t}, 0.5 f_{2,t}, 0.5 f_{3,t})$ 的相关系数都在 0.9 以上，噪声的标准差与 $\sigma_\varepsilon/\sqrt N$ 相差不到 20%，噪声的时间平均与 0 的距离在 3 倍标准误以内；加入 $\theta_1 = 0.01$ 后，$z_1$ 的系数平均多出 $\theta_1$（均由 `assert` 保证）。同一种子下两个市场的因子、特征与异质性冲击完全相同，只有收益中多了 $\alpha_{i,t}$，所以两次回归的差别完全来自 $\bv\theta$。实际的 Barra 模型还包含行业因子，并且回归通常按市值的平方根加权，这些细节不改变上面的逻辑。
 
+这些名词在学术论文、国内量化业界与本书中的不同口径，集中整理在[术语对照：学术与业界](../glossary.md)一页，例如[因子](#glossary-factor)、[载荷与暴露](#glossary-loading)与[因子收益](#glossary-factor-return)。
+
 ### 概念—符号—模拟器字段对照表
 
 | 概念 | 符号 | 维度 | 模拟器中的字段 |
@@ -519,6 +521,8 @@ assert tiny.gamma.shape == (L0 + 1, K0) and tiny.theta.shape == (L0,)          #
 assert tiny.sdf_weights.shape == (K0,) and tiny.sdf().shape == (tiny.params.n_periods,)
 print(sorted(tiny.panel.columns))
 ```
+
+表中“因子”“载荷”“定价误差”等名词，在国内量化业界常有不同的口径（例如业界的“因子”多指这里的特征），读文献或与业界交流时要先确认所指，对照见[术语对照：学术与业界](../glossary.md)。
 
 ## 0.3 记号与时点约定
 
