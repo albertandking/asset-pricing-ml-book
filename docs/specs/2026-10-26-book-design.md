@@ -22,7 +22,8 @@
 | Node.js | 本机已有 v24 | Jupyter Book 2 需要 |
 | 构建 | `jupyter book build --html --execute` | 输出静态网页 |
 | 阅读 | `jupyter book start` 或 `python -m http.server` 打开构建产物 | 不建议直接双击 HTML 文件 |
-| 版本管理 | 本地 git，不推送远程 | |
+| 版本管理 | git，公开仓库 albertandking/asset-pricing-ml-book | 2026-10-26 起公开（原定只在本地） |
+| 发布 | GitHub Actions 冷构建（`--strict`）后发布到 GitHub Pages | 网址 https://albertandking.github.io/asset-pricing-ml-book/ ；正文 CC BY-NC-SA 4.0，代码 MIT |
 
 ## 3. 目录结构
 
@@ -33,7 +34,6 @@
 ├── uv.lock
 ├── .python-version
 ├── .gitignore
-├── 参考资料/参考.md        原根目录的参考.md 移入
 ├── docs/specs/            设计文档
 ├── src/apsim/             模拟市场生成器、检验函数、作图工具
 ├── tests/                 apsim 单元测试（pytest）
@@ -158,7 +158,6 @@
 ## 9. 不在范围内
 
 - 不使用真实市场数据，不接入 CSMAR、Wind 或 AKShare 的在线接口。
-- 不部署到互联网，只在本地阅读。
 - 不生成 PDF 或 Word 版本（以后需要时可另行添加）。
 
 ## 10. 实施顺序

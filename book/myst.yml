@@ -2,6 +2,10 @@ version: 1
 project:
   title: 资产定价与机器学习：从理论到 A 股实证
   subtitle: 自包含教材
+  github: https://github.com/albertandking/asset-pricing-ml-book
+  license:
+    content: CC-BY-NC-SA-4.0
+    code: MIT
   bibliography:
     - references.bib
   math:

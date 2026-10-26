@@ -1,0 +1,61 @@
+# 推送到 main 时：运行测试，冷构建全书（执行全部代码，--strict），通过后发布到 GitHub Pages
+name: 构建并发布到 GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  # 项目页面位于 https://<用户名>.github.io/<仓库名>/，链接与静态资源需要这个前缀
+  BASE_URL: /${{ github.event.repository.name }}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装中文字体（作图用）
+        run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+
+      - uses: astral-sh/setup-uv@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+
+      - name: 安装依赖
+        run: uv sync --frozen
+
+      - name: 单元测试
+        run: uv run pytest -q
+
+      - name: 冷构建全书
+        working-directory: book
+        run: uv run jupyter book build --html --execute --strict
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: book/_build/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

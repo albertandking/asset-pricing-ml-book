@@ -58,7 +58,7 @@
 - [ ] **Step 1: 移动参考文件**
 
 ```bash
-cd C:/Users/albert/Documents/trae_projects/学术金融预测
+cd <项目根目录>
 mkdir -p 参考资料 && git mv -f 参考.md 参考资料/参考.md 2>/dev/null || mv 参考.md 参考资料/参考.md
 ```
 

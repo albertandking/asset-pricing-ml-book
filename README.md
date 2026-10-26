@@ -1,6 +1,9 @@
 # 资产定价与机器学习：从理论到 A 股实证
 
-本地阅读的自包含教材，配套模拟市场生成器 `apsim`。
+自包含教材，配套模拟市场生成器 `apsim`。
+
+- 在线阅读：<https://albertandking.github.io/asset-pricing-ml-book/>（推送到 `main` 后由 GitHub Actions 自动冷构建并发布，见 `.github/workflows/deploy.yml`）
+- 许可：正文 CC BY-NC-SA 4.0（见 `LICENSE-CONTENT.md`），代码 MIT（见 `LICENSE`）
 
 ## 前提条件
 
@@ -44,4 +47,3 @@ uv run pytest
 - `src/apsim/`：模拟市场生成器与工具函数
 - `tests/`：单元测试
 - `docs/specs/`：设计文档
-- `参考资料/`：参考材料
