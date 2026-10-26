@@ -198,3 +198,76 @@
 | `SimulatedMarket.sdf_weights` | $\mathbf b$ | |
 | `SimulatedMarket.sdf()` | $m_t$，$t = 1, \dots, T$ | |
 | `simulate_market(params, seed=0)` | | `seed` 必须以关键字传入，为整数或 `np.random.Generator` |
+
+(notation-reading)=
+## 符号读法
+
+读公式的第一步是能把它念出来。下面列出本书用到的希腊字母、修饰符号与运算符号的读法和在本书中的含义。英文读法是国际通行的念法，括号中的中文只是近似读音，帮助记忆。各章出现新符号时，会补充到这里。
+
+### 希腊字母
+
+| 符号 | 英文读法 | 近似读音 | 本书含义 |
+|---|---|---|---|
+| $\alpha$ | alpha | 阿尔法 | 定价误差 $\alpha_{i,t}$ |
+| $\beta$、$\bv\beta$ | beta | 贝塔 | 载荷 $\bv\beta_{i,t}$ |
+| $\Gamma$ | Gamma（大写） | 伽马 | 载荷矩阵 $\bv\Gamma$ |
+| $\delta$ | delta | 德尔塔 | 预留：主观贴现因子 |
+| $\varepsilon$ | epsilon | 艾普西隆 | 异质性冲击 $\varepsilon_{i,t}$ |
+| $\theta$ | theta | 西塔 | 定价误差系数 $\bv\theta$ |
+| $\kappa$ | kappa | 卡帕 | 预留：正则化系数 |
+| $\lambda$ | lambda | 兰姆达 | 因子风险溢价 $\bv\lambda$ |
+| $\mu$ | mu | 缪 | 因子均值 $\bv\mu$ |
+| $\rho$ | rho | 柔 | 预留：相关系数、Campbell–Shiller 常数 |
+| $\sigma$ | sigma（小写） | 西格玛 | 标准差，如 $\sigma_\varepsilon$、$\bv\sigma$ |
+| $\Sigma$ | Sigma（大写） | 西格玛 | 协方差矩阵 $\bv\Sigma_f$（作求和号时见下表） |
+| $\phi$ | phi（小写） | 斐 | 特征持续性 $\phi$ |
+| $\Phi$ | Phi（大写） | 斐 | 标准正态分布的分布函数 |
+
+大小写含义不同：$\sigma$ 是标准差，$\Sigma$ 是协方差矩阵；$\phi$ 是特征持续性，$\Phi$ 是正态分布函数。同一个字母加粗与否含义也不同（见本页“字体”），例如 $\beta_i$ 是单因子时的标量载荷，$\bv\beta_i$ 是载荷向量。
+
+### 修饰符号与上下标
+
+| 写法 | 读作 | 含义 |
+|---|---|---|
+| $\hat{\bv\beta}_i$ | beta hat i | 估计值：“帽子”表示从数据估计出来的量 |
+| $\bar{\mathbf g}$ | g bar | 平均值：本书中多指时间平均 |
+| $\tilde{\mathbf z}_{i,t-1}$ | z tilde i，t 减 1 | 变形后的量：本书中指在 $\mathbf z$ 前加常数 1 |
+| $\mathbf b'$ | b prime，或 b 转置 | 转置；本书中撇号 $'$ 只表示转置，不表示导数 |
+| $r_{i,t}$ | r i t（r 下标 i 逗号 t） | 下标：股票 $i$、第 $t$ 期 |
+| $R^f_{t-1}$ | R f，下标 t 减 1 | 上标 $f$ 是标签（free，无风险），不是幂次 |
+| $\sigma_\varepsilon^2$ | sigma epsilon 平方 | 上标 2 是幂次 |
+| $\mathbf I_K$ | K 阶单位矩阵 | 下标表示维度 |
+| $\mathbf 1_N$ | N 维全 1 向量 | 下标表示维度 |
+| $\Real^{N\times K}$ | R N 乘 K | 所有 $N$ 行 $K$ 列实矩阵的集合 |
+
+上标可能是幂次（$\sigma^2$），也可能是标签（$R^f$、$R^e$），要看上下文：标签通常是字母，幂次通常是数字或 $-1$。$\bv\Sigma_f^{-1}$ 读作“Sigma f 的逆”，表示逆矩阵。
+
+### 运算符与关系符号
+
+| 写法 | 读作 | 含义 |
+|---|---|---|
+| $\E[x]$ | x 的期望 | 总体均值 |
+| $\E_{t-1}[x]$ | 在 t 减 1 期信息下 x 的条件期望 | 用第 $t-1$ 期末已知的信息做的最优预测 |
+| $\E[x \mid \mathbf z]$ | 给定 z 时 x 的条件期望 | 竖线读作“给定” |
+| $\Var(x)$、$\Cov(x, y)$ | x 的方差；x 与 y 的协方差 | |
+| $\sum_{t=1}^T$ | 对 t 从 1 到 T 求和 | 大写 Sigma 作求和号 |
+| $a'b$ | a 转置乘 b | 两个列向量的内积，结果是标量 |
+| $\mathbf A\mathbf B$ | A 乘 B | 矩阵乘法 |
+| $\mathbf A^{-1}$ | A 的逆 | |
+| $\mathbf A \otimes \mathbf B$ | A 与 B 的 Kronecker 积 | 见第 0 章“模拟实验” |
+| $\operatorname{vec}(\mathbf A)$ | vec A | 把矩阵按列堆成一个长列向量 |
+| $\operatorname{diag}(\cdot)$ | diag | 由向量构成对角矩阵 |
+| $\in$ | 属于 | 如 $\mathbf f_t \in \Real^K$：$\mathbf f_t$ 是 $K$ 维向量 |
+| $\sim$ | 服从 | 如 $\varepsilon \sim N(0, \sigma^2)$：服从正态分布 |
+| $\approx$ | 约等于 | |
+| $\to$、$\infty$ | 趋于；无穷 | 如 $T \to \infty$：样本期数趋于无穷 |
+
+### 念法示范
+
+| 公式 | 念法 |
+|---|---|
+| $\bv\beta_{i,t} = \bv\Gamma'\tilde{\mathbf z}_{i,t-1}$ | beta i t 等于 Gamma 转置乘 z tilde i，t 减 1 |
+| $r_{i,t} = \alpha_{i,t} + \bv\beta_{i,t}'\mathbf f_t + \varepsilon_{i,t}$ | r i t 等于 alpha i t，加 beta i t 转置乘 f t，加 epsilon i t |
+| $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$ | m t 等于 1 减 b 转置乘括号 f t 减 mu |
+| $\mathbf b = \bv\Sigma_f^{-1}\bv\mu$ | b 等于 Sigma f 的逆乘 mu |
+| $\E_{t-1}[r_{i,t}] = \alpha_{i,t} + \bv\beta_{i,t}'\bv\lambda$ | 在 t 减 1 期信息下 r i t 的条件期望，等于 alpha i t 加 beta i t 转置乘 lambda |
