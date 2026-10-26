@@ -36,7 +36,9 @@ def setup() -> str | None:
     sans = ["Arial"] + ([chosen] if chosen else []) + ["DejaVu Sans"]
     plt.rcParams.update(
         {
-            "font.family": "sans-serif",
+            # font.family 必须直接给出字体列表：matplotlib 只在 font.family 的各项之间逐字回退，
+            # 若写成通用族 "sans-serif"，只会取 font.sans-serif 中的第一个字体，中文将显示为方框。
+            "font.family": sans,
             "font.sans-serif": sans,
             "axes.unicode_minus": False,
             "axes.prop_cycle": plt.cycler(color=list(_COLOR_CYCLE)),
