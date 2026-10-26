@@ -8,7 +8,9 @@ project:
     '\E': '\mathbb{E}'
     '\Var': '\operatorname{Var}'
     '\Cov': '\operatorname{Cov}'
-    '\R': '\mathbb{R}'
+    '\Real': '\mathbb{R}'
+    # 希腊字母向量与矩阵的粗体，如 \bv\beta、\bv{\Gamma}；拉丁字母直接用 \mathbf
+    '\bv': '\boldsymbol{#1}'
   numbering:
     equation: true
     figure: true
