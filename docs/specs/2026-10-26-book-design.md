@@ -140,7 +140,7 @@
 
 一章视为完成，需同时满足：
 
-1. `jupyter book build --html --execute` 全书构建成功，该章代码全部执行无报错；
+1. `jupyter book build --html --execute` 全书构建成功，该章代码全部执行无报错；验收必须用 `sh scripts/build.sh --clean` 冷构建（删除执行缓存后以 `--strict` 构建，代码单元中的 assert 失败或任何警告都会使构建失败）；
 2. `apsim` 新增或修改的函数通过 `pytest`；
 3. 本章各项“代码验证”的结果与推导结论一致；
 4. 用户阅读后确认，或提出的修改已完成。

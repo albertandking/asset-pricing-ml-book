@@ -20,6 +20,7 @@ project:
       children:
         - file: part0/ch00-guide.md
 site:
-  template: book-theme
+  # 固定为 @myst-theme/book 1.4.1（myst-templates/book-theme 提交 23f2df5，“v1.4.1 from 1c3581d”）
+  template: https://github.com/myst-templates/book-theme/archive/23f2df5493e23dfb1d9433c8aa64c87beb4232a3.zip
   options:
     style: _static/custom.css
