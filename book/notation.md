@@ -129,6 +129,11 @@
 | $\alpha_{i,t}$ | 定价误差（错误定价） | $\alpha_{i,t} = \E_{t-1}[m_t r_{i,t}]$ 在本书模型中等于 $\bv\theta' \mathbf z_{i,t-1}$；`panel["alpha"]` |
 | $\varepsilon_{i,t}$ | 异质性冲击 | $\varepsilon_{i,t} \sim N(0, \sigma_\varepsilon^2)$ |
 | $\mathbf g_t \in \Real^{L+1}$ | 第 $t$ 期收益对 $\tilde{\mathbf z}_{i,t-1}$ 的横截面系数，$\mathbf g_t = \bv\Gamma\mathbf f_t + (0, \bv\theta')'$ | $\hat{\mathbf g}_t$ 为第 $t$ 期的最小二乘估计，分量 $\hat g_{j,t}$，$j = 0, \dots, L$；见第 0 章 0.2 节“因子、特征、载荷的关系” |
+| $a_i$、$\hat a_i$；$\hat{\bv\beta}_i \in \Real^K$ | 股票 $i$ 时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 的截距（标量）与常数斜率（载荷）的估计 | 载荷时变时，$\hat{\bv\beta}_i$ 估计样本期内的平均载荷；$\hat{\mathbf B} \in \Real^{N\times K}$ 的第 $i$ 行为 $\hat{\bv\beta}_i'$；见第 0 章[几种回归](#sec-ch0-regs) |
+| $\mathbf F \in \Real^{T\times K}$ | 因子按期堆叠，第 $t$ 行为 $\mathbf f_t'$ | 时间序列回归的设计矩阵为 $[\mathbf 1_T, \mathbf F]$；`factors.to_numpy()` |
+| $\bar{\mathbf g} \in \Real^{L+1}$ | Fama–MacBeth 点估计 $T^{-1}\sum_t\hat{\mathbf g}_t$ | 标准误逐分量为 $\hat g_{j,t}$ 的时间序列标准差除以 $\sqrt T$；见第 0 章[几种回归](#sec-ch0-regs) |
+| $\lambda_{0,t}$、$\hat{\bv\lambda}_t \in \Real^K$、$\bar{\bv\lambda}$ | 第 $t$ 期收益对载荷估计值横截面回归的截距与斜率（每单位载荷的实现补偿），及斜率的时间平均 | 两步法的第二步；$\bar{\bv\lambda}$ 估计风险溢价 $\bv\lambda$ |
+| $\hat{\mathbf g}^{\mathrm P} \in \Real^{L+1}$ | 混合回归（pooled）的系数估计 | $\hat{\mathbf g}^{\mathrm P} = \sum_t\mathbf W_t\hat{\mathbf g}_t$，$\mathbf W_t = (\sum_s\tilde{\mathbf Z}_{s-1}'\tilde{\mathbf Z}_{s-1})^{-1}\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}$ 为 $(L+1)\times(L+1)$ 权重矩阵 |
 | $\mathbf w_t \in \Real^N$ | 第 $t$ 期的组合权重向量 | 组合收益 $\mathbf w_t'\mathbf r_t$，组合载荷 $\mathbf B_t'\mathbf w_t$；零成本多空组合满足 $\mathbf w_t'\mathbf 1_N = 0$ |
 
 ## 特征与载荷矩阵
@@ -168,7 +173,7 @@
 | $x_{t+1}$ | 支付 | 带常数项的特征向量记为 $\tilde{\mathbf z}_{i,t-1}$，不用 $x$ |
 | $P_t$ 与 $p_t$ | 大写为价格水平，小写为对数价格 | 同理，小写 $d_t$、$c_t$、$r_t$ 为对数；面板中的 $r_{i,t}$ 是水平超额收益，是明确声明的例外 |
 | $\bv\lambda$ | 因子风险溢价 | 第四部分的正则化（惩罚）系数记为 $\kappa$，或在该章另行声明，不用 $\lambda$ |
-| $\mathbf u_t$、$u_{i,t}$ | $\mathbf u_t$ 为因子的标准化冲击向量；$u_{i,t}$ 为时间序列回归的残差（标量，见第 0 章 0.2 节与习题） | 两者由字体与下标区分，不改 |
+| $\mathbf u_t$、$u_{i,t}$ | $\mathbf u_t$ 为因子的标准化冲击向量；$u_{i,t}$ 为回归残差（标量；时间序列、横截面与混合回归通用，见第 0 章 0.2 节“几种回归”与习题） | 两者由字体与下标区分，不改 |
 | $\mathbf e_{i,t}$ 与 $\varepsilon_{i,t}$ | $\mathbf e_{i,t}$ 为特征的更新冲击；$\varepsilon_{i,t}$ 为收益的异质性冲击 | 注意区分 |
 | $\mathbf c$ | 第 0 章中遗漏变量偏误的系数向量 | 只在第 0 章局部使用；粗体，与标量的对数消费 $c_t$ 不同 |
 
