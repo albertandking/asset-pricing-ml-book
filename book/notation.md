@@ -128,6 +128,8 @@
 | $\bv\lambda \in \Real^K$ | 因子风险溢价 | 因子本身是超额收益时 $\bv\lambda = \bv\mu$ |
 | $\alpha_{i,t}$ | 定价误差（错误定价） | $\alpha_{i,t} = \E_{t-1}[m_t r_{i,t}]$ 在本书模型中等于 $\bv\theta' \mathbf z_{i,t-1}$；`panel["alpha"]` |
 | $\varepsilon_{i,t}$ | 异质性冲击 | $\varepsilon_{i,t} \sim N(0, \sigma_\varepsilon^2)$ |
+| $\mathbf g_t \in \Real^{L+1}$ | 第 $t$ 期收益对 $\tilde{\mathbf z}_{i,t-1}$ 的横截面系数，$\mathbf g_t = \bv\Gamma\mathbf f_t + (0, \bv\theta')'$ | $\hat{\mathbf g}_t$ 为第 $t$ 期的最小二乘估计，分量 $\hat g_{j,t}$，$j = 0, \dots, L$；见第 0 章 0.2 节“因子、特征、载荷的关系” |
+| $\mathbf w_t \in \Real^N$ | 第 $t$ 期的组合权重向量 | 组合收益 $\mathbf w_t'\mathbf r_t$，组合载荷 $\mathbf B_t'\mathbf w_t$；零成本多空组合满足 $\mathbf w_t'\mathbf 1_N = 0$ |
 
 ## 特征与载荷矩阵
 

@@ -401,7 +401,7 @@ assert np.all(b_def > 0) and 0.92 < m_up < 0.93 and 1.18 < m_down < 1.19
 - **因子**：“小减大”组合每期的收益，例如本月的 3%；
 - **载荷**：一只股票的收益对规模因子的敏感度，例如上表的 1.2。
 
-特征与载荷是两个不同的量。小市值股票对规模因子的载荷通常为正，而它的规模特征（标准化对数市值）是负的：二者连符号都可以相反。单位也不同：特征的单位是“横截面标准差”，载荷的单位是“因子每变动 1 个百分点，股票收益变动多少个百分点”。特征可以直接观察，载荷却需要估计（例如用前面的时间序列回归）。“特征决定载荷”是一个模型假设，$\bv\Gamma$ 刻画二者的关系；本章的模拟器中这个关系是精确的线性关系，真实数据中至多是近似。
+特征与载荷是两个不同的量。小市值股票的规模特征（标准化对数市值）是负的，它对规模因子的载荷却通常为正；不过这个符号差别只是因为规模因子的方向被定义为“小减大”，如果把因子定义为“大减小”，载荷就与特征同号。二者真正的区别有三点。第一，尺度与单位不同：特征的单位是“横截面标准差”，载荷的单位是“因子每变动 1 个百分点，股票收益变动多少个百分点”；本章模拟器中载荷是 $0.5\, z_1$ 而不是 $z_1$ 本身。第二，特征可以直接观察，载荷却需要估计（例如用前面的时间序列回归）。第三，“特征决定载荷”只是一个模型假设，$\bv\Gamma$ 刻画二者的关系；本章的模拟器中这个关系是精确的线性关系，真实数据中至多是近似。
 
 **例子。** 在模拟器的默认 $\bv\Gamma$ 下，载荷为 $\bv\beta_{i,t} = (1,\ 0.5\, z_{1,i,t-1},\ 0.5\, z_{2,i,t-1})'$。设三只股票的 $z_1$ 分别为 $-1$、$0$、$2$，其他特征都为 0。按 $z_1$ 从低到高排序，它们对第 2 个因子的载荷依次为 $-0.5$、$0$、$1$，对第 1 个因子的载荷都是 1，对第 3 个因子的载荷都是 0。所以买入 $z_1$ 高的股票、卖空 $z_1$ 低的股票，得到的组合对第 1 个因子的载荷正好抵消，对第 2 个因子的载荷为正：“$z_1$ 高减低”组合的收益主要跟着 $f_{2,t}$ 走。如果把 $z_1$ 理解为“小市值程度”（负的标准化对数市值），这个组合就是“小减大”，$f_{2,t}$ 扮演规模因子的角色。
 
@@ -419,12 +419,12 @@ assert np.allclose(beta_three, [[1, -0.5, 0], [1, 0, 0], [1, 1, 0]])
 fcl = simulate_market(MarketParams(n_periods=120), seed=7)
 T_f, N_f = fcl.params.n_periods, fcl.params.n_stocks
 Z1_f = fcl.panel["z1"].unstack("stock").to_numpy()                       # (T, N)：第 t 行为各股票的 z_{1,i,t-1}
-R_f = fcl.panel["exret"].unstack("stock").to_numpy()                     # (T, N)：第 t 行为 r_t'
+exret_f = fcl.panel["exret"].unstack("stock").to_numpy()                 # (T, N)：第 t 行为 r_t'
 B_f = fcl.panel[["beta1", "beta2", "beta3"]].to_numpy().reshape(T_f, N_f, 3)   # (TN, K) -> (T, N, K)
 lo_q, hi_q = np.quantile(Z1_f, [0.3, 0.7], axis=1)                       # 各期的 30%、70% 分位数，各为 (T,)
 high, low = Z1_f >= hi_q[:, None], Z1_f <= lo_q[:, None]                # (T, N) 的布尔数组
 w_ls = high / high.sum(axis=1, keepdims=True) - low / low.sum(axis=1, keepdims=True)   # (T, N)：第 t 行为 w_t'
-ls_ret = (w_ls * R_f).sum(axis=1)                                        # (T,)：w_t'r_t
+ls_ret = (w_ls * exret_f).sum(axis=1)                                    # (T,)：w_t'r_t
 ls_beta = np.einsum("tn,tnk->tk", w_ls, B_f)                             # (T, N), (T, N, K) -> (T, K)：第 t 行为 (B_t'w_t)'
 F_f = fcl.factors.to_numpy()                                             # (T, K)
 corr_ls = np.array([np.corrcoef(ls_ret, F_f[:, k])[0, 1] for k in range(3)])
@@ -439,7 +439,7 @@ assert corr_ls[1] > 0.85 and np.all(np.abs(corr_ls[[0, 2]]) < 0.3)
 
 **业界的口径：Barra 与横截面回归。** 国内量化业界说的“因子”，多数时候指的是这里的**特征**或**信号**：“市值因子”“动量因子”“换手率因子”通常指每只股票每期的一个数值，而不是一条收益序列。Barra 风险模型的做法与此一致：它直接把标准化后的特征当作载荷，称为“因子暴露”，再在每一期用横截面回归估计“因子收益”。
 
-用本章的模型看，这相当于一个特例：$K = L+1$、$\bv\Gamma = \mathbf I_{L+1}$。常数项对应一个所有股票载荷都为 1 的因子（Barra 称为国家因子），其余每个特征对应一个因子，载荷就是特征本身，即去掉常数行与常数列之后，$\bv\Gamma$ 的其余部分是单位阵 $\mathbf I_L$；因子收益事先未知，每期由回归得到，是估计值。为什么横截面回归能估计“因子收益”？把式 {eq}`eq-ch0-alpha` 与 {eq}`eq-ch0-beta` 代入收益方程，并利用 $\bv\beta_{i,t}'\mathbf f_t = \tilde{\mathbf z}_{i,t-1}'\bv\Gamma\mathbf f_t$：
+用本章的模型看，这相当于一个特例：$K = L+1$、$\bv\Gamma = \mathbf I_{L+1}$。常数项对应一个所有股票载荷都为 1 的因子（Barra 称为国家因子；它与行业哑变量完全共线，求解方法见本小节末尾），其余每个特征对应一个因子，载荷就是特征本身，即去掉常数行与常数列之后，$\bv\Gamma$ 的其余部分是单位阵 $\mathbf I_L$；因子收益事先未知，每期由回归得到，是估计值。为什么横截面回归能估计“因子收益”？把式 {eq}`eq-ch0-alpha` 与 {eq}`eq-ch0-beta` 代入收益方程，并利用 $\bv\beta_{i,t}'\mathbf f_t = \tilde{\mathbf z}_{i,t-1}'\bv\Gamma\mathbf f_t$：
 
 ```{math}
 :enumerated: false
@@ -466,7 +466,7 @@ $z_3$～$z_5$ 的系数真值为 0（假定 $\bv\theta$ 也只作用于 $z_1$、
 # 逐期横截面回归：r_t 对 (1, z1, z2)，与 (f1, 0.5 f2, 0.5 f3) 比较（默认 Γ、θ = 0）
 X_cs = np.concatenate([np.ones((T_f, N_f, 1)),
                        fcl.panel[["z1", "z2"]].to_numpy().reshape(T_f, N_f, 2)], axis=2)   # (T, N, 3)：第 t 期为 [1_N, z1, z2]
-g_hat = np.array([np.linalg.lstsq(X_cs[t], R_f[t], rcond=None)[0] for t in range(T_f)])  # (T, 3)：第 t 行为 ĝ_t'
+g_hat = np.array([np.linalg.lstsq(X_cs[t], exret_f[t], rcond=None)[0] for t in range(T_f)])  # (T, 3)：第 t 行为 ĝ_t'
 g_true = F_f * np.array([1.0, 0.5, 0.5])                                  # 广播 (T, 3) * (3,) -> (T, 3)：(f1, 0.5 f2, 0.5 f3)
 err_cs = g_hat - g_true                                                   # (T, 3)：横截面噪声
 corr_cs = np.array([np.corrcoef(g_hat[:, k], g_true[:, k])[0, 1] for k in range(3)])
@@ -477,18 +477,17 @@ assert np.all(corr_cs > 0.9)
 assert np.all(np.abs(err_cs.std(axis=0) / noise_sd - 1) < 0.2)
 assert np.all(np.abs(err_cs.mean(axis=0)) < 3 * err_cs.std(axis=0, ddof=1) / np.sqrt(T_f))   # 噪声均值为 0
 
-# θ1 = 0.01：同一种子，只改定价误差；z1 的系数在 0.5 f2 之外多出 θ1
+# θ1 = 0.01：同一种子，只改定价误差；α = θ1 z1 在回归元张成的空间内，z1 的系数每期恰好多出 θ1
 fcl_a = simulate_market(MarketParams(n_periods=120, alpha_coef=(0.01, 0, 0, 0, 0)), seed=7)
 R_a = fcl_a.panel["exret"].unstack("stock").to_numpy()                   # (T, N)
 g_hat_a = np.array([np.linalg.lstsq(X_cs[t], R_a[t], rcond=None)[0] for t in range(T_f)])  # (T, 3)
-gap_a = g_hat_a - g_true                                                  # (T, 3)：理论上为 (0, θ1, 0) 加噪声
-se_a = gap_a.std(axis=0, ddof=1) / np.sqrt(T_f)
-print("θ1 = 0.01 时 ĝ_t − (f1, 0.5 f2, 0.5 f3) 的时间平均：", gap_a.mean(axis=0).round(4))
+gap_a = g_hat_a - g_hat                                                   # (T, 3)：两次回归系数之差，每期应恰为 (0, θ1, 0)
+print("θ1 = 0.01 与 θ = 0 的系数之差（前 3 期）：\n", gap_a[:3].round(6) + 0.0)
 assert np.array_equal(fcl_a.factors.to_numpy(), F_f)                       # 两个市场的因子相同
-assert np.all(np.abs(gap_a.mean(axis=0) - [0, 0.01, 0]) < 3 * se_a)
+assert np.allclose(gap_a, [0, 0.01, 0])                                    # 每期精确成立，不只是平均
 ```
 
-三列系数与对应的 $(f_{1,t}, 0.5 f_{2,t}, 0.5 f_{3,t})$ 的相关系数都在 0.9 以上，噪声的标准差与 $\sigma_\varepsilon/\sqrt N$ 相差不到 20%，噪声的时间平均与 0 的距离在 3 倍标准误以内；加入 $\theta_1 = 0.01$ 后，$z_1$ 的系数平均多出 $\theta_1$（均由 `assert` 保证）。同一种子下两个市场的因子、特征与异质性冲击完全相同，只有收益中多了 $\alpha_{i,t}$，所以两次回归的差别完全来自 $\bv\theta$。实际的 Barra 模型还包含行业因子，并且回归通常按市值的平方根加权，这些细节不改变上面的逻辑。
+三列系数与对应的 $(f_{1,t}, 0.5 f_{2,t}, 0.5 f_{3,t})$ 的相关系数都在 0.9 以上，噪声的标准差与 $\sigma_\varepsilon/\sqrt N$ 相差不到 20%，噪声的时间平均与 0 的距离在 3 倍标准误以内；加入 $\theta_1 = 0.01$ 后，$z_1$ 的系数每期恰好多出 $\theta_1$（均由 `assert` 保证）。同一种子下两个市场的因子、特征与异质性冲击完全相同，收益只多了 $\alpha_{i,t} = \theta_1 z_{1,i,t-1}$；它是回归元 $z_1$ 的倍数，而最小二乘系数是收益的线性函数，所以两次回归的系数之差每期精确等于 $(0, \theta_1, 0)$，没有噪声。如果 $\bv\theta$ 作用于回归中省略的 $z_3$～$z_5$，就不再精确：模拟器中特征相互独立，被省略的那部分 $\alpha_{i,t}$ 只增加噪声；真实数据中特征相关，它会使保留下来的系数产生偏误。实际的 Barra 模型还包含行业因子；国家因子与全部行业哑变量完全共线，Barra 通过约束“行业因子收益按市值加权之和为 0”来求解。回归通常还按市值的平方根加权。这些细节不改变上面的逻辑。
 
 这些名词在学术论文、国内量化业界与本书中的不同口径，集中整理在[术语对照：学术与业界](../glossary.md)一页，例如[因子](#glossary-factor)、[载荷与暴露](#glossary-loading)与[因子收益](#glossary-factor-return)。
 
