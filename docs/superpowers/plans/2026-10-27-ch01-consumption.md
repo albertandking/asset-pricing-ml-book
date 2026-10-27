@@ -20,6 +20,7 @@
   - 超过约 3 万字符就拆分子页面（第 14 条）。
   - 写作前后都要核对前向引用台账（第 16 条）。
 - 记号：标量用斜体，向量用粗体小写，矩阵用粗体大写；向量一律为列向量，转置记作 ′；希腊字母加粗用 `\bv{}`。主观贴现因子记为 $\delta$，风险厌恶系数记为 $\gamma$，对数用小写（$c_t = \log C_t$，$\Delta c_{t+1} = c_{t+1} - c_t$），无风险利率按理论写法记为 $R^f_t$（第 $t$ 期已知，适用于 $t \to t+1$）。$\rho$ 预留给相关系数。
+- 术语：$P/D$ 称“价格—红利比”，不是“市盈率”（市盈率是 $P/E$，价格与盈利之比）；第一次出现时说明二者的区别，A 股常用的股息率为 $D/P$。
 - 排版：
   - 中文用全角标点，引号用“”，数值范围用～，省略号用……，破折号用——。
   - 中文与英文、数字、行内公式之间留一个半角空格。
@@ -37,7 +38,7 @@
 | 1.2 欧拉方程与 SDF | $P_t = \E_t[m_{t+1}x_{t+1}]$，$m_{t+1} = \delta u'(C_{t+1})/u'(C_t)$，应用于股票、债券、总收益与超额收益 | 引入 $R^f_t$ 的理论写法（`ch00-model.md:180`） |
 | 1.3 风险调整 | $P = \E[x]/R^f + \Cov(m,x)$，$\E[R^e] = -R^f\Cov(m,R^e)$，说明“坏时候赚钱”的资产为什么期望收益低 | `glossary.md:209` |
 | 1.4 幂效用与对数正态消费 | 无风险利率与风险溢价的闭式解；消费 CAPM 是以不可交易因子为因子的 β 模型，$\lambda \neq \E[\Delta c]$ | `ch00-concepts.md:58`、`:185` |
-| 1.5 多期与 Lucas 树（展开写） | 价格等于未来支付的贴现和，横截性条件；独立同分布时市盈率为常数，收益与红利增长的关系 | |
+| 1.5 多期与 Lucas 树（展开写） | 价格等于未来支付的贴现和，横截性条件；独立同分布时价格—红利比为常数，收益与红利增长的关系 | |
 | 1.6 回到第 0 章 | 第 0 章的线性 SDF 是消费 SDF 的一阶近似 $m \approx \delta(1 - \gamma\Delta c)$ | `ch00-concepts.md:24`、`:289` |
 | A 股视角、模拟实验、常见误区、小结、习题（概念题、推导题、编程题各 2 道）、文献 | | |
 
@@ -79,7 +80,7 @@
 - 对数红利增长：$\Delta d_{t+1} = \mu_d + \sigma_d\eta_{t+1}$，$\eta = \rho\varepsilon + \sqrt{1-\rho^2}\,\nu$，$\nu \sim N(0,1)$，且与 $\varepsilon$ 独立。
 - SDF：$m_{t+1} = \delta\exp(-\gamma\Delta c_{t+1})$。
 - $\E[m] = \delta\exp(-\gamma\mu_c + \gamma^2\sigma_c^2/2)$，$R^f = 1/\E[m]$。
-- $a = \E[m e^{\Delta d}] = \delta\exp\big(\mu_d - \gamma\mu_c + (\sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho\sigma_c\sigma_d)/2\big)$，要求 $a < 1$；市盈率 $P/D = a/(1-a)$。
+- $a = \E[m e^{\Delta d}] = \delta\exp\big(\mu_d - \gamma\mu_c + (\sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho\sigma_c\sigma_d)/2\big)$，要求 $a < 1$；价格—红利比 $P/D = a/(1-a)$。
 - 总收益：$R_{t+1} = e^{\Delta d_{t+1}}/a$；$\E[R] = e^{\mu_d+\sigma_d^2/2}/a$；$\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$（精确成立）。
 
 - [ ] **Step 1：写 `tests/test_rng.py` 和 `src/apsim/_rng.py`，并让 market 改用它**
@@ -227,7 +228,7 @@ def test_invalid_n_years(n):
 - 对数红利增长：Δd_{t+1} = μ_d + σ_d η_{t+1}，η = ρ ε + sqrt(1 − ρ²) ν，ν ~ N(0, 1) 与 ε 独立。
 - 幂效用的 SDF：m_{t+1} = δ exp(−γ Δc_{t+1})。
 - E[m] = δ exp(−γ μ_c + γ² σ_c² / 2)，R^f = 1 / E[m]（常数）。
-- 红利索取权：增长独立同分布时市盈率为常数 P/D = a / (1 − a)，
+- 红利索取权：增长独立同分布时价格—红利比为常数 P/D = a / (1 − a)，
   a = E[m e^{Δd}] = δ exp(μ_d − γ μ_c + (σ_d² + γ² σ_c² − 2γρσ_cσ_d) / 2)，须 a < 1。
 - 总收益 R_{t+1} = e^{Δd_{t+1}} / a；E[R] = e^{μ_d + σ_d²/2} / a；
   对数股权溢价 log(E[R] / R^f) = γ ρ σ_c σ_d（精确成立）。
@@ -295,7 +296,7 @@ class ConsumptionParams:
 
     @property
     def price_dividend_ratio(self) -> float:
-        """市盈率 P/D = a / (1 − a)；a ≥ 1 时价格无穷大，抛出 ValueError。"""
+        """价格—红利比 P/D = a / (1 − a)；a ≥ 1 时价格无穷大，抛出 ValueError。"""
         a = self.dividend_discount
         if a >= 1.0:
             raise ValueError(f"a = E[m e^Δd] = {a:.4f} ≥ 1，红利索取权的价格无穷大（横截性条件不成立）")
@@ -410,7 +411,7 @@ git commit -m "feat(apsim): 新增 consumption 模块（幂效用、对数正态
   - 多期迭代：$P_t = \E_t\sum_{j\ge1} M_{t,t+j}D_{t+j}$，并写出横截性条件。
   - Lucas 树：红利等于消费（$\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$）是特例。一般情形给出 $P/D = a/(1-a)$，推导要完整，并解释 $a < 1$ 的含义：横截性条件、价格有限。
   - 用 `simulate_consumption` 画一条模拟的红利、价格和收益路径。可以画图，作图前调用 `apsim.plotting.setup()`，线条较少时直接标注。
-  - 说明独立同分布模型的局限：市盈率不变，所以收益不可预测；第 6 章再引入时变的贴现率。
+  - 说明独立同分布模型的局限：价格—红利比不变，所以收益不可预测；第 6 章再引入时变的贴现率。
 - **1.6**：把 $m = \delta e^{-\gamma\Delta c}$ 在 $\mu_c$ 处线性化，得到 $m \approx \E[m](1 - \gamma(\Delta c - \mu_c))$，这就是第 0 章 $m = 1 - \mathbf b'(\mathbf f - \bv\mu)$ 的一维形式（按 $\E[m]$ 归一化）。逐项对照第 0 章的记号，并说明第 0 章“因子是超额收益”与这里“因子是消费增长”的区别，引出第 3、4 章。
 
 - [ ] **Step 4：写 A 股视角、模拟实验、常见误区、小结、习题、文献**
@@ -421,7 +422,7 @@ git commit -m "feat(apsim): 新增 consumption 模块（幂效用、对数正态
   - 风险溢价闭式解与模拟样本均值一致，用 assert 守护，阈值要写明理由；
   - 用 $\Delta c$ 做时间序列回归求 β 再乘 $\lambda_c$ 的消费 CAPM 近似，与精确值比较。回归用 `apsim.stats.ols`。
 - **常见误区**：至少 3 条，例如：把 $\gamma$ 同时当作风险厌恶与跨期替代弹性的倒数而不加说明；把 $\lambda_c$ 当作 $\E[\Delta c]$；忽视 $a < 1$ 的条件。
-- **习题**：概念题 2 道、推导题 2 道（其中 1 道推导 $\log R^f$ 的闭式解，或推导 Lucas 树的市盈率）、编程题 2 道。全部给出折叠的解答，数值答案用 assert 核对。
+- **习题**：概念题 2 道、推导题 2 道（其中 1 道推导 $\log R^f$ 的闭式解，或推导 Lucas 树的价格—红利比）、编程题 2 道。全部给出折叠的解答，数值答案用 assert 核对。
 - **文献**：只引用 `references.bib` 中有的条目，以及确定无误的经典文献（例如 Lucas 1978 Econometrica 46(6):1429–1445、Hansen–Singleton 1983 JPE 91(2):249–265、Breeden 1979 JFE 7(3):265–296、Rubinstein 1976 Bell J. Econ. 7(2):407–425），卷、期、页码必须核对；不确定的不加。
 
 - [ ] **Step 5：构建与自查**
