@@ -48,7 +48,7 @@ K = MarketParams().n_factors                                # 因子个数 K = 3
 :::{solution} ex-ch0-timing
 :class: dropdown
 1. 第 $t$ 期末的市值是价格 $P_{i,t}$ 乘以股本，而 $P_{i,t}$ 已经包含了第 $t$ 期的收益。按它分组，再看同一期的收益，相当于用结果去解释结果：第 $t$ 期上涨的股票市值变大、下跌的变小，于是“小市值组”机械地集中了本期下跌的股票。正确的做法是按第 $t-1$ 期末的市值分组，计算第 $t$ 期的收益；在本书的面板中，就是用同一行的 `z` 列解释 `exret` 列。研究者发现的“大市值组收益更高”，正是这种机械效应的结果，与期望收益无关。
-2. 不会。模拟器中 $\mathbf z_{i,t} = \phi \mathbf z_{i,t-1} + \sqrt{1-\phi^2} \mathbf e_{i,t}$（[拆解](#ch0-unpack-char)），更新冲击 $\mathbf e_{i,t}$ 与 $r_{i,t}$ 独立，所以 $\mathbf z_{i,t}$ 只是 $\mathbf z_{i,t-1}$ 的一个含噪声的版本，错用它只会把真实的关系衰减为原来的 $\phi$ 倍（见“常见误区”一节的推导与代码）。真实数据中，特征的更新与当期收益相关（市值、动量、换手率、波动率等都直接由当期价格或成交量计算），所以错用同期特征会制造虚假的预测力。这也提醒我们：模拟只能检验我们放进模型的机制。
+2. 不会。模拟器中 $\mathbf z_{i,t} = \phi \mathbf z_{i,t-1} + \sqrt{1-\phi^2} \mathbf e_{i,t}$（[拆解](#ch0-unpack-char)），更新冲击 $\mathbf e_{i,t}$ 与 $r_{i,t}$ 独立，所以 $\mathbf z_{i,t}$ 只是 $\mathbf z_{i,t-1}$ 的一个含噪声的版本，错用它只会把真实的关系衰减为原来的 $\phi$ 倍（见[“常见误区”一节](#sec-ch0-pitfalls)的推导与代码）。真实数据中，特征的更新与当期收益相关（市值、动量、换手率、波动率等都直接由当期价格或成交量计算），所以错用同期特征会制造虚假的预测力。这也提醒我们：模拟只能检验我们放进模型的机制。
 :::
 
 :::{exercise} 无条件定价误差为零，是否说明没有错误定价？
@@ -251,7 +251,7 @@ e0, e99 = small_n["平均 RMSE"].iloc[0], small_n["平均 RMSE"].iloc[-1]
 assert e99 > 1.15 * e0 and e99 - e0 > 3 * np.hypot(*small_n["其标准误"].iloc[[0, -1]])
 ```
 
-**拆开讲均方根误差。** $\hat\Gamma_{j,k} - \Gamma_{j,k}$ 是 $(L+1)K$ 个系数（默认 18 个）各自的估计误差，单位与 $\Gamma$ 相同，即“特征每高 1 个标准差，载荷变化多少”；平方后对全部 $(j, k)$ 平均、再开平方，得到“典型的一个系数差多少”。代码中的 `np.sqrt(np.mean((g_hat - rep.gamma) ** 2))` 对 $(L+1)\times K$ 矩阵的全部元素求平均；这里的 `g_hat` 是 $\hat{\bv\Gamma}$，不是横截面回归的 $\hat{\mathbf g}_t$。**特例**：只有一个系数时，它就是这个系数估计误差的绝对值。
+**拆开讲均方根误差。** $\hat\Gamma_{j,k} - \Gamma_{j,k}$ 是 $(L+1)K$ 个系数（默认 18 个）各自的估计误差，单位与 $\Gamma$ 相同：$j \geq 1$ 的行是“特征每高 1 个标准差，载荷变化多少”，第 0 行是全部特征处于平均水平时的基准载荷；平方后对全部 $(j, k)$ 平均、再开平方，得到“典型的一个系数差多少”。代码中的 `np.sqrt(np.mean((g_hat - rep.gamma) ** 2))` 对 $(L+1)\times K$ 矩阵的全部元素求平均；这里的 `g_hat` 是 $\hat{\bv\Gamma}$，不是横截面回归的 $\hat{\mathbf g}_t$。**特例**：只有一个系数时，它就是这个系数估计误差的绝对值。
 
 $N = 200$ 时，四种持续性下的平均误差几乎相同：最大值与最小值相差不到 5%，也小于两倍蒙特卡洛标准误（由 `assert` 保证）。原因是：在 $\varepsilon_{i,t}$ 与解释变量独立的条件下，最小二乘估计的条件协方差为 $\sigma_\varepsilon^2 (\mathbf X'\mathbf X)^{-1}$，而由式 {eq}`eq-ch0-kron` 与混合乘积规则，$\mathbf X'\mathbf X = \sum_t \left(\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'\right) \otimes \mathbf f_t\mathbf f_t'$，这是 $(L+1)\times(L+1)$ 矩阵与 $K\times K$ 矩阵的 Kronecker 积之和，为 $(L+1)K\times(L+1)K$ 矩阵（各部分的拆解见[推导要用到的几个矩阵](#ch0-unpack-ovb)与[拆解](#ch0-unpack-xtx)）。特征的边际分布始终是 $N(\mathbf 0, \mathbf I_L)$，与 $\phi$ 无关；$\phi$ 只决定同一只股票的特征在不同期之间是否相似。当 $N$ 足够大时，每一期的横截面矩 $N^{-1}\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'$ 都接近 $\mathbf I_{L+1}$，$\mathbf X'\mathbf X$ 也就几乎不受 $\phi$ 影响。
 
@@ -270,7 +270,7 @@ $N = 10$ 时，$\phi = 0.99$ 的误差明显变大：比 $\phi = 0$ 时高出 15
 :class: dropdown
 :::
 
-先对每一期计算横截面平均 $\mathbf g_t = N^{-1}\sum_i m_t r_{i,t} \mathbf z_{i,t-1} \in \Real^L$，再对 $\mathbf g_t$ 求时间序列均值。由于因子冲击在同一期内影响所有股票，$\mathbf g_t$ 已经把同期相关“吸收”进去了，而不同期的 $\mathbf g_t$ 近似独立：$\mathbf f_t$、$\varepsilon_{i,t}$ 跨期独立；$\mathbf g_t$ 的条件均值 $N^{-1}\sum_i \mathbf z_{i,t-1} \mathbf z_{i,t-1}'\bv\theta$（$L\times L$ 乘 $L\times 1$）随特征缓慢变化，但其波动只有 $N^{-1/2}$ 的量级，远小于因子冲击带来的波动。所以第 $j$ 个分量的标准误可用 $\text{Std}(g_{j,t})/\sqrt{T}$，代码中同时计算 $g_{1,t}$ 的一阶自相关加以确认；单个样本的自相关本身有约 $1/\sqrt{T}$ 的抽样误差，所以再用 100 个种子重复，看其平均值是否接近 0。把 $NT$ 个观测当作独立样本计算的标准误，会低估同期相关较强的那些矩的不确定性。
+先对每一期计算横截面平均 $\mathbf g_t = N^{-1}\sum_i m_t r_{i,t} \mathbf z_{i,t-1} \in \Real^L$（注意这里的 $\mathbf g_t$ 是 $L$ 维的管理组合矩，与 0.2 节横截面回归中 $L+1$ 维的系数向量 $\mathbf g_t$ 不是同一个量，见[拆解](#ch0-unpack-g)，只是沿用了代码中的名字 `g`），再对 $\mathbf g_t$ 求时间序列均值。由于因子冲击在同一期内影响所有股票，$\mathbf g_t$ 已经把同期相关“吸收”进去了，而不同期的 $\mathbf g_t$ 近似独立：$\mathbf f_t$、$\varepsilon_{i,t}$ 跨期独立；$\mathbf g_t$ 的条件均值 $N^{-1}\sum_i \mathbf z_{i,t-1} \mathbf z_{i,t-1}'\bv\theta$（$L\times L$ 乘 $L\times 1$）随特征缓慢变化，但其波动只有 $N^{-1/2}$ 的量级，远小于因子冲击带来的波动。所以第 $j$ 个分量的标准误可用 $\text{Std}(g_{j,t})/\sqrt{T}$，代码中同时计算 $g_{1,t}$ 的一阶自相关加以确认；单个样本的自相关本身有约 $1/\sqrt{T}$ 的抽样误差，所以再用 100 个种子重复，看其平均值是否接近 0。把 $NT$ 个观测当作独立样本计算的标准误，会低估同期相关较强的那些矩的不确定性。
 
 (ch0-unpack-thetahat)=
 **拆开讲 $\hat{\bv\theta}$ 与 $\mathbf g_t$。** $\hat{\bv\theta}$ 是[推论 %s](#cor-ch0-managed) 中 $L\times 1$ 矩向量的样本版本（各分量的含义见[拆解](#ch0-unpack-managed)），第 $j$ 个分量 $\hat\theta_j = (NT)^{-1}\sum_t\sum_i m_t r_{i,t} z_{j,i,t-1}$ 是按特征 $j$ 加权的管理组合的样本定价误差。两步算法就是把双重求和拆开：$\hat{\bv\theta} = T^{-1}\sum_t \mathbf g_t$，其中
@@ -280,7 +280,7 @@ $N = 10$ 时，$\phi = 0.99$ 的误差明显变大：比 $\phi = 0$ 时高出 15
 \underbrace{\mathbf g_t}_{L\times 1} = \begin{pmatrix} g_{1,t} \\ \vdots \\ g_{L,t} \end{pmatrix} , \qquad g_{j,t} = \frac{1}{N}\sum_{i=1}^{N} m_t r_{i,t} z_{j,i,t-1} .
 ```
 
-注意这里的 $\mathbf g_t$ 是 $L$ 维的管理组合矩，与 0.2 节横截面回归中 $L+1$ 维的系数向量 $\mathbf g_t$（[拆解](#ch0-unpack-g)）不是同一个量，只是沿用了代码中的名字 `g`。$\mathbf g_t$ 的条件均值 $N^{-1}\sum_i \mathbf z_{i,t-1}\mathbf z_{i,t-1}'\bv\theta$ 中，$N^{-1}\sum_i \mathbf z_{i,t-1}\mathbf z_{i,t-1}'$ 是 $L\times L$ 的横截面二阶矩，接近 $\mathbf I_L$，所以条件均值接近 $\bv\theta$。**特例**：$L = 1$ 时 $\mathbf g_t$ 只有一个分量 $g_{1,t}$；下面的代码检查序列相关时，也只用第一个分量 $g_{1,t}$。**数据矩阵**：代码中 `g` 的形状为 `(T, L)`，第 $t$ 行是 $\mathbf g_t'$；按期标准误 $\text{Std}(g_{j,t})/\sqrt{T}$ 用的是这 $T$ 个数的波动，同一期的 $N$ 只股票先在 $\mathbf g_t$ 中平均。
+$\mathbf g_t$ 的条件均值 $N^{-1}\sum_i \mathbf z_{i,t-1}\mathbf z_{i,t-1}'\bv\theta$ 中，$N^{-1}\sum_i \mathbf z_{i,t-1}\mathbf z_{i,t-1}'$ 是 $L\times L$ 的横截面二阶矩，接近 $\mathbf I_L$，所以条件均值接近 $\bv\theta$。**特例**：$L = 1$ 时 $\mathbf g_t$ 只有一个分量 $g_{1,t}$；下面的代码检查序列相关时，也只用第一个分量 $g_{1,t}$。**数据矩阵**：代码中 `g` 的形状为 `(T, L)`，第 $t$ 行是 $\mathbf g_t'$；按期标准误 $\text{Std}(g_{j,t})/\sqrt{T}$ 用的是这 $T$ 个数的波动，同一期的 $N$ 只股票先在 $\mathbf g_t$ 中平均。
 
 ```{code-cell} python
 th_params = MarketParams(alpha_coef=(0.01, -0.005, 0.0, 0.0, 0.0))
