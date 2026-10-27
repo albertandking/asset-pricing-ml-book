@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="资产定价与机器学习">
+  <!-- 蓝底圆角方块：散布在一条向上倾斜的拟合线两侧的三个点，寓意“期望收益与载荷成正比”的横截面回归 -->
+  <rect width="64" height="64" rx="14" fill="#2a78d6"/>
+  <line x1="12" y1="48" x2="52" y2="16" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="20" cy="31" r="5" fill="#ffd27a"/>
+  <circle cx="35" cy="40" r="5" fill="#ffd27a"/>
+  <circle cx="44" cy="13.5" r="5" fill="#ffd27a"/>
+</svg>

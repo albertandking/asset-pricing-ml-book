@@ -39,5 +39,9 @@ site:
   template: https://github.com/myst-templates/book-theme/archive/23f2df5493e23dfb1d9433c8aa64c87beb4232a3.zip
   options:
     style: _static/custom.css
+    # 图标：散点与拟合线，源文件为 _static/logo.svg；favicon.ico 由同一几何图形生成（16～64 像素）
+    favicon: _static/favicon.ico
+    logo: _static/logo.svg
+    logo_alt: 资产定价与机器学习
     # 左上角显示书名（不设置时主题显示“Made with MyST”）
     logo_text: 资产定价与机器学习：从理论到 A 股实证
