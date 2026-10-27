@@ -86,7 +86,7 @@
 
 | 记号 | 含义 | 说明 |
 |---|---|---|
-| $t$ | 时间下标（期） | 本书模拟数据为月度，$t = 1, \dots, T$ |
+| $t$ | 时间下标（期） | 第 0 章的模拟市场为月度，第 1 章的 `apsim.consumption` 为年度；$t = 1, \dots, T$ |
 | $i$ | 资产（股票）下标 | 理论推导中 $i = 1, \dots, N$；`apsim` 中股票编号从 0 开始，为 $0, \dots, N-1$ |
 | $T$ | 期数 | `MarketParams.n_periods` |
 | $N$ | 股票数 | `MarketParams.n_stocks` |
@@ -111,9 +111,36 @@
 | $R^f_t$ | 无风险总收益 | 第 $t$ 期末已知，适用于从 $t$ 到 $t+1$ |
 | $R^e_{t+1}$ | 超额收益 | $R^e_{t+1} = R_{t+1} - R^f_t$ |
 | $r_{i,t}$ | 股票 $i$ 在第 $t$ 期的超额收益（面板记号，水平值） | 即 $R^e_{i,t}$ 的面板写法；`panel["exret"]`；是下文对数约定的例外 |
-| $p_t$、$d_t$、$c_t$、$r_t$ | 对数价格、对数红利、对数消费、对数收益 | 第 1、6、7 章的惯例，如 $p_t = \log P_t$ |
+| $p_t$、$d_t$、$c_t$、$r_t$ | 对数价格、对数红利、对数消费、对数收益 | 如 $p_t = \log P_t$；第 1 章起使用 $c_t$、$d_t$，第 1 章不用 $r_t$，对数收益直接写作 $\log R_{t+1}$；第 6、7 章沿用 |
 | $m_{t+1}$ | 随机贴现因子（stochastic discount factor，SDF） | 面板部分写作 $m_t$；`SimulatedMarket.sdf()` |
 | $P_t = \E_t[m_{t+1} x_{t+1}]$ | 基本定价方程 | 对总收益为 $1 = \E_t[m_{t+1} R_{t+1}]$，对超额收益为 $0 = \E_t[m_{t+1} R^e_{t+1}]$ |
+
+## 消费、偏好与 Lucas 树（第 1 章）
+
+第 1 章的数值例子都使用年度的假设参数。下表“说明”一列给出对应的 `apsim.consumption` 字段：`ConsumptionParams` 的参数与只读属性，以及 `simulate_consumption` 返回值中 `data` 的列。
+
+| 记号 | 含义 | 说明 |
+|---|---|---|
+| $C_t$ | 第 $t$ 期的消费（水平） | 大写为水平；Lucas 树中 $C_t = D_t$ |
+| $c_t$、$\Delta c_{t+1}$ | 对数消费 $\log C_t$；对数消费增长 $c_{t+1} - c_t = \mu_c + \sigma_c\varepsilon_{t+1}$ | $\Delta c_t$ 为 `data["dc"]` |
+| $D_t$ | 第 $t$ 期的红利（水平） | 红利索取权获得红利流 $D_{t+1}, D_{t+2}, \dots$ |
+| $d_t$、$\Delta d_{t+1}$ | 对数红利 $\log D_t$；对数红利增长 $\mu_d + \sigma_d\eta_{t+1}$ | $\Delta d_t$ 为 `data["dd"]` |
+| $\delta$ | 主观贴现因子，$\delta \in (0, 1)$，越小越没耐心 | `delta`，默认 0.99 |
+| $\gamma$ | 风险厌恶系数（相对风险厌恶系数 $-Cu''(C)/u'(C)$）；幂效用下跨期替代弹性为 $1/\gamma$ | `gamma`，默认 2；与载荷矩阵 $\bv\Gamma$ 无关 |
+| $u(\cdot)$ | 效用函数；幂效用 $u(C) = C^{1-\gamma}/(1-\gamma)$，$u'(C) = C^{-\gamma}$ | 撇号在这里表示导数，见“已预留与已知冲突” |
+| $e_t$、$\xi$ | 1.1 节两期问题中的收入（禀赋）与买入资产的份数 | 只在 1.1 节局部使用 |
+| $m_{t+1} = \delta e^{-\gamma\Delta c_{t+1}}$ | 幂效用下的 SDF | $m_t$ 为 `data["m"]`；$\E[m]$ 为 `sdf_mean` |
+| $M_{t,t+j}$ | 从第 $t$ 期到第 $t+j$ 期的多期 SDF $m_{t+1}m_{t+2}\cdots m_{t+j}$，$M_{t,t} = 1$ | 为第 $t+j$ 期的支付定价 |
+| $\mu_c$、$\sigma_c$ | 对数消费增长的均值、标准差 | `mu_c`、`sigma_c`，默认均为 0.02 |
+| $\mu_d$、$\sigma_d$ | 对数红利增长的均值、标准差 | `mu_d`、`sigma_d`，默认 0.02、0.12 |
+| $\rho$ | 消费增长与红利增长的相关系数，$\Cov(\Delta c, \Delta d) = \rho\sigma_c\sigma_d$ | `rho_cd`，默认 0.5 |
+| $\varepsilon_{t+1}$、$\nu_{t+1}$、$\eta_{t+1}$ | 消费冲击、与之独立的红利冲击、红利增长的标准化冲击 $\eta_{t+1} = \rho\varepsilon_{t+1} + \sqrt{1-\rho^2}\,\nu_{t+1}$ | 都是标准正态的标量；$\varepsilon_{t+1}$ 不带资产下标，与异质性冲击 $\varepsilon_{i,t}$ 不同 |
+| $a$ | $\E[m_{t+1}e^{\Delta d_{t+1}}]$：明年红利增长因子 $D_{t+1}/D_t$ 的索取权今天的价格；$a^j$ 对应第 $j$ 年 | `dividend_discount`；$a < 1$ 是价格为正且有限的条件 |
+| $P_t/D_t$ | 价格—红利比（$P/D$），独立同分布时为常数 $a/(1-a)$ | `price_dividend_ratio`（$a \geq 1$ 时抛出 `ValueError`）；倒数 $D/P$ 为股息率；不是市盈率 $P/E$ |
+| $R_{t+1}$、$R^f$ | 红利索取权的总收益 $e^{\Delta d_{t+1}}/a$；无风险总收益 $1/\E[m]$（常数） | `data["R"]`、`data["Rf"]`；$\E[R]$ 为 `expected_return`，$R^f$ 为 `risk_free` |
+| $\log(\E[R]/R^f)$ | 对数溢价，对红利索取权等于 $\gamma\rho\sigma_c\sigma_d$ | `log_equity_premium` |
+| $\beta_{\Delta c}$ | 超额收益对消费增长做时间序列回归的斜率 $\Cov(R^e, \Delta c)/\Var(\Delta c)$ | 消费 CAPM：$\E[R^e] \approx \beta_{\Delta c}\lambda_c$ |
+| $\lambda_c$ | 消费增长的风险溢价 $\gamma\sigma_c^2$，即每单位 $\beta_{\Delta c}$ 的补偿 | 不等于 $\E[\Delta c] = \mu_c$；无对应字段 |
 
 ## 因子、载荷与定价误差
 
@@ -168,14 +195,17 @@
 
 | 记号 | 约定 | 说明 |
 |---|---|---|
-| $\delta$ | 主观贴现因子（Campbell 等文献的惯例） | 定价误差系数因此记为 $\bv\theta$，不用 $\delta$ |
-| $\rho$ | Campbell–Shiller 对数线性化常数；相关系数 | 特征持续性因此记为 $\phi$ |
+| $\delta$ | 主观贴现因子（Campbell 等文献的惯例），第 1 章起正式使用 | 定价误差系数因此记为 $\bv\theta$，不用 $\delta$ |
+| $\gamma$ 与 $\bv\Gamma$ | 小写 $\gamma$ 为风险厌恶系数（第 1 章起）；大写粗体 $\bv\Gamma$ 为载荷矩阵 | 由大小写与字体区分；代码中 `ConsumptionParams.gamma` 与 `MarketParams.gamma` 同名，前者是标量，后者是载荷矩阵 |
+| $\rho$ | 相关系数（第 1 章为消费增长与红利增长的相关系数，代码 `rho_cd`）；Campbell–Shiller 对数线性化常数（第 6 章） | 特征持续性因此记为 $\phi$ |
 | $s_t$ | Campbell–Cochrane 模型中的（对数）盈余消费比 | 异质性波动率因此记为 $\sigma_\varepsilon$；最小二乘的残差方差估计记作 $\hat\sigma_\varepsilon^2$，不用 $s^2$ |
 | $x_{t+1}$ | 支付 | 带常数项的特征向量记为 $\tilde{\mathbf z}_{i,t-1}$，不用 $x$ |
 | $P_t$ 与 $p_t$ | 大写为价格水平，小写为对数价格 | 同理，小写 $d_t$、$c_t$、$r_t$ 为对数；面板中的 $r_{i,t}$ 是水平超额收益，是明确声明的例外 |
 | $\bv\lambda$ | 因子风险溢价 | 第四部分的正则化（惩罚）系数记为 $\kappa$，或在该章另行声明，不用 $\lambda$ |
-| $\mathbf u_t$、$u_{i,t}$ | $\mathbf u_t$ 为因子的标准化冲击向量；$u_{i,t}$ 为回归残差（标量；时间序列、横截面与混合回归通用，见[导读：几种回归](#sec-ch0-regs)与第 0 章习题） | 两者由字体与下标区分，不改 |
-| $\mathbf e_{i,t}$ 与 $\varepsilon_{i,t}$ | $\mathbf e_{i,t}$ 为特征的更新冲击；$\varepsilon_{i,t}$ 为收益的异质性冲击 | 注意区分 |
+| $\mathbf u_t$、$u_{i,t}$、$u(\cdot)$ | $\mathbf u_t$ 为因子的标准化冲击向量；$u_{i,t}$ 为回归残差（标量；时间序列、横截面与混合回归通用，见[导读：几种回归](#sec-ch0-regs)与第 0 章习题）；$u(\cdot)$ 为效用函数（第 1 章） | 三者由字体、下标与括号中的自变量区分，不改 |
+| $\mathbf e_{i,t}$ 与 $\varepsilon_{i,t}$ | $\mathbf e_{i,t}$ 为特征的更新冲击；$\varepsilon_{i,t}$ 为收益的异质性冲击 | 注意区分；第 1 章的 $e_t$（标量，收入）与 $\varepsilon_{t+1}$（消费冲击）不带资产下标 |
+| $a$ 与 $a_i$ | $a$ 为第 1 章的常数 $\E[m_{t+1}e^{\Delta d_{t+1}}]$；$a_i$ 为时间序列回归的截距 | 由下标区分 |
+| 撇号 $'$ | 作用于向量、矩阵时表示转置；作用于标量函数时表示导数，如 $u'(C)$、$u''(C)$、$V'(\xi)$（第 1 章） | 由作用对象区分：本书的转置只作用于粗体的向量与矩阵 |
 | $\mathbf W_t$ | 第 0 章中混合回归与 Fama–MacBeth 关系式里的 $(L+1)\times(L+1)$ 权重矩阵 | 只在第 0 章局部使用；第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关 |
 | $\mathbf c$ | 第 0 章中遗漏变量偏误的系数向量 | 只在第 0 章局部使用；粗体，与标量的对数消费 $c_t$ 不同 |
 
@@ -198,6 +228,12 @@
 | `SimulatedMarket.sdf_weights` | $\mathbf b$ | |
 | `SimulatedMarket.sdf()` | $m_t$，$t = 1, \dots, T$ | |
 | `simulate_market(params, seed=0)` | | `seed` 必须以关键字传入，为整数或 `np.random.Generator` |
+| `ConsumptionParams.delta`、`gamma` | $\delta$、$\gamma$ | 第 1 章；`gamma` 是标量，与 `MarketParams.gamma` 无关 |
+| `mu_c`、`sigma_c`、`mu_d`、`sigma_d`、`rho_cd` | $\mu_c$、$\sigma_c$、$\mu_d$、$\sigma_d$、$\rho$ | 年度假设参数 |
+| `sdf_mean`、`risk_free` | $\E[m]$、$R^f = 1/\E[m]$ | 只读属性 |
+| `dividend_discount`、`price_dividend_ratio` | $a$、$P/D = a/(1-a)$ | $a \geq 1$ 时后者抛出 `ValueError` |
+| `expected_return`、`log_equity_premium` | $\E[R]$、$\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$ | 红利索取权 |
+| `simulate_consumption(params, seed=0, n_years=1000).data` 的列 `dc`、`dd`、`m`、`R`、`Rf` | $\Delta c_t$、$\Delta d_t$、$m_t$、$R_t$、$R^f$ | 索引 `year` 取 $1, \dots, T$；`seed` 的规则同 `simulate_market` |
 
 (notation-reading)=
 ## 符号读法
@@ -210,20 +246,25 @@
 |---|---|---|---|
 | $\alpha$ | alpha | 阿尔法 | 定价误差 $\alpha_{i,t}$ |
 | $\beta$、$\bv\beta$ | beta | 贝塔 | 载荷 $\bv\beta_{i,t}$ |
+| $\gamma$ | gamma（小写） | 伽马 | 风险厌恶系数 $\gamma$ |
 | $\Gamma$ | Gamma（大写） | 伽马 | 载荷矩阵 $\bv\Gamma$ |
-| $\delta$ | delta | 德尔塔 | 预留：主观贴现因子 |
-| $\varepsilon$ | epsilon | 艾普西隆 | 异质性冲击 $\varepsilon_{i,t}$ |
+| $\delta$ | delta（小写） | 德尔塔 | 主观贴现因子 $\delta$ |
+| $\Delta$ | Delta（大写） | 德尔塔 | 一期的变化，如 $\Delta c_{t+1} = c_{t+1} - c_t$ |
+| $\varepsilon$ | epsilon | 艾普西隆 | 异质性冲击 $\varepsilon_{i,t}$；第 1 章的消费冲击 $\varepsilon_{t+1}$ |
+| $\eta$ | eta | 伊塔 | 第 1 章红利增长的标准化冲击 $\eta_{t+1}$ |
 | $\theta$ | theta | 西塔 | 定价误差系数 $\bv\theta$ |
 | $\kappa$ | kappa | 卡帕 | 预留：正则化系数 |
-| $\lambda$ | lambda | 兰姆达 | 因子风险溢价 $\bv\lambda$ |
-| $\mu$ | mu | 缪 | 因子均值 $\bv\mu$ |
-| $\rho$ | rho | 柔 | 预留：相关系数、Campbell–Shiller 常数 |
-| $\sigma$ | sigma（小写） | 西格玛 | 标准差，如 $\sigma_\varepsilon$、$\bv\sigma$ |
+| $\lambda$ | lambda | 兰姆达 | 因子风险溢价 $\bv\lambda$；消费增长的风险溢价 $\lambda_c$ |
+| $\mu$ | mu | 缪 | 因子均值 $\bv\mu$；对数增长的均值 $\mu_c$、$\mu_d$ |
+| $\nu$ | nu | 纽 | 第 1 章与消费冲击独立的红利冲击 $\nu_{t+1}$ |
+| $\xi$ | xi | 克西 | 1.1 节中买入资产的份数 $\xi$ |
+| $\rho$ | rho | 柔 | 相关系数（第 1 章为消费增长与红利增长的相关系数）；预留：Campbell–Shiller 常数 |
+| $\sigma$ | sigma（小写） | 西格玛 | 标准差，如 $\sigma_\varepsilon$、$\bv\sigma$、$\sigma_c$、$\sigma_d$ |
 | $\Sigma$ | Sigma（大写） | 西格玛 | 协方差矩阵 $\bv\Sigma_f$（作求和号时见下表） |
 | $\phi$ | phi（小写） | 斐 | 特征持续性 $\phi$ |
 | $\Phi$ | Phi（大写） | 斐 | 标准正态分布的分布函数 |
 
-大小写含义不同：$\sigma$ 是标准差，$\Sigma$ 是协方差矩阵；$\phi$ 是特征持续性，$\Phi$ 是正态分布函数。同一个字母加粗与否含义也不同（见本页“字体”），例如 $\beta_i$ 是单因子时的标量载荷，$\bv\beta_i$ 是载荷向量。
+大小写含义不同：$\sigma$ 是标准差，$\Sigma$ 是协方差矩阵；$\phi$ 是特征持续性，$\Phi$ 是正态分布函数；$\gamma$ 是风险厌恶系数，$\bv\Gamma$ 是载荷矩阵；$\delta$ 是主观贴现因子，$\Delta$ 表示一期的变化。同一个字母加粗与否含义也不同（见本页“字体”），例如 $\beta_i$ 是单因子时的标量载荷，$\bv\beta_i$ 是载荷向量。
 
 ### 修饰符号与上下标
 
@@ -232,7 +273,9 @@
 | $\hat{\bv\beta}_i$ | beta hat i | 估计值：“帽子”表示从数据估计出来的量 |
 | $\bar{\mathbf g}$ | g bar | 平均值：本书中多指时间平均 |
 | $\tilde{\mathbf z}_{i,t-1}$ | z tilde i，t 减 1 | 变形后的量：本书中指在 $\mathbf z$ 前加常数 1 |
-| $\mathbf b'$ | b prime，或 b 转置 | 转置；本书中撇号 $'$ 只表示转置，不表示导数 |
+| $\mathbf b'$ | b prime，或 b 转置 | 转置；撇号 $'$ 作用于向量、矩阵时只表示转置 |
+| $u'(C)$、$u''(C)$ | u prime C；u double prime C | 标量函数的一阶、二阶导数（第 1 章），见“已预留与已知冲突” |
+| $\xi^*$ | xi star | 星号表示最优值 |
 | $r_{i,t}$ | r i t（r 下标 i 逗号 t） | 下标：股票 $i$、第 $t$ 期 |
 | $R^f_{t-1}$ | R f，下标 t 减 1 | 上标 $f$ 是标签（free，无风险），不是幂次 |
 | $\sigma_\varepsilon^2$ | sigma epsilon 平方 | 上标 2 是幂次 |
@@ -251,6 +294,9 @@
 | $\E[x \mid \mathbf z]$ | 给定 z 时 x 的条件期望 | 竖线读作“给定” |
 | $\Var(x)$、$\Cov(x, y)$ | x 的方差；x 与 y 的协方差 | |
 | $\sum_{t=1}^T$ | 对 t 从 1 到 T 求和 | 大写 Sigma 作求和号 |
+| $\prod_{k=1}^{j}$ | 对 k 从 1 到 j 求积 | 大写 Pi 作求积号，如多期 SDF $M_{t,t+j} = \prod_{k=1}^{j} m_{t+k}$ |
+| $\partial y/\partial x$ | y 对 x 的偏导数 | $\partial$ 读作 partial，如 $\partial\log a/\partial\mu_c$ |
+| $\lim_{J\to\infty}$ | J 趋于无穷时的极限 | 如第 1 章的横截性条件 |
 | $a'b$ | a 转置乘 b | 两个列向量的内积，结果是标量 |
 | $\mathbf A\mathbf B$ | A 乘 B | 矩阵乘法 |
 | $\mathbf A^{-1}$ | A 的逆 | |
