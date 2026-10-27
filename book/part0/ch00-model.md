@@ -1,4 +1,5 @@
 ---
+short_title: 0.3～0.6 模型与 SDF 定价
 kernelspec:
   name: python3
   display_name: Python 3

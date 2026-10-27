@@ -1,4 +1,5 @@
 ---
+short_title: 0.2（续）几种回归
 kernelspec:
   name: python3
   display_name: Python 3

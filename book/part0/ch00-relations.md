@@ -1,4 +1,5 @@
 ---
+short_title: 0.2（续）因子、特征、载荷的关系
 kernelspec:
   name: python3
   display_name: Python 3

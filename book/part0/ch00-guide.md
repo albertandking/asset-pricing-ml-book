@@ -1,4 +1,5 @@
 ---
+short_title: 第 0 章　如何使用本书
 kernelspec:
   name: python3
   display_name: Python 3
