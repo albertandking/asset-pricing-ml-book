@@ -23,6 +23,8 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
+from apsim._rng import substreams
+
 # simulate_market 的随机子流，按此顺序由 SeedSequence.spawn 分配。
 # 以后新增随机部分时只在末尾追加，不改变已有子流的抽样：spawn 依次分配键，前面的子流不随子流总数变化；
 # 传入 Generator 时，每次调用也只从它取 1 个键（见 _substreams），后续调用同样不受子流总数影响。
@@ -182,18 +184,7 @@ class SimulatedMarket:
 
 
 def _substreams(seed: int | np.random.Generator) -> dict[str, np.random.Generator]:
-    if isinstance(seed, np.random.Generator):
-        # 每次调用只从父生成器取 1 个子键，再由它派生全部子流。若直接 seed.spawn(len(_STREAMS))，
-        # 子流数改变时，父生成器被取走的键数随之改变，同一生成器后续调用的结果就会全部改变。
-        children = seed.spawn(1)[0].spawn(len(_STREAMS))
-    elif isinstance(seed, (int, np.integer)) and not isinstance(seed, bool):
-        children = [np.random.default_rng(s) for s in np.random.SeedSequence(int(seed)).spawn(len(_STREAMS))]
-    else:
-        raise TypeError(
-            "seed 须为非负整数或 np.random.Generator；"
-            "确实需要不可复现的随机数时，显式传入 seed=np.random.default_rng()"
-        )
-    return dict(zip(_STREAMS, children))
+    return dict(zip(_STREAMS, substreams(seed, len(_STREAMS))))
 
 
 def simulate_market(params: MarketParams | None = None, *, seed: int | np.random.Generator) -> SimulatedMarket:
