@@ -33,8 +33,11 @@ def default_gamma(n_chars: int, n_factors: int) -> np.ndarray:
     """默认载荷矩阵 Gamma，形状 (L+1, K)。
 
     第 0 行（截距）只载荷第一个因子，取 1；第 j 行（j = 1, ..., min(L, K-1)）只载荷第 j+1 个因子，取 0.5；
-    其余元素为 0。因此 L > K-1 时，第 K 个以后的特征是与载荷无关的“噪声特征”；
-    L < K-1 时，第 L+2……K 个因子只有零载荷（对应的列全为 0），这些因子不进入任何股票的收益。
+    其余元素为 0。特征与因子都从 1 计数，第 j 个特征对应 Gamma 的第 j 行：
+    - L ≥ K 时，第 K～L 个特征（Gamma 的第 K～L 行全为 0）与载荷无关，是“噪声特征”；
+    - L = K-1 时，没有噪声特征，每个因子都有非零载荷；
+    - L < K-1 时，没有噪声特征，而第 L+2～K 个因子只有零载荷（对应的列全为 0），这些因子不进入任何股票的收益。
+    默认 L = 5、K = 3：第 1、2 个特征分别决定对第 2、3 个因子的载荷，第 3～5 个特征是噪声特征。
     """
     gamma = np.zeros((n_chars + 1, n_factors))
     gamma[0, 0] = 1.0
@@ -50,6 +53,13 @@ def _float_tuple(values, name: str) -> tuple[float, ...]:
     return out
 
 
+def _int_value(value, name: str) -> int:
+    """整数参数：接受 Python 与 NumPy 整数，拒绝 float、bool 等其他类型，统一转为 int。"""
+    if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
+        raise TypeError(f"{name} 须为整数（int 或 NumPy 整数），而不是 {type(value).__name__}")
+    return int(value)
+
+
 def _read_only(values) -> np.ndarray:
     arr = np.array(values, dtype=float, copy=True)
     arr.setflags(write=False)
@@ -60,8 +70,10 @@ def _read_only(values) -> np.ndarray:
 class MarketParams:
     """模拟市场的参数。收益均为月度超额收益。
 
-    构造时 `factor_mean`、`factor_vol`、`alpha_coef` 统一转为 float 元组；`gamma` 被复制为只读的 float 数组，
-    之后修改传入的数组不影响本对象。相等判断与哈希把 `gamma` 的取值考虑在内。
+    构造时 `n_stocks`、`n_periods`、`n_chars` 须为整数（接受 NumPy 整数，拒绝 float 与 bool），统一转为 int；
+    `factor_mean`、`factor_vol`、`alpha_coef` 统一转为 float 元组；`gamma` 被复制为只读的 float 数组，
+    之后修改传入的数组不影响本对象。相等判断与哈希按实际使用的载荷矩阵（`resolved_gamma()`）的取值进行，
+    所以 `gamma=None` 与显式传入 `default_gamma(n_chars, n_factors)` 相等、哈希相同。
     """
 
     n_stocks: int = 500
@@ -77,6 +89,8 @@ class MarketParams:
 
     def __post_init__(self) -> None:
         set_ = object.__setattr__
+        for name in ("n_stocks", "n_periods", "n_chars"):
+            set_(self, name, _int_value(getattr(self, name), name))
         if self.n_stocks < 1 or self.n_periods < 1 or self.n_chars < 0:
             raise ValueError("n_stocks、n_periods 须为正，n_chars 须非负")
         set_(self, "factor_mean", _float_tuple(self.factor_mean, "factor_mean"))
@@ -98,7 +112,8 @@ class MarketParams:
             if not np.all(np.isfinite(gamma)):
                 raise ValueError("gamma 须全为有限数（不能含 NaN 或 inf）")
             set_(self, "gamma", gamma)
-            set_(self, "_gamma_key", tuple(tuple(float(v) for v in row) for row in gamma))
+        # 比较键取实际使用的载荷矩阵：gamma 为 None 时取默认矩阵，与显式传入默认矩阵的对象相等
+        set_(self, "_gamma_key", tuple(tuple(float(v) for v in row) for row in self.resolved_gamma()))
         if self.alpha_coef is not None:
             set_(self, "alpha_coef", _float_tuple(self.alpha_coef, "alpha_coef"))
             if len(self.alpha_coef) != self.n_chars:

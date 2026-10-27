@@ -265,3 +265,28 @@ def test_non_finite_params_raise(bad):
     g[2, 1] = bad
     with pytest.raises(ValueError):
         MarketParams(gamma=g)
+
+
+def test_default_gamma_equals_explicit_default():
+    """gamma=None 与显式传入默认矩阵：比较相等、哈希相同，模拟结果也相同。"""
+    a = MarketParams()
+    b = MarketParams(gamma=default_gamma(5, 3))
+    assert a == b and hash(a) == hash(b)
+    assert a.gamma is None                                         # 不改变用户看到的字段
+    assert MarketParams(n_chars=2) == MarketParams(n_chars=2, gamma=default_gamma(2, 3))
+    assert a != MarketParams(gamma=default_gamma(5, 3) * 2)
+    pd.testing.assert_frame_equal(simulate_market(a, seed=0).panel, simulate_market(b, seed=0).panel)
+
+
+@pytest.mark.parametrize("name", ["n_stocks", "n_periods", "n_chars"])
+@pytest.mark.parametrize("bad", [5.0, 5.5, True, "5", None])
+def test_integer_params_reject_non_integers(name, bad):
+    with pytest.raises(TypeError):
+        MarketParams(**{name: bad})
+
+
+@pytest.mark.parametrize("name", ["n_stocks", "n_periods", "n_chars"])
+def test_integer_params_accept_numpy_integers(name):
+    p = MarketParams(**{name: np.int64(4)})
+    assert getattr(p, name) == 4 and type(getattr(p, name)) is int
+    assert p == MarketParams(**{name: 4}) and hash(p) == hash(MarketParams(**{name: 4}))
