@@ -35,6 +35,7 @@
 ├── .python-version
 ├── .gitignore
 ├── docs/specs/            设计文档
+├── docs/promises.md       前向引用台账（由 scripts/promises.py 生成）
 ├── src/apsim/             模拟市场生成器、检验函数、作图工具
 ├── tests/                 apsim 单元测试（pytest）
 ├── book/
@@ -55,7 +56,8 @@
 │   └── ……                 文件名用英文，标题用中文
 └── scripts/
     ├── build.sh
-    └── serve.sh
+    ├── serve.sh
+    └── promises.py        生成前向引用台账 docs/promises.md
 ```
 
 ## 4. 全书目录
@@ -155,6 +157,7 @@
 13. **符号读法**：每章出现新的希腊字母、修饰符号或运算符时，补充到 `book/notation.md` 的“符号读法”一节（读法与本书含义）。
 14. **长章拆页**：每章源文件若超过约 3 万字符，按节拆成子页面，在 `myst.yml` 中作为该章首页的 `children`。mystmd 中每个页面使用独立的内核，所以每页开头加一个“本页准备”代码单元，只导入并重建本页需要的对象，参数与种子与原处完全相同；各页的 frontmatter 都写 `numbering.enumerator`，公式编号跨页接续时用 `numbering.equation.continue: true`，保证整章编号唯一。
 15. **估计工具不在页面间复制**：一个估计工具（如最小二乘、交互项设计矩阵、Fama–MacBeth）第一次在书中出现时，在页面中内联实现并讲解，随后用 `assert` 断言内联实现与 `apsim.stats` 中的同名函数结果一致；之后的页面和章节直接调用 `apsim.stats`，不再复制代码。
+16. **前向引用台账**：每章写作计划的第一步，是运行 `uv run python scripts/promises.py`，逐条核对台账 `docs/promises.md` 中指向本章的承诺（前文中“见第 N 章”“附录 A”一类的说法），在本章兑现，或改写原处的说法；本章写完后重新生成台账。
 
 ## 8. 完成标准
 
