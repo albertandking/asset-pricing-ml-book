@@ -39,11 +39,11 @@ BOOK = ROOT / "book"
 OUTPUT = ROOT / "docs" / "promises.md"
 
 # 章号列表：数字之间用顿号、逗号、和/与/及/或连接，或用浪纹线等表示范围
-_SEP = r"\s*(?:[、，,]|和|与|及|或|[～~–—-])\s*(?:第\s*)?"
+_SEP = r"\s*(?:[、，,]|和|与|及|或|至|到|[～~–—-])\s*(?:第\s*)?"
 CHAPTER_RE = re.compile(r"第\s*(\d+(?:" + _SEP + r"\d+)*)\s*章(?!　)")
 APPENDIX_RE = re.compile(r"附录\s*([A-Z](?:\s*[、，,和与及或～~–—-]\s*[A-Z])*)(?![A-Za-z　])")
-_TOKEN_RE = re.compile(r"\d+|[A-Z]|[～~–—-]")
-_RANGE = set("～~–—-")
+_TOKEN_RE = re.compile(r"\d+|[A-Z]|[～~–—-]|至|到")
+_RANGE = set("～~–—-") | {"至", "到"}
 _SENTENCE_END = "。！？；"
 CONTEXT_WIDTH = 80
 
@@ -187,6 +187,9 @@ def collect(book: Path = BOOK) -> dict[tuple[str, int | str], list[tuple[str, in
             seen: set[tuple[str, int | str]] = set()
             for kind, key, s, e in parse_refs(line):
                 ref = (kind, key)
+                # “进入第 N 章”是阅读导航，不是要在第 N 章兑现的承诺
+                if line[max(0, s - 2):s] == "进入":
+                    continue
                 if ref in done or ref in seen:
                     continue
                 seen.add(ref)

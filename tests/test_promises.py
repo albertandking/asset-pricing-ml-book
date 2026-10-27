@@ -48,3 +48,24 @@ def test_context_is_the_sentence():
     line = "前一句。Shanken 修正见第 10 章，这里不展开。后一句。"
     (_, _, s, e), = promises.parse_refs(line)
     assert promises.context(line, s, e) == "Shanken 修正见第 10 章，这里不展开。"
+
+
+def test_parse_range_with_zhi_and_dao():
+    assert keys("见第 20 至 22 章") == [("chapter", 20), ("chapter", 21), ("chapter", 22)]
+    assert keys("第 5 到 7 章") == [("chapter", 5), ("chapter", 6), ("chapter", 7)]
+
+
+def test_collect_skips_written_chapters_and_navigation(tmp_path, monkeypatch):
+    book = tmp_path / "book"
+    (book / "part0").mkdir(parents=True)
+    (book / "myst.yml").write_text(
+        "version: 1\nproject:\n  toc:\n    - file: part0/ch01-x.md\n", encoding="utf-8"
+    )
+    (book / "part0" / "ch01-x.md").write_text(
+        "# 第 1 章　消费\n\n见第 1 章与第 2 章。读完即可进入第 3 章。\n", encoding="utf-8"
+    )
+    monkeypatch.setattr(promises, "ROOT", tmp_path)
+    got = promises.collect(book)
+    assert ("chapter", 1) not in got  # 已写出的章节不列入
+    assert [e[1] for e in got[("chapter", 2)]] == [3]
+    assert ("chapter", 3) not in got  # “进入第 3 章”是导航
