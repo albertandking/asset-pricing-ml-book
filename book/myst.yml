@@ -36,6 +36,7 @@ project:
         - file: part0/ch00-guide.md
           children:
             - file: part0/ch00-concepts.md
+            - file: part0/ch00-concepts-sdf.md
             - file: part0/ch00-relations.md
             - file: part0/ch00-model.md
             - file: part0/ch00-experiments.md

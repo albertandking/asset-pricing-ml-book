@@ -82,6 +82,66 @@
 
 **解方程而不求逆。** 公式中的 $\bv\Sigma_f^{-1}\bv\mu$、$(\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf y$ 在代码中用 `np.linalg.solve(Sigma_f, mu)` 与 `np.linalg.lstsq(X, y)` 计算，而不是先用 `np.linalg.inv` 求出逆矩阵再相乘：直接解线性方程组的计算量更小，在矩阵接近奇异时舍入误差也小得多。只有需要逆矩阵本身时（例如最小二乘系数的协方差矩阵 $\hat\sigma_\varepsilon^2(\mathbf X'\mathbf X)^{-1}$），才通过 `solve(A, I)` 得到它。更多的矩阵代数与矩阵微积分工具见附录 A。
 
+(notation-unpack)=
+## 范例：拆开讲 $\bv\beta_i'\mathbf f_t$
+
+本书的公式都按同一个顺序“拆开讲”：每一个编号公式，以及每一个向量或矩阵表达式在全书（或本章）第一次出现时，依次**写出分量、标维度、展开运算、讲特例、写数据矩阵**；标量公式则逐项解释每个符号的含义和单位。同一个式子在后文再次出现时不再重复拆解，而是链接到第一次拆开讲的地方，例如“各分量的含义见[记号表的范例](#notation-unpack)”。下面以时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 中的因子部分 $\bv\beta_i'\mathbf f_t$ 为例示范这五步，它是全书拆解公式的标准写法。
+
+**第一步，写出分量。** $\mathbf f_t$ 是 $K$ 个因子在第 $t$ 期的值竖着排成的列向量：
+
+```{math}
+:enumerated: false
+\mathbf f_t = \begin{pmatrix} f_{1,t} \\ f_{2,t} \\ \vdots \\ f_{K,t} \end{pmatrix} .
+```
+
+- $f_{1,t}$：第 1 个因子在第 $t$ 期的值，例如市场因子 MKT（市场组合的超额收益）
+- $f_{2,t}$：第 2 个因子在第 $t$ 期的值，例如规模因子 SMB（小市值组合减大市值组合）
+- ……
+- $f_{K,t}$：第 $K$ 个因子在第 $t$ 期的值
+
+股票 $i$ 对这 $K$ 个因子各有一个载荷，同样竖着排成列向量：
+
+```{math}
+:enumerated: false
+\bv\beta_i = \begin{pmatrix} \beta_{1,i} \\ \beta_{2,i} \\ \vdots \\ \beta_{K,i} \end{pmatrix} ,
+```
+
+其中 $\beta_{k,i}$ 是股票 $i$ 对第 $k$ 个因子的载荷：其他因子不变时，第 $k$ 个因子每高 1 个百分点，股票 $i$ 的收益平均高 $\beta_{k,i}$ 个百分点。下标的顺序是“因子在前、股票在后”，与时变载荷 $\bv\beta_{i,t}$ 的分量 $\beta_{k,i,t}$ 一致；不少文献写作 $\beta_{ik}$，含义相同。
+
+**第二步，标维度。** $\mathbf f_t$ 与 $\bv\beta_i$ 都是 $K\times 1$ 的列向量，即 $\mathbf f_t \in \Real^K$、$\bv\beta_i \in \Real^K$。转置把列向量横过来，$\bv\beta_i'$ 是 $1\times K$ 的行向量：$\bv\beta_i' = (\beta_{1,i}, \beta_{2,i}, \dots, \beta_{K,i})$。$1\times K$ 乘 $K\times 1$，结果是 $1\times 1$，即一个标量。
+
+**第三步，展开运算。**
+
+```{math}
+:enumerated: false
+\underbrace{\bv\beta_i'}_{1\times K}\,\underbrace{\mathbf f_t}_{K\times 1}
+= (\beta_{1,i}, \beta_{2,i}, \dots, \beta_{K,i}) \begin{pmatrix} f_{1,t} \\ f_{2,t} \\ \vdots \\ f_{K,t} \end{pmatrix}
+= \beta_{1,i} f_{1,t} + \beta_{2,i} f_{2,t} + \dots + \beta_{K,i} f_{K,t}
+= \sum_{k=1}^{K} \beta_{k,i} f_{k,t} .
+```
+
+白话：$\bv\beta_i'\mathbf f_t$ 是 $K$ 个因子共同贡献给股票 $i$ 的那部分收益，即每个因子的收益乘以股票对它的敏感度，再加总。例如[第 0 章“载荷”](#sec-ch0-loading)一节中的大盘银行股，$\bv\beta_i = (0.7, -0.5, 0.8)'$，某个月 $\mathbf f_t = (3\%, 3\%, -1\%)'$，则 $\bv\beta_i'\mathbf f_t = 0.7 \times 3\% + (-0.5) \times 3\% + 0.8 \times (-1\%) = 2.1\% - 1.5\% - 0.8\% = -0.2\%$。
+
+**第四步，特例。** $K = 1$ 时只有市场一个因子，$\bv\beta_i'\mathbf f_t = \beta_{1,i} f_{1,t}$，回归退化为经典 CAPM 的时间序列形式（只有市场一个因子）；$K = 3$ 就是 Fama–French 三因子（市场、规模 SMB、价值 HML）[@fama1993common]，中国市场的 CH3 也是三个因子（市场、规模、价值，价值按盈利价格比划分）[@liu2019size]；$K = 5$ 就是 Fama–French 五因子（再加盈利 RMW、投资 CMA）[@fama2015five]，以此类推。
+
+**第五步，数据矩阵。** 估计 $\bv\beta_i$ 时，要把 $T$ 期的数据堆叠起来，和矩阵的维度对应一下（很关键）：
+
+- 因子矩阵 $\mathbf F = (\mathbf f_1, \dots, \mathbf f_T)' \in \Real^{T\times K}$，第 $t$ 行是 $\mathbf f_t'$：一共 $T$ 个时间点，每个时间点有 $K$ 个因子，所以是 $T$ 行 $K$ 列。
+- 设计矩阵 $[\mathbf 1_T, \mathbf F]$ 在 $\mathbf F$ 左边多了一列全 1 向量，用来估计截距 $a_i$，维度是 $T\times(1+K)$。
+- 所有股票共用同一套因子时间序列 $\mathbf F$（因而共用同一个设计矩阵），但每只股票有自己的一套 $\bv\beta_i$（以及截距 $a_i$），也就是每只股票对这 $K$ 个因子的敏感程度不一样。
+
+股票 $i$ 的 $T$ 期回归于是可以一次写出：
+
+```{math}
+:enumerated: false
+\underbrace{\begin{pmatrix} r_{i,1} \\ r_{i,2} \\ \vdots \\ r_{i,T} \end{pmatrix}}_{T\times 1}
+= \underbrace{\begin{pmatrix} 1 & f_{1,1} & \cdots & f_{K,1} \\ 1 & f_{1,2} & \cdots & f_{K,2} \\ \vdots & \vdots & & \vdots \\ 1 & f_{1,T} & \cdots & f_{K,T} \end{pmatrix}}_{[\mathbf 1_T,\ \mathbf F]:\ T\times(1+K)}
+\underbrace{\begin{pmatrix} a_i \\ \beta_{1,i} \\ \vdots \\ \beta_{K,i} \end{pmatrix}}_{(1+K)\times 1}
++ \underbrace{\begin{pmatrix} u_{i,1} \\ u_{i,2} \\ \vdots \\ u_{i,T} \end{pmatrix}}_{T\times 1} .
+```
+
+设计矩阵的第 $t$ 行乘以系数向量，就是第 $t$ 期的 $a_i + \bv\beta_i'\mathbf f_t$。反过来，把 $N$ 只股票的 $\bv\beta_i'$ 按行堆叠，得到 $N\times K$ 的载荷矩阵 $\mathbf B$，第 $i$ 行是 $\bv\beta_i'$；$\mathbf B\mathbf f_t$（$N\times K$ 乘 $K\times 1$，得 $N\times 1$）的第 $i$ 个元素就是 $\bv\beta_i'\mathbf f_t$。代码中，$\mathbf F$ 是形状为 `(T, K)` 的 `mkt.factors.to_numpy()`，设计矩阵是 `np.column_stack([np.ones(T), F])`，形状为 `(T, 1 + K)`。
+
 ## 下标与维度
 
 | 记号 | 含义 | 说明 |
@@ -297,7 +357,7 @@
 | $\prod_{k=1}^{j}$ | 对 k 从 1 到 j 求积 | 大写 Pi 作求积号，如多期 SDF $M_{t,t+j} = \prod_{k=1}^{j} m_{t+k}$ |
 | $\partial y/\partial x$ | y 对 x 的偏导数 | $\partial$ 读作 partial，如 $\partial\log a/\partial\mu_c$ |
 | $\lim_{J\to\infty}$ | J 趋于无穷时的极限 | 如第 1 章的横截性条件 |
-| $a'b$ | a 转置乘 b | 两个列向量的内积，结果是标量 |
+| $\mathbf a'\mathbf b$ | a 转置乘 b | 两个列向量的内积，结果是标量 |
 | $\mathbf A\mathbf B$ | A 乘 B | 矩阵乘法 |
 | $\mathbf A^{-1}$ | A 的逆 | |
 | $\mathbf A \otimes \mathbf B$ | A 与 B 的 Kronecker 积 | 见第 0 章“模拟实验” |

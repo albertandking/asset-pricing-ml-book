@@ -9,8 +9,8 @@
 ## 第 2 章（5 条）
 
 - `book/glossary.md:525` — 无套利是资产定价的基本假设，由它可以推出存在为正的 SDF（第 2 章）。
+- `book/part0/ch00-concepts-sdf.md:168` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
-- `book/part0/ch00-concepts.md:289` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-model.md:284` — 这本身并不意味着这些因子之间存在套利：无套利等价于存在某个严格为正的 SDF（第 2 章），而一个特定的线性 $m_t$ 取负值，并不排除另有一个正的 ……
 - `book/part1/ch01-lucas.md:328` — 更一般的理论在后面几章展开：第 2 章说明无套利等价于存在严格为正的 SDF；
 
@@ -19,8 +19,8 @@
 - `book/glossary.md:30` — 因子相关时二者可以不同（见第 3、4 章）。
 - `book/glossary.md:196` — ……绝对值都不超过 $\sigma(m)/\E[m]$（Hansen–Jagannathan 界 [@hansen1991implications]，第 3 章）。
 - `book/glossary.md:222` — ……收益与 SDF 的协方差决定，$\E[R^e] = -\Cov(m, R^e)/\E[m]$（随机贴现因子，第 1、3 章）；
+- `book/part0/ch00-concepts-sdf.md:168` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
-- `book/part0/ch00-concepts.md:289` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-exercises.md:296` — ……DF 波动率与最大夏普比率的关系，即 Hansen–Jagannathan 界，原始文献为 @hansen1991implications，第 3 章详细讨论。
 - `book/part0/ch00-model.md:284` — 第 3 章将详细讨论。
 - `book/part1/ch01-euler-sdf.md:41` — ……第 0 章的线性 SDF 是消费 SDF 的一阶近似（1.6 节），由此可以看清“因子是超额收益”与“因子是消费增长”的区别，为第 3、4 章的一般理论做准备。
@@ -33,10 +33,10 @@
 - `book/glossary.md:222` — 在因子模型中，就是对被定价因子的载荷（第 4 章）。
 - `book/glossary.md:410` — 不可交易因子的风险溢价要用横截面回归或模拟组合另行估计（第 4、10 章）。
 - `book/glossary.md:525` — Ross（1976）的套利定价理论（APT）用的是近似套利：大量资产的分散化组合几乎消除了异质风险（第 4 章）。
+- `book/part0/ch00-concepts-sdf.md:168` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
-- `book/part0/ch00-concepts.md:58` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
-- `book/part0/ch00-concepts.md:185` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
-- `book/part0/ch00-concepts.md:289` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
+- `book/part0/ch00-concepts.md:61` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
+- `book/part0/ch00-concepts.md:250` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
 - `book/part0/ch00-exercises.md:164` — 第 4 章会在更一般的条件下讨论 SDF 表示与 β 表示的等价性。
 - `book/part1/ch01-euler-sdf.md:41` — ……第 0 章的线性 SDF 是消费 SDF 的一阶近似（1.6 节），由此可以看清“因子是超额收益”与“因子是消费增长”的区别，为第 3、4 章的一般理论做准备。
 - `book/part1/ch01-experiments.md:168` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
@@ -60,8 +60,8 @@
 - `book/glossary.md:567` — 资产定价实证多用简单收益（尤其是超额收益），Campbell–Shiller 分解等推导用对数收益（第 6 章）。
 - `book/glossary.md:593` — 折现率随时间、也随资产变化 [@cochrane2011presidential]（第 6 章）。
 - `book/glossary.md:597` — 对数形式在第 6 章另行定义。
-- `book/notation.md:114` — 第 6、7 章沿用
-- `book/notation.md:200` — Campbell–Shiller 对数线性化常数（第 6 章）
+- `book/notation.md:174` — 第 6、7 章沿用
+- `book/notation.md:260` — Campbell–Shiller 对数线性化常数（第 6 章）
 - `book/part1/ch01-exercises.md:250` — 估值比率随时间变化、预测收益的证据与“折现率”的含义见 @cochrane2011presidential，第 6 章展开；
 - `book/part1/ch01-lucas.md:247` — 第 6 章引入时变的贴现率，并用 Campbell–Shiller 分解把价格—红利比的变动拆成两部分；
 
@@ -70,7 +70,7 @@
 - `book/glossary.md:167` — Epstein 与 Zin 的递归效用把二者分开 [@epstein1989substitution]（第 7 章）。
 - `book/glossary.md:173` — ……不等于模型中的 $\gamma$ 下降：幂效用模型中 $\gamma$ 是常数，期望收益随时间变化要靠其他机制，例如时变的消费分布或习惯形成（第 6、7 章）。
 - `book/glossary.md:404` — 消费模型与数据的定量矛盾（股权溢价之谜）见第 7 章 [@mehra1985equity]，用广义矩方法估计偏好参数见第 11 章。
-- `book/notation.md:114` — 第 6、7 章沿用
+- `book/notation.md:174` — 第 6、7 章沿用
 - `book/part1/ch01-euler-sdf.md:43` — 本章只讲理论与模拟，不讨论实证数字：消费模型在数据中遇到的困难（股权溢价之谜）留到第 7 章，估计偏好参数的广义矩方法（GMM）留到第 11 章。
 - `book/part1/ch01-exercises.md:75` — 这类问题的定量讨论见第 7 章（股权溢价之谜与无风险利率之谜）。
 - `book/part1/ch01-exercises.md:203` — 这正是第 7 章要讨论的问题。
@@ -85,7 +85,7 @@
 - `book/glossary.md:180` — 学术研究关心的问题是：溢价为什么存在（风险补偿还是错误定价，第 8 章）；
 - `book/glossary.md:486` — 可预测性来自风险补偿还是错误定价，是第 8 章的主题。
 - `book/glossary.md:525` — ……利限制”（limits to arbitrage）中的套利也取学术含义，讨论的是现实中的套利需要资本、要承担风险与成本，所以错误定价可以持续存在（第 8 章）。
-- `book/part0/ch00-concepts.md:240` — 区分这两种解释往往很难，是第 8 章的主题。
+- `book/part0/ch00-concepts-sdf.md:108` — 区分这两种解释往往很难，是第 8 章的主题。
 - `book/part0/ch00-experiments.md:43` — A 股融券规模小、成本高，许多“空头腿”在现实中难以实现，这既影响因子收益的可实现性（第 26 章），也是错误定价能够持续存在的一个原因（第 8 章）。
 - `book/part0/ch00-experiments.md:284` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
 
@@ -94,7 +94,7 @@
 - `book/glossary.md:606` — 一是两种回归：时间序列回归对每只资产沿时间回归，得到载荷与截距（第 9 章）；
 - `book/index.md:106` — 导读：几种回归是第二部分的预习，读到第 9 章之前读即可。
 - `book/part0/ch00-exercises.md:109` — 也就是说，即使存在错误定价，每只股票时间序列回归的截距在总体上也是 0，GRS 一类的时间序列检验（第 9 章）检验的只是平均定价误差，看不到这里的条件错误定价……
-- `book/part0/ch00-guide.md:95` — 它是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
+- `book/part0/ch00-guide.md:96` — 它是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
 - `book/part0/primer-regressions.md:11` — 本页是第二部分（实证计量）的预习，不属于第 0 章的必读内容，第一次阅读可以跳过，读到第 9 章之前再回来。
 - `book/part0/primer-regressions.md:65` — 检验全部 $N$ 个截距同时为 0 的 GRS 检验 [@gibbons1989test]，见第 9 章。
 
@@ -104,8 +104,8 @@
 - `book/glossary.md:430` — 载荷需先由时间序列回归估计（两步法），由此带来的变量误差与 Shanken 修正 [@shanken1992estimation] 见第 10 章。
 - `book/glossary.md:447` — ……法是“控制变量”：在 Fama–MacBeth 横截面回归 [@fama1973risk] 中同时放入信号与市值、行业等控制变量，看信号的系数（第 10 章）；
 - `book/glossary.md:606` — 横截面回归每期沿资产回归，得到风险溢价或特征的补偿（横截面回归与 Fama–MacBeth，第 10 章）。
-- `book/part0/ch00-concepts.md:58` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
-- `book/part0/ch00-concepts.md:185` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
+- `book/part0/ch00-concepts.md:61` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
+- `book/part0/ch00-concepts.md:250` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
 - `book/part0/ch00-experiments.md:311` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
 - `book/part0/primer-regressions.md:102` — 这些都在第 10 章展开。
 - `book/part0/primer-regressions.md:103` — 估计风险溢价 $\bv\lambda$（第 10 章）；
@@ -118,7 +118,7 @@
 ## 第 11 章（6 条）
 
 - `book/glossary.md:404` — 消费模型与数据的定量矛盾（股权溢价之谜）见第 7 章 [@mehra1985equity]，用广义矩方法估计偏好参数见第 11 章。
-- `book/notation.md:209` — 第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关
+- `book/notation.md:269` — 第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关
 - `book/part1/ch01-euler-sdf.md:43` — 本章只讲理论与模拟，不讨论实证数字：消费模型在数据中遇到的困难（股权溢价之谜）留到第 7 章，估计偏好参数的广义矩方法（GMM）留到第 11 章。
 - `book/part1/ch01-exercises.md:239` — 要检验定价模型，需要利用横截面上大量资产的信息（第二、三部分）或多个矩的共同约束（第 11 章的 GMM），并始终把估计值与标准误放在一起看。
 - `book/part1/ch01-exercises.md:248` — 用广义矩方法估计偏好参数的方法在第 11 章介绍。
@@ -154,7 +154,7 @@
 - `book/glossary.md:284` — CH3 在中国市场改用盈利市值比（EP），价值因子称为 VMG [@liu2019size]（构造见第 15、16 章）。
 - `book/glossary.md:310` — Jegadeesh 与 Titman 发现，这样的组合在随后 3～12 个月有显著的正收益 [@jegadeesh1993returns]（第 15 章）。
 - `book/glossary.md:362` — ……Frazzini 与 Pedersen 的 QMJ（quality minus junk）因子 [@asness2019quality]（第 15、16 章）。
-- `book/part0/ch00-concepts.md:66` — 因子的具体构造见第 15、16 章。
+- `book/part0/ch00-concepts.md:69` — 因子的具体构造见第 15、16 章。
 - `book/part0/ch00-experiments.md:41` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
 - `book/part0/ch00-experiments.md:42` — 月度数据中如何处理停牌股票的收益与特征，会直接影响组合收益，详见第 15 章。
 - `book/part0/ch00-experiments.md:45` — 正式研究必须使用带有公告日期的时点数据，第 15 章给出对齐规则。
@@ -164,15 +164,15 @@
 - `book/glossary.md:180` — 少数几个因子能否概括大量异象（第 16、18 章）。
 - `book/glossary.md:284` — CH3 在中国市场改用盈利市值比（EP），价值因子称为 VMG [@liu2019size]（构造见第 15、16 章）。
 - `book/glossary.md:362` — ……Frazzini 与 Pedersen 的 QMJ（quality minus junk）因子 [@asness2019quality]（第 15、16 章）。
-- `book/part0/ch00-concepts.md:66` — 因子的具体构造见第 15、16 章。
-- `book/part0/ch00-concepts.md:240` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
+- `book/part0/ch00-concepts-sdf.md:108` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
+- `book/part0/ch00-concepts.md:69` — 因子的具体构造见第 15、16 章。
 - `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
 - `book/part0/ch00-experiments.md:44` — 第 16、17 章讨论这一处理。
 
 ## 第 17 章（5 条）
 
 - `book/glossary.md:349` — CH3 因此剔除市值最小的 30% 的股票后再构造因子 [@liu2019size]（第 17 章）。
-- `book/part0/ch00-concepts.md:240` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
+- `book/part0/ch00-concepts-sdf.md:108` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
 - `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
 - `book/part0/ch00-experiments.md:41` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
 - `book/part0/ch00-experiments.md:44` — 第 16、17 章讨论这一处理。
