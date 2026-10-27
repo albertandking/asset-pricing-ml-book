@@ -69,7 +69,7 @@ class FamaMacBethResult(NamedTuple):
 def fama_macbeth(X, y) -> FamaMacBethResult:
     """Fama–MacBeth 程序：逐期横截面回归，再对系数求时间平均与时间序列标准误。
 
-    对应书中 0.2 节（续）“Fama–MacBeth 程序”的三步（`ch00-regressions.md`，标签 sec-ch0-regs）：
+    对应书中“导读：几种回归”一页（标签 `sec-ch0-regs`）中“Fama–MacBeth 程序”的三步：
     1. 每期把 y_t 对 X_t 做横截面最小二乘回归，得到 ĝ_t；
     2. 点估计 ḡ = T⁻¹ Σ_t ĝ_t；
     3. 标准误 se(ḡ_j) = σ̂(ĝ_{j,t}) / √T，σ̂(ĝ_{j,t}) = [(T − 1)⁻¹ Σ_t (ĝ_{j,t} − ḡ_j)²]^{1/2}。

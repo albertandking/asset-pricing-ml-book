@@ -72,8 +72,9 @@ class MarketParams:
 
     构造时 `n_stocks`、`n_periods`、`n_chars` 须为整数（接受 NumPy 整数，拒绝 float 与 bool），统一转为 int；
     `factor_mean`、`factor_vol`、`alpha_coef` 统一转为 float 元组；`gamma` 被复制为只读的 float 数组，
-    之后修改传入的数组不影响本对象。相等判断与哈希按实际使用的载荷矩阵（`resolved_gamma()`）的取值进行，
-    所以 `gamma=None` 与显式传入 `default_gamma(n_chars, n_factors)` 相等、哈希相同。
+    之后修改传入的数组不影响本对象。相等判断与哈希按实际使用的载荷矩阵（`resolved_gamma()`）与定价误差系数
+    （`resolved_theta()`）的取值进行，所以 `gamma=None` 与显式传入 `default_gamma(n_chars, n_factors)`、
+    `alpha_coef=None` 与显式传入零向量 `(0.0,) * n_chars` 分别相等、哈希相同（二者的模拟结果也相同）。
     """
 
     n_stocks: int = 500
@@ -84,8 +85,9 @@ class MarketParams:
     char_persistence: float = 0.9
     idio_vol: float = 0.10
     gamma: np.ndarray | None = field(default=None, compare=False)
-    alpha_coef: tuple[float, ...] | None = None
+    alpha_coef: tuple[float, ...] | None = field(default=None, compare=False)
     _gamma_key: tuple[tuple[float, ...], ...] | None = field(default=None, init=False, repr=False)
+    _theta_key: tuple[float, ...] | None = field(default=None, init=False, repr=False)
 
     def __post_init__(self) -> None:
         set_ = object.__setattr__
@@ -118,6 +120,8 @@ class MarketParams:
             set_(self, "alpha_coef", _float_tuple(self.alpha_coef, "alpha_coef"))
             if len(self.alpha_coef) != self.n_chars:
                 raise ValueError(f"alpha_coef 长度须为 n_chars={self.n_chars}")
+        # 同理，alpha_coef 为 None 时取零向量，与显式传入零向量的对象相等
+        set_(self, "_theta_key", tuple(float(v) for v in self.resolved_theta()))
 
     @property
     def n_factors(self) -> int:

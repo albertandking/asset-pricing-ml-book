@@ -278,6 +278,17 @@ def test_default_gamma_equals_explicit_default():
     pd.testing.assert_frame_equal(simulate_market(a, seed=0).panel, simulate_market(b, seed=0).panel)
 
 
+def test_default_alpha_equals_explicit_zero():
+    """alpha_coef=None 与显式传入零向量：比较相等、哈希相同，模拟结果也相同。"""
+    a = MarketParams()
+    b = MarketParams(alpha_coef=(0.0,) * 5)
+    assert a == b and hash(a) == hash(b)
+    assert a.alpha_coef is None                                    # 不改变用户看到的字段
+    assert MarketParams(n_chars=2) == MarketParams(n_chars=2, alpha_coef=np.zeros(2))
+    assert a != MarketParams(alpha_coef=(0.01, 0.0, 0.0, 0.0, 0.0))
+    pd.testing.assert_frame_equal(simulate_market(a, seed=0).panel, simulate_market(b, seed=0).panel)
+
+
 @pytest.mark.parametrize("name", ["n_stocks", "n_periods", "n_chars"])
 @pytest.mark.parametrize("bad", [5.0, 5.5, True, "5", None])
 def test_integer_params_reject_non_integers(name, bad):

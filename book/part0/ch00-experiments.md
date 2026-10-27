@@ -110,7 +110,10 @@ coef, se = ols(X, mkt.panel["exret"].to_numpy())
 # 上面的内联定义与 apsim.stats 中的同名函数结果相同：比较设计矩阵 X、Z，以及系数与标准误
 X_lib, Z_lib = stats.interaction_design(mkt)
 coef_lib, se_lib = stats.ols(X, mkt.panel["exret"].to_numpy())
-assert np.array_equal(X, X_lib) and np.array_equal(interaction_design(mkt)[1], Z_lib) and np.allclose(coef, coef_lib) and np.allclose(se, se_lib)
+assert np.array_equal(X, X_lib)
+assert np.array_equal(interaction_design(mkt)[1], Z_lib)
+assert np.allclose(coef, coef_lib)
+assert np.allclose(se, se_lib)
 names = [f"Γ[{j},{k + 1}]" for j in range(params.n_chars + 1) for k in range(K)]
 table = pd.DataFrame(
     {"真值": mkt.gamma.ravel(), "估计值": coef, "标准误": se, "标准化偏差": (coef - mkt.gamma.ravel()) / se},
@@ -294,6 +297,8 @@ Xp3 = Xp.reshape(n_t, n_i, -1)                                           # (TN, 
 yp3 = pred.panel["exret"].to_numpy().reshape(n_t, n_i)                   # (TN,) -> (T, N)
 per_period = np.array([np.linalg.lstsq(Xp3[t], yp3[t], rcond=None)[0] for t in range(n_t)])   # (T, L+1)
 se_fm = per_period.std(axis=0, ddof=1) / np.sqrt(n_t)
+fm_p = stats.fama_macbeth(Xp3, yp3)                                      # 同一程序的 apsim.stats 版本：比较 coefs、mean、se
+assert all(np.allclose(a, b) for a, b in [(fm_p.coefs, per_period), (fm_p.mean, per_period.mean(axis=0)), (fm_p.se, se_fm)])
 print(pd.DataFrame({"理论值 Γμ": truth_p, "混合回归估计": coef_p, "同方差标准误": se_p, "逐期回归标准误": se_fm},
                    index=["常数", "z1", "z2", "z3", "z4", "z5"]).round(5))
 ratio = se_fm / se_p

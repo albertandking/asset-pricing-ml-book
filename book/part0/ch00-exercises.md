@@ -174,6 +174,9 @@ coef_b = np.linalg.lstsq(Xb, yb, rcond=None)[0]
 Xb3, yb3 = Xb.reshape(5_000, 100, -1), yb.reshape(5_000, 100)                                       # 按期切开：(T, N, L+1)、(T, N)
 per_b = np.array([np.linalg.lstsq(Xb3[t], yb3[t], rcond=None)[0] for t in range(5_000)])            # (T, L+1)
 se_b = per_b.std(axis=0, ddof=1) / np.sqrt(5_000)
+from apsim.stats import fama_macbeth                                                                # 同一程序的 apsim.stats 版本
+fm_b = fama_macbeth(Xb3, yb3)                                                                       # 比较 coefs、mean、se
+assert all(np.allclose(a, b) for a, b in [(fm_b.coefs, per_b), (fm_b.mean, per_b.mean(axis=0)), (fm_b.se, se_b)])
 truth_b = bp.gamma @ np.asarray(bp_params.factor_mean) + np.r_[0.0, bp.theta]                       # Γμ + (0, θ')'：(L+1,)
 print(pd.DataFrame({"理论值 Γμ + (0, θ')'": truth_b, "估计值": coef_b, "逐期回归标准误": se_b,
                     "标准化偏差": (coef_b - truth_b) / se_b},

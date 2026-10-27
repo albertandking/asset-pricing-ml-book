@@ -32,7 +32,7 @@
 - `book/glossary.md:209` — ……收益与 SDF 的协方差决定，$\E[R^e] = -\Cov(m, R^e)/\E[m]$（随机贴现因子，第 1、3 章）；
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:289` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
-- `book/part0/ch00-exercises.md:293` — ……DF 波动率与最大夏普比率的关系，即 Hansen–Jagannathan 界，原始文献为 @hansen1991implications，第 3 章详细讨论。
+- `book/part0/ch00-exercises.md:296` — ……DF 波动率与最大夏普比率的关系，即 Hansen–Jagannathan 界，原始文献为 @hansen1991implications，第 3 章详细讨论。
 - `book/part0/ch00-model.md:284` — 第 3 章将详细讨论。
 
 ## 第 4 章（8 条）
@@ -72,7 +72,7 @@
 - `book/glossary.md:486` — ……利限制”（limits to arbitrage）中的套利也取学术含义，讨论的是现实中的套利需要资本、要承担风险与成本，所以错误定价可以持续存在（第 8 章）。
 - `book/part0/ch00-concepts.md:240` — 区分这两种解释往往很难，是第 8 章的主题。
 - `book/part0/ch00-experiments.md:43` — A 股融券规模小、成本高，许多“空头腿”在现实中难以实现，这既影响因子收益的可实现性（第 26 章），也是错误定价能够持续存在的一个原因（第 8 章）。
-- `book/part0/ch00-experiments.md:281` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
+- `book/part0/ch00-experiments.md:284` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
 
 ## 第 9 章（6 条）
 
@@ -90,7 +90,7 @@
 - `book/glossary.md:554` — 横截面回归每期沿资产回归，得到风险溢价或特征的补偿（横截面回归与 Fama–MacBeth，第 10 章）。
 - `book/part0/ch00-concepts.md:58` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
 - `book/part0/ch00-concepts.md:185` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
-- `book/part0/ch00-experiments.md:306` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
+- `book/part0/ch00-experiments.md:311` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
 - `book/part0/primer-regressions.md:102` — 这些都在第 10 章展开。
 - `book/part0/primer-regressions.md:103` — 估计风险溢价 $\bv\lambda$（第 10 章）；
 - `book/part0/primer-regressions.md:367` — 处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
@@ -104,7 +104,7 @@
 - `book/glossary.md:189` — 夏普比率的估计误差很大：样本只有几年时，年化 1 与 0.5 往往难以在统计上区分（标准误见第 12 章）。
 - `book/glossary.md:235` — $t$ 值依赖标准误的算法，要考虑自相关、截面相关与估计误差（第 12 章）；
 - `book/glossary.md:400` — 按时间聚类的标准误见第 12 章。
-- `book/part0/ch00-experiments.md:306` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
+- `book/part0/ch00-experiments.md:311` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
 - `book/part0/primer-regressions.md:104` — ……t$ 在时间上相关时（例如用月度数据计算未来 12 个月的收益，相邻各期的收益期限重叠），标准误会偏小，需要 Newey–West 一类的调整，见第 12 章。
 - `book/part0/primer-regressions.md:137` — 允许同一期残差任意相关的“按时间聚类”（clustered by time）标准误，见第 12 章。
 
@@ -113,8 +113,8 @@
 - `book/glossary.md:440` — 样本外检验的计量见第 13、19 章）。
 - `book/glossary.md:460` — 若改用历史均值作基准，所有方法的 $R^2$ 约高 3 个百分点（第 13、22 章）。
 - `book/glossary.md:473` — 样本外表现普遍不如样本内（第 6、13 章）。
-- `book/part0/ch00-exercises.md:230` — 第 13 章讨论这一问题。
-- `book/part0/ch00-exercises.md:294` — 持续回归变量的小样本偏误见 @stambaugh1999predictive，第 13 章详细讨论。
+- `book/part0/ch00-exercises.md:233` — 第 13 章讨论这一问题。
+- `book/part0/ch00-exercises.md:297` — 持续回归变量的小样本偏误见 @stambaugh1999predictive，第 13 章详细讨论。
 
 ## 第 14 章（4 条）
 
@@ -141,14 +141,14 @@
 - `book/glossary.md:336` — ……Frazzini 与 Pedersen 的 QMJ（quality minus junk）因子 [@asness2019quality]（第 15、16 章）。
 - `book/part0/ch00-concepts.md:66` — 因子的具体构造见第 15、16 章。
 - `book/part0/ch00-concepts.md:240` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
-- `book/part0/ch00-exercises.md:295` — 它们分别是第 22 章与第 16、17 章的主要文献。
+- `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
 - `book/part0/ch00-experiments.md:44` — 第 16、17 章讨论这一处理。
 
 ## 第 17 章（5 条）
 
 - `book/glossary.md:323` — CH3 因此剔除市值最小的 30% 的股票后再构造因子 [@liu2019size]（第 17 章）。
 - `book/part0/ch00-concepts.md:240` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
-- `book/part0/ch00-exercises.md:295` — 它们分别是第 22 章与第 16、17 章的主要文献。
+- `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
 - `book/part0/ch00-experiments.md:41` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
 - `book/part0/ch00-experiments.md:44` — 第 16、17 章讨论这一处理。
 
@@ -167,13 +167,13 @@
 
 - `book/glossary.md:171` — 业界意义上的多因子选股，本书称为“多信号选股”或“基于特征的收益预测”，它正是第四部分收益预测（第 22 章）与可实施性（第 26 章）研究的对象。
 - `book/glossary.md:460` — 若改用历史均值作基准，所有方法的 $R^2$ 约高 3 个百分点（第 13、22 章）。
-- `book/part0/ch00-exercises.md:295` — 它们分别是第 22 章与第 16、17 章的主要文献。
+- `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
 
 ## 第 23 章（3 条）
 
 - `book/glossary.md:382` — 统计因子与协方差结构见第 23 章，组合构造中的风险约束见第 26 章。
-- `book/part0/ch00-exercises.md:292` — ……“载荷是特征的线性函数”与“特征驱动的截距”的设定，来自 IPCA 模型 @kelly2019characteristics，第 23 章将完整介绍其估计方法。
-- `book/part0/ch00-experiments.md:281` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
+- `book/part0/ch00-exercises.md:295` — ……“载荷是特征的线性函数”与“特征驱动的截距”的设定，来自 IPCA 模型 @kelly2019characteristics，第 23 章将完整介绍其估计方法。
+- `book/part0/ch00-experiments.md:284` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
 
 ## 第 26 章（10 条）
 
@@ -197,4 +197,4 @@
 - `book/glossary.md:414` — ……–Waugh–Lovell 定理，收益对“信号与控制变量”做多元回归时信号的系数，等于收益对“残差化后的信号”做一元回归的系数（附录 A 讨论投影时给出证明）。
 - `book/index.md:21` — 附录 A 汇总数学工具
 - `book/notation.md:83` — 更多的矩阵代数与矩阵微积分工具见附录 A。
-- `book/part0/ch00-exercises.md:295` — vec 算子、Kronecker 积与矩阵求导的系统介绍见附录 A。
+- `book/part0/ch00-exercises.md:298` — vec 算子、Kronecker 积与矩阵求导的系统介绍见附录 A。
