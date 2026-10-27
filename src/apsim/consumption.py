@@ -6,7 +6,7 @@
 - 对数红利增长：Δd_{t+1} = μ_d + σ_d η_{t+1}，η = ρ ε + sqrt(1 − ρ²) ν，ν ~ N(0, 1) 与 ε 独立。
 - 幂效用的 SDF：m_{t+1} = δ exp(−γ Δc_{t+1})。
 - E[m] = δ exp(−γ μ_c + γ² σ_c² / 2)，R^f = 1 / E[m]（常数）。
-- 红利索取权：增长独立同分布时市盈率为常数 P/D = a / (1 − a)，
+- 红利索取权：增长独立同分布时价格—红利比（P/D）为常数 P/D = a / (1 − a)，
   a = E[m e^{Δd}] = δ exp(μ_d − γ μ_c + (σ_d² + γ² σ_c² − 2γρσ_cσ_d) / 2)，须 a < 1。
 - 总收益 R_{t+1} = e^{Δd_{t+1}} / a；E[R] = e^{μ_d + σ_d²/2} / a；
   对数股权溢价 log(E[R] / R^f) = γ ρ σ_c σ_d（精确成立）。
@@ -74,7 +74,7 @@ class ConsumptionParams:
 
     @property
     def price_dividend_ratio(self) -> float:
-        """市盈率 P/D = a / (1 − a)；a ≥ 1 时价格无穷大，抛出 ValueError。"""
+        """价格—红利比（P/D） P/D = a / (1 − a)；a ≥ 1 时价格无穷大，抛出 ValueError。"""
         a = self.dividend_discount
         if a >= 1.0:
             raise ValueError(f"a = E[m e^Δd] = {a:.4f} ≥ 1，红利索取权的价格无穷大（横截性条件不成立）")

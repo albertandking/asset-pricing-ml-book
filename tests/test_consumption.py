@@ -48,7 +48,7 @@ def test_return_identity_from_prices():
 
 def test_euler_equations_hold_in_simulation():
     data = simulate_consumption(seed=1, n_years=400_000).data
-    assert abs((data["m"] * data["R"]).mean() - 1.0) < 0.003  # 约 15 倍标准误
+    assert abs((data["m"] * data["R"]).mean() - 1.0) < 0.003  # 约 18 倍标准误
     assert abs(data["m"].mean() * data["Rf"].iloc[0] - 1.0) < 0.001
 
 
@@ -103,3 +103,12 @@ def test_golden_values():
     np.testing.assert_allclose(
         data["dd"].to_numpy(), [0.19028880952934726, -0.23246378128956882, -0.2992251090598254], rtol=0, atol=1e-12
     )
+
+
+def test_expected_return_matches_sample_mean():
+    # 400_000 年样本均值的标准误取自样本自身（std/sqrt(n)）；偏差在 4 倍标准误内，
+    # 误报概率约 6e-5，且种子固定，结果可复现。
+    p = ConsumptionParams()
+    r = simulate_consumption(p, seed=4, n_years=400_000).data["R"]
+    se = r.std() / math.sqrt(len(r))
+    assert abs(r.mean() - p.expected_return) < 4 * se
