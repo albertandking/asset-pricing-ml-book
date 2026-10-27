@@ -36,13 +36,13 @@ p = ConsumptionParams()                                    # 默认的年度假�
 (sec-ch1-summary)=
 ## 本章小结
 
-1. 两期消费—储蓄问题的一阶条件 $P_t u'(C_t) = \delta\E_t[u'(C_{t+1})x_{t+1}]$：边际代价等于边际收益，对投资者能自由买卖的每一项资产都成立（1.1 节）。
-2. 由此得到基本定价方程 $P_t = \E_t[m_{t+1}x_{t+1}]$，$m_{t+1} = \delta u'(C_{t+1})/u'(C_t)$；幂效用下 $m_{t+1} = \delta(C_{t+1}/C_t)^{-\gamma}$。特例：$R^f_t = 1/\E_t[m_{t+1}]$、$1 = \E_t[m_{t+1}R_{t+1}]$、$0 = \E_t[m_{t+1}R^e_{t+1}]$。理论写法 $R^f_t$ 与第 0 章的面板写法 $R^f_{t-1}$ 只差时点标号；第 0 章的 $m_t$ 对应本章的 $R^f_t m_{t+1}$（1.2 节）。
-3. 价格等于不考虑风险的价值加上风险调整，$P = \E[x]/R^f + \Cov(m, x)$；期望超额收益 $\E[R^e] = -R^f\Cov(m, R^e)$。坏时候 $m$ 高，在坏时候赚钱的资产像保险，期望收益低，甚至低于无风险利率；与 $m$ 不相关的波动得不到补偿（1.3 节）。
-4. 对数正态下，$\log R^f = -\log\delta + \gamma\mu_c - \gamma^2\sigma_c^2/2$，三项分别对应耐心、跨期替代与预防性储蓄；$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R)$，对红利索取权为 $\gamma\rho\sigma_c\sigma_d$。二者在联合正态时精确，冲击非正态时只是保留到二阶项的近似（1.4 节）。
-5. 消费 CAPM：$\E[R^e] \approx \beta_{\Delta c}\lambda_c$，$\lambda_c = \gamma\Var(\Delta c)$，来自 SDF 的线性化，默认参数下相对误差约 0.12%。消费增长是不可交易的因子，$\lambda_c$ 不等于 $\E[\Delta c]$（1.4 节、模拟实验三）。
-6. 多期定价：$P_t = \E_t\sum_{j\ge1}M_{t,t+j}D_{t+j}$，需要横截性条件排除泡沫。独立同分布时价格—红利比为常数 $a/(1-a)$，$a = \E[m e^{\Delta d}] < 1$ 等价于期望收益高于红利的期望增长；收益 $R_{t+1} = e^{\Delta d_{t+1}}/a$ 不可预测。Lucas 树是红利等于消费的特例，$\gamma > 1$ 时预期增长提高反而降低价格—红利比（1.5 节）。
-7. 第 0 章的线性 SDF 是消费 SDF 的一阶近似 $m/\E[m] \approx 1 - \gamma(\Delta c - \mu_c)$；两种情形都满足 $\bv\lambda = \bv\Sigma_f\mathbf b$，区别在于可交易因子必须为自身定价，从而 $\mathbf b = \bv\Sigma_f^{-1}\bv\mu$、$\bv\lambda = \bv\mu$（1.6 节）。
+1. 两期消费—储蓄问题的一阶条件 $P_t u'(C_t) = \delta\E_t[u'(C_{t+1})x_{t+1}]$：边际代价等于边际收益，对投资者能自由买卖的每一项资产都成立（1.1 节，[拆解](#ch1-unpack-foc)）。
+2. 由此得到基本定价方程 $P_t = \E_t[m_{t+1}x_{t+1}]$，$m_{t+1} = \delta u'(C_{t+1})/u'(C_t)$；幂效用下 $m_{t+1} = \delta(C_{t+1}/C_t)^{-\gamma}$。特例：$R^f_t = 1/\E_t[m_{t+1}]$、$1 = \E_t[m_{t+1}R_{t+1}]$、$0 = \E_t[m_{t+1}R^e_{t+1}]$。理论写法 $R^f_t$ 与第 0 章的面板写法 $R^f_{t-1}$ 只差时点标号；第 0 章的 $m_t$ 对应本章的 $R^f_t m_{t+1}$（1.2 节，[拆解](#ch1-unpack-pricing)）。
+3. 价格等于不考虑风险的价值加上风险调整，$P = \E[x]/R^f + \Cov(m, x)$；期望超额收益 $\E[R^e] = -R^f\Cov(m, R^e)$。坏时候 $m$ 高，在坏时候赚钱的资产像保险，期望收益低，甚至低于无风险利率；与 $m$ 不相关的波动得不到补偿（1.3 节，[拆解](#ch1-unpack-covprice)）。
+4. 对数正态下，$\log R^f = -\log\delta + \gamma\mu_c - \gamma^2\sigma_c^2/2$，三项分别对应耐心、跨期替代与预防性储蓄；$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R)$，对红利索取权为 $\gamma\rho\sigma_c\sigma_d$。二者在联合正态时精确，冲击非正态时只是保留到二阶项的近似（1.4 节，[拆解](#ch1-unpack-logrf)）。
+5. 消费 CAPM：$\E[R^e] \approx \beta_{\Delta c}\lambda_c$，$\lambda_c = \gamma\Var(\Delta c)$，来自 SDF 的线性化，默认参数下相对误差约 0.12%。消费增长是不可交易的因子，$\lambda_c$ 不等于 $\E[\Delta c]$（1.4 节、模拟实验三，[拆解](#ch1-unpack-ccapm)）。
+6. 多期定价：$P_t = \E_t\sum_{j\ge1}M_{t,t+j}D_{t+j}$，需要横截性条件排除泡沫。独立同分布时价格—红利比为常数 $a/(1-a)$，$a = \E[m e^{\Delta d}] < 1$ 等价于期望收益高于红利的期望增长；收益 $R_{t+1} = e^{\Delta d_{t+1}}/a$ 不可预测。Lucas 树是红利等于消费的特例，$\gamma > 1$ 时预期增长提高反而降低价格—红利比（1.5 节，[拆解](#ch1-unpack-a)）。
+7. 第 0 章的线性 SDF 是消费 SDF 的一阶近似 $m/\E[m] \approx 1 - \gamma(\Delta c - \mu_c)$；两种情形都满足 $\bv\lambda = \bv\Sigma_f\mathbf b$，区别在于可交易因子必须为自身定价，从而 $\mathbf b = \bv\Sigma_f^{-1}\bv\mu$、$\bv\lambda = \bv\mu$（1.6 节，[拆解](#ch1-unpack-bsb)）。
 8. 中国的消费数据频率低、样本短、口径多、会修订，直接用消费数据检验定价模型很困难；在本章的默认参数下，几十年的样本甚至无法把风险溢价与 0 区分开（A 股视角、[习题 %s](#ex-ch1-short)）。
 
 ## 习题
@@ -56,7 +56,7 @@ p = ConsumptionParams()                                    # 默认的年度假�
 
 :::{solution} ex-ch1-insurance
 :class: dropdown
-“风险越高收益越高”中的风险，只能是与 $m$ 相关的那部分风险。由式 {eq}`eq-ch1-premium`，$\E[R^e] = -R^f\Cov(m, R^e)$：期望超额收益的符号由收益与 $m$ 的协方差决定，与收益自身的方差无关。保险型资产在坏状态（$m$ 高）支付多，$\Cov(m, R^e) > 0$，期望超额收益为负：持有它降低了消费的波动，投资者愿意为此接受低于无风险利率的期望收益，正如为保险支付保费。
+“风险越高收益越高”中的风险，只能是与 $m$ 相关的那部分风险。由式 {eq}`eq-ch1-premium`（[拆解](#ch1-unpack-premium)），$\E[R^e] = -R^f\Cov(m, R^e)$：期望超额收益的符号由收益与 $m$ 的协方差决定，与收益自身的方差无关。保险型资产在坏状态（$m$ 高）支付多，$\Cov(m, R^e) > 0$，期望超额收益为负：持有它降低了消费的波动，投资者愿意为此接受低于无风险利率的期望收益，正如为保险支付保费。
 
 在幂效用、对数正态的模型中，由式 {eq}`eq-ch1-logprem`，红利索取权的 $\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$。所以 $\rho < 0$（红利在消费增长低时增长高）的资产期望超额收益为负；$\rho = 0$ 的资产，不论 $\sigma_d$ 多大，期望超额收益都恰好为 0（模拟实验三的第二项资产）。
 :::
@@ -112,6 +112,8 @@ assert math.isclose(both.loc["合计 log R^f", "γ = 10"], math.log(ConsumptionP
    \log R^f_t = -\log\delta + \gamma\mu_{c,t} - \frac{\gamma^2\sigma_c^2}{2} .
    ```
 
+   式中各项的含义与单位与式 {eq}`eq-ch1-logrf` 相同（[拆解](#ch1-unpack-logrf)），唯一的区别是 $\mu_{c,t}$：它是第 $t$ 期末已知的、第 $t+1$ 年对数消费增长的条件均值（年度），随 $t$ 变化，所以左边带下标 $t$。例如 $\mu_{c,t}$ 从 2% 降到 1% 时，$\log R^f_t$ 降低 $\gamma \times 1\%$，默认 $\gamma = 2$ 时为 2 个百分点。
+
    与[命题 %s](#prop-ch1-rf) 的推导相同，只是条件期望不再等于无条件期望。$R^f_t$ 依赖于 $\mu_{c,t}$，随时间变化，并且在第 $t$ 期末已知、适用于从 $t$ 到 $t+1$，正是 1.2 节理论写法 $R^f_t$ 的含义。在独立同分布的模型中它恰好是常数，下标可以省略。
 2. 衰退时 $\mu_{c,t}$ 低，跨期替代项 $\gamma\mu_{c,t}$ 小，无风险利率低。预期未来消费增长慢时，投资者想把今天的资源留到未来，储蓄意愿上升，均衡利率因此下降。$\gamma$ 越大（跨期替代弹性越小），利率对预期增长越敏感。
 
@@ -145,7 +147,7 @@ assert sp.diff(logRf_t, muct) == g_s
 :class: dropdown
 :::
 
-1. $M_{t,t+j}D_{t+j}/D_t = \delta^j(C_{t+j}/C_t)^{-\gamma}(C_{t+j}/C_t) = \delta^j\exp\left((1-\gamma)\sum_{k=1}^{j}\Delta c_{t+k}\right)$。各年的 $\Delta c$ 独立同分布，乘积的期望等于期望的乘积，每一个期望由式 {eq}`eq-ch1-lognormal` 为 $a = \delta\exp\left((1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2\right)$，所以 $\E_t[M_{t,t+j}D_{t+j}]/D_t = a^j$。求和得 $P_t/D_t = \sum_{j\ge1}a^j = a/(1-a)$，条件是 $a < 1$，即 $\log\delta + (1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2 < 0$；此时横截性条件 $\E_t[M_{t,t+J}P_{t+J}] = (P/D)\,D_t\,a^J \to 0$ 也成立。这与[命题 %s](#prop-ch1-pd) 取 $\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 的结果一致。
+1. $M_{t,t+j}D_{t+j}/D_t = \delta^j(C_{t+j}/C_t)^{-\gamma}(C_{t+j}/C_t) = \delta^j\exp\left((1-\gamma)\sum_{k=1}^{j}\Delta c_{t+k}\right)$。各年的 $\Delta c$ 独立同分布，乘积的期望等于期望的乘积，每一个期望由式 {eq}`eq-ch1-lognormal` 为 $a = \delta\exp\left((1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2\right)$（与式 {eq}`eq-ch1-a` 的六项对照，见[拆解](#ch1-unpack-a)：Lucas 树中 $\mu_d - \gamma\mu_c$ 合并为 $(1-\gamma)\mu_c$，三个方差项合并为 $(1-\gamma)^2\sigma_c^2/2$），所以 $\E_t[M_{t,t+j}D_{t+j}]/D_t = a^j$。求和得 $P_t/D_t = \sum_{j\ge1}a^j = a/(1-a)$，条件是 $a < 1$，即 $\log\delta + (1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2 < 0$；此时横截性条件 $\E_t[M_{t,t+J}P_{t+J}] = (P/D)\,D_t\,a^J \to 0$ 也成立。这与[命题 %s](#prop-ch1-pd) 取 $\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 的结果一致。
 2. $\gamma = 1$ 时 $(1-\gamma) = 0$，$a = \delta$，$P/D = \delta/(1-\delta)$。原因是对数效用下 $m_{t+1}D_{t+1} = \delta (C_t/C_{t+1}) C_{t+1} = \delta C_t$ 是确定的：增长带来更多红利的“现金流效应”与增长使边际效用下降的“折现效应”恰好抵消，红利的任何变化都被边际效用的变化完全抵消。
 3. $\partial\log a/\partial\mu_c = 1 - \gamma$。$P/D = a/(1-a)$ 是 $a$ 的增函数，所以 $\gamma > 1$ 时预期增长提高使价格—红利比下降，$\gamma < 1$ 时使它上升。直观上，$\mu_c$ 提高使未来红利增加（系数 1），同时由式 {eq}`eq-ch1-logrf` 使利率上升（系数 $\gamma$），净效应为 $1 - \gamma$。
 4. 由 $P_t = vD_t$，$v = a/(1-a)$，$R_{t+1} = (v+1)/v \cdot D_{t+1}/D_t = e^{\Delta c_{t+1}}/a$（式 {eq}`eq-ch1-return`）。于是 $\log R_{t+1} = \Delta c_{t+1} - \log a$，由[命题 %s](#prop-ch1-premium)，$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R) = \gamma\sigma_c^2$。默认的 $\gamma = 2$、$\sigma_c = 2\%$ 下为 0.08%，恰好等于 $\lambda_c$。原因是对数收益 $\log R = \Delta c - \log a$ 对消费增长的 β 恰好为 1；总收益的 β 则是 $\Cov(R, \Delta c)/\sigma_c^2 = \E[R] \approx 1.05$（由 1.4 节的 $\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$）。
@@ -237,6 +239,16 @@ assert 0.4 < np.mean(Rebar < 0) < 0.5 and 10_000 < years_needed < 11_000
 1. 500 条路径上样本平均超额收益的均值与闭式解相差不到 3 倍蒙特卡洛标准误，说明样本均值是无偏的；但它的标准差是闭式解的 6 倍以上，有将近一半的路径得到负的样本溢价（数值见上方输出，均由 `assert` 保证）。
 2. 理论标准误 $\text{Std}(R)/\sqrt{50}$ 与第 1 问的标准差相差不到 10%。要使标准误小于闭式解的一半，需要 $T > (2\,\text{Std}(R)/(\E[R] - R^f))^2$，约一万年。
 3. 默认参数下风险溢价很小、收益波动很大，任何现实长度的样本都无法可靠地估计它，更不用说估计它与消费 β 的关系：年度消费数据同样只有几十个观测，还有口径、修订、时间加总等问题。要检验定价模型，需要利用横截面上大量资产的信息（第二、三部分）或多个矩的共同约束（第 11 章的 GMM），并始终把估计值与标准误放在一起看。
+
+(ch1-unpack-se)=
+**拆开讲标准误的公式。** $\Var(R) = \E[R]^2(e^{\sigma_d^2} - 1)$ 中，$R = e^{\Delta d}/a$ 是红利索取权的年度总收益，$\E[R] \approx 1.053$，$\sigma_d^2 = 0.0144$ 是对数红利增长的年度方差。它来自式 {eq}`eq-ch1-lognormal`：$\E[R^2] = \E[e^{2\Delta d}]/a^2 = \E[R]^2 e^{\sigma_d^2}$，再减去 $\E[R]^2$。于是 $\text{Std}(R) = 1.053 \times \sqrt{e^{0.0144} - 1} \approx 0.127$，即年度收益的标准差约 12.7%；$R^f$ 是常数，超额收益的标准差与之相同。$T$ 年样本均值的标准误是 $\text{Std}(R)/\sqrt T$，$T = 50$ 时约为 $0.127/\sqrt{50} \approx 1.79\%$，是闭式解 0.2524% 的 7 倍多。要求标准误小于闭式解的一半，即 $\text{Std}(R)/\sqrt T < (\E[R] - R^f)/2$，两边平方后移项得 $T > (2\,\text{Std}(R)/(\E[R] - R^f))^2 \approx (2 \times 0.127/0.002524)^2$，约 1.01 万年。
+
+```{code-cell} python
+# 拆开讲标准误：Std(R) = E[R] √(e^{σ_d²} − 1)；T = 50 时的标准误与所需年数
+print(f"Std(R) = {sd_R:.4f}，50 年的标准误 {se_theory:.4%}，为闭式解的 {se_theory / truth:.2f} 倍")
+assert 0.1268 < sd_R < 0.1269 and 0.0179 < se_theory < 0.0180 and 7 < se_theory / truth < 7.2
+assert 10_000 < (2 * sd_R / truth) ** 2 < 10_200
+```
 :::{solution-end}
 :::
 
