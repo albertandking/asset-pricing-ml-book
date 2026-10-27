@@ -11,3 +11,17 @@ if [ -n "$1" ]; then
     [ -f "$f" ] && sed -i "s#http://localhost:3000#$1#g" "$f"
   done
 fi
+
+# 3. 已移动页面的旧网址：生成跳转页，避免外部链接失效（格式：旧路径 新路径，相对网站根目录）
+while read -r old new; do
+  [ -z "$old" ] && continue
+  mkdir -p "$old"
+  cat > "$old/index.html" <<HTML
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>页面已移动</title>
+<link rel="canonical" href="../$new/"><meta http-equiv="refresh" content="0; url=../$new/">
+</head><body><p>本页已移动到 <a href="../$new/">新地址</a>。</p></body></html>
+HTML
+done <<'MOVED'
+ch00-regressions primer-regressions
+MOVED
