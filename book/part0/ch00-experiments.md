@@ -18,7 +18,7 @@ numbering:
 import numpy as np
 import pandas as pd
 
-from apsim import MarketParams, simulate_market
+from apsim import MarketParams, simulate_market, stats
 
 # 0.4 节的默认市场（种子 0）及其逐行的载荷 β_{i,t}' 与因子 f_t'
 params = MarketParams()
@@ -75,7 +75,7 @@ $$ (eq-ch0-kron)
 
 **与代码的对应。** 下面的 `interaction_design` 用广播构造 $\mathbf X$：`zt[:, :, None] * ff[:, None, :]` 的形状为 `(TN, L+1, K)`，其 `[n, j, k]` 元素是 $\tilde z_j f_k$；NumPy 的 `reshape` 默认按行优先（C 顺序）展开，最后一维 `k` 变化最快，所以展开后每一行正是 $(\tilde{\mathbf z} \otimes \mathbf f)'$。同理，`gamma.ravel()`（行优先）就是 $\operatorname{vec}(\bv\Gamma')$，而列优先的 `gamma.ravel(order="F")` 才是 $\operatorname{vec}(\bv\Gamma)$；系数向量用 `coef.reshape(L+1, K)` 还原为 $\hat{\bv\Gamma}$。数学上的 vec 是列优先，NumPy 的默认展开是行优先，两者差一个转置，这是最容易出错的地方，下面的代码单元用 `np.kron` 与 `assert` 核对这一对应。
 
-由于 $\varepsilon_{i,t}$ 与 $(\mathbf z_{i,t-1}, \mathbf f_t)$ 独立，解释变量严格外生，最小二乘估计量无偏，其条件协方差矩阵为 $\sigma_\varepsilon^2 (\mathbf X'\mathbf X)^{-1}$（$(L+1)K \times (L+1)K$）。函数 `ols` 用 `lstsq` 求系数、用 `solve` 求 $(\mathbf X'\mathbf X)^{-1}$，而不调用 `inv`。下面用默认参数（$N = 500$、$T = 240$）检验这一点。
+由于 $\varepsilon_{i,t}$ 与 $(\mathbf z_{i,t-1}, \mathbf f_t)$ 独立，解释变量严格外生，最小二乘估计量无偏，其条件协方差矩阵为 $\sigma_\varepsilon^2 (\mathbf X'\mathbf X)^{-1}$（$(L+1)K \times (L+1)K$）。函数 `ols` 用 `lstsq` 求系数、用 `solve` 求 $(\mathbf X'\mathbf X)^{-1}$，而不调用 `inv`。这两个函数也收在 `apsim.stats` 中，代码单元用 `assert` 核对二者与这里的定义结果相同，后面的页面直接调用 `apsim.stats`。下面用默认参数（$N = 500$、$T = 240$）检验这一点。
 
 ```{code-cell} python
 def interaction_design(market):
@@ -107,6 +107,10 @@ assert np.allclose(X @ mkt.gamma.ravel(), np.sum(beta * f_row, axis=1))       # 
 assert not np.allclose(X @ mkt.gamma.ravel(order="F"), np.sum(beta * f_row, axis=1))
 
 coef, se = ols(X, mkt.panel["exret"].to_numpy())
+# 上面的内联定义与 apsim.stats 中的同名函数结果相同：比较设计矩阵 X、Z，以及系数与标准误
+X_lib, Z_lib = stats.interaction_design(mkt)
+coef_lib, se_lib = stats.ols(X, mkt.panel["exret"].to_numpy())
+assert np.array_equal(X, X_lib) and np.array_equal(interaction_design(mkt)[1], Z_lib) and np.allclose(coef, coef_lib) and np.allclose(se, se_lib)
 names = [f"Γ[{j},{k + 1}]" for j in range(params.n_chars + 1) for k in range(K)]
 table = pd.DataFrame(
     {"真值": mkt.gamma.ravel(), "估计值": coef, "标准误": se, "标准化偏差": (coef - mkt.gamma.ravel()) / se},

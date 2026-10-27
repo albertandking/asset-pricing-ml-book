@@ -18,7 +18,7 @@ numbering:
 import numpy as np
 import pandas as pd
 
-from apsim import MarketParams, simulate_market
+from apsim import MarketParams, simulate_market, stats
 ```
 
 **白话。** 实证资产定价用的数据几乎都是面板：一个维度是股票 $i$，另一个维度是时间 $t$，每个格子里是一个收益 $r_{i,t}$，同一格还附着期初特征 $\mathbf z_{i,t-1}$，同一行（同一期）共用一个因子 $\mathbf f_t$。本书出现的几种回归用的是同一张表，区别只在于**沿哪个维度跑**：固定一只股票、沿时间跑，是时间序列回归；固定一期、沿股票跑，是横截面回归；每期各跑一次横截面回归、再对系数求时间平均，是 Fama–MacBeth 程序；不分股票与时间，把全部格子放在一起跑一次，是混合回归（pooled regression）。跑的方向不同，得到的系数含义不同，回答的问题不同，标准误的算法也不同。
@@ -201,7 +201,7 @@ assert abs(dev_rg.std() - 1) < 0.1                                         # N×
 
 $\hat{\bv\beta}_i$ 的横截面平均与 $(1, 0, 0)'$ 的差别在 0.05 以内（由 `assert` 保证）。上面挑出 $z_1$ 路径均值最高与最低的两只股票：它们在样本期内对因子 2 的平均载荷分别高于 0.3 与低于 $-0.3$，正好是 $0.5$ 乘以 $z_1$ 的路径均值；估计值 $\hat{\bv\beta}_i$ 的每个分量与平均载荷的偏离都在 3 倍标准误以内（均由 `assert` 保证，具体数值见上方输出）。但单只股票的标准误约为 0.2，与平均载荷在股票之间的差别是同一个量级，所以单只股票的 $\hat{\bv\beta}_i$ 只能粗略地反映它的平均载荷。按 $z_1$ 均值分组后，噪声被平均掉：最高、最低两组 50 只股票的 $\hat\beta_2$ 组内平均明显偏离 0，方向与 $z_1$ 一致，并且与组内的平均载荷相差在 3 倍标准误以内。全部 1500 个标准化偏离的标准差与 1 相差不到 0.1（均由 `assert` 保证）：$\hat{\bv\beta}_i$ 以样本期平均载荷为中心，回归标准误正确地度量了它的误差。
 
-**(b) 横截面回归与 (c) Fama–MacBeth。** 每期把 $\mathbf r_t$ 对 $[\mathbf 1_N, \mathbf z_1, \mathbf z_2]$（$N\times 3$，即 $\tilde{\mathbf Z}_{t-1}$ 的前三列）回归，这与[因子、特征、载荷的关系](#sec-ch0-fcl)中的回归相同，第 $t$ 期的系数应约等于 $(f_{1,t},\ 0.5 f_{2,t},\ 0.5 f_{3,t})$，那里已详细验证，这里只用相关系数简要复核。新的内容是 Fama–MacBeth：$\bar{\mathbf g}$ 应约等于 $\bv\Gamma\bv\mu$ 的前三个分量 $(\mu_1,\ 0.5\mu_2,\ 0.5\mu_3) = (0.006,\ 0.0015,\ 0.002)$。更准确地说，$\hat{\mathbf g}_t$ 等于 $\bv\Gamma\mathbf f_t$ 加上横截面噪声，所以 $\bar{\mathbf g}$ 约等于 $\bv\Gamma\bar{\mathbf f}$（$\bar{\mathbf f}$ 为本样本的因子均值），二者只差平均后的横截面噪声，量级为 $\sigma_\varepsilon/\sqrt{NT}$；$\bar{\mathbf g}$ 与 $\bv\Gamma\bv\mu$ 的差别则主要来自因子样本均值的抽样误差，FM 标准误因而约为 $\hat{\mathbf g}_t$ 中因子部分的标准差除以 $\sqrt T$，即 $\bv\Gamma$ 第 $j$ 行与 $\bv\Sigma_f$ 构成的 $[\bv\Gamma\bv\Sigma_f\bv\Gamma']_{jj}^{1/2}/\sqrt T$。代码同时记下每期回归中每个系数的 OLS $t$ 值，供下文“与业界的对应”使用。
+**(b) 横截面回归与 (c) Fama–MacBeth。** 每期把 $\mathbf r_t$ 对 $[\mathbf 1_N, \mathbf z_1, \mathbf z_2]$（$N\times 3$，即 $\tilde{\mathbf Z}_{t-1}$ 的前三列）回归，这与[因子、特征、载荷的关系](#sec-ch0-fcl)中的回归相同，第 $t$ 期的系数应约等于 $(f_{1,t},\ 0.5 f_{2,t},\ 0.5 f_{3,t})$，那里已详细验证，这里只用相关系数简要复核。新的内容是 Fama–MacBeth：$\bar{\mathbf g}$ 应约等于 $\bv\Gamma\bv\mu$ 的前三个分量 $(\mu_1,\ 0.5\mu_2,\ 0.5\mu_3) = (0.006,\ 0.0015,\ 0.002)$。更准确地说，$\hat{\mathbf g}_t$ 等于 $\bv\Gamma\mathbf f_t$ 加上横截面噪声，所以 $\bar{\mathbf g}$ 约等于 $\bv\Gamma\bar{\mathbf f}$（$\bar{\mathbf f}$ 为本样本的因子均值），二者只差平均后的横截面噪声，量级为 $\sigma_\varepsilon/\sqrt{NT}$；$\bar{\mathbf g}$ 与 $\bv\Gamma\bv\mu$ 的差别则主要来自因子样本均值的抽样误差，FM 标准误因而约为 $\hat{\mathbf g}_t$ 中因子部分的标准差除以 $\sqrt T$，即 $\bv\Gamma$ 第 $j$ 行与 $\bv\Sigma_f$ 构成的 $[\bv\Gamma\bv\Sigma_f\bv\Gamma']_{jj}^{1/2}/\sqrt T$。代码同时记下每期回归中每个系数的 OLS $t$ 值，供下文“与业界的对应”使用。Fama–MacBeth 的三步也收在 `apsim.stats.fama_macbeth` 中，代码单元用 `assert` 核对它与这里的内联实现结果相同，后面的页面直接调用它。
 
 ```{code-cell} python
 # (b) 横截面回归：每期 r_t 对 [1_N, z1, z2]，并记录每个系数在该期回归中的 OLS t 值
@@ -219,6 +219,8 @@ assert np.all(corr_b_rg > 0.9)                                             # 与
 # (c) Fama–MacBeth：系数的时间平均与时间序列标准误
 gbar_rg = G_rg.mean(axis=0)                                                # ḡ: (3,)
 se_fm_rg = G_rg.std(axis=0, ddof=1) / np.sqrt(T_rg)                        # 逐分量：σ̂(ĝ_{j,t}) / √T
+fm_lib_rg = stats.fama_macbeth(X_rg, R_rg)                                 # 同一程序的 apsim.stats 版本
+assert np.allclose(fm_lib_rg.coefs, G_rg) and np.allclose(fm_lib_rg.mean, gbar_rg) and np.allclose(fm_lib_rg.se, se_fm_rg)
 G3_rg = rg.gamma[:3]                                                       # Γ 的前三行（常数、z1、z2）：(3, K)
 truth_rg = G3_rg @ mu_rg                                                   # Γμ：(3, K) @ (K,) -> (3,)
 sample_rg = G3_rg @ F_rg.mean(axis=0)                                      # Γ f̄：(3, K) @ (K,) -> (3,)

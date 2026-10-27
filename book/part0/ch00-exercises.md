@@ -10,36 +10,16 @@ numbering:
 
 # 本章小结、习题与延伸阅读
 
-**本页准备。** 本书每个页面的代码在独立的内核中运行，前面页面定义的变量在这里不可用。下面的单元导入本页用到的模块，并重新定义上一页“模拟实验”一节的两个函数 `interaction_design` 与 `ols`。
+**本页准备。** 本书每个页面的代码在独立的内核中运行，前面页面定义的变量在这里不可用。下面的单元导入本页用到的模块，以及上一页“模拟实验”一节讲解过的两个函数 `interaction_design` 与 `ols`（它们收在 `apsim.stats` 中）。
 
 ```{code-cell} python
 import numpy as np
 import pandas as pd
 
 from apsim import MarketParams, simulate_market
+from apsim.stats import interaction_design, ols
 
 K = MarketParams().n_factors                                # 因子个数 K = 3，与 0.4 节相同
-
-
-# 以下两个函数与上一页“模拟实验”一节中的定义相同
-def interaction_design(market):
-    """返回交互项设计矩阵 X（行：(t, i)；列：z̃_j f_k，j 在外层、k 在内层）与期初特征矩阵 Z。"""
-    pnl = market.panel
-    n_chars = market.params.n_chars
-    Z = pnl[[f"z{j}" for j in range(1, n_chars + 1)]].to_numpy()               # (TN, L)
-    zz = np.column_stack([np.ones(len(pnl)), Z])                               # (TN, L+1)，每行 z̃'
-    ff = market.factors.reindex(pnl.index.get_level_values("period")).to_numpy()   # (TN, K)，每行 f_t'
-    X = (zz[:, :, None] * ff[:, None, :]).reshape(len(pnl), -1)                # (TN, L+1, K) -> (TN, (L+1)K)
-    return X, Z
-
-
-def ols(X, y):
-    """最小二乘系数与同方差标准误。X: (n, p)，y: (n,)。"""
-    coef, *_ = np.linalg.lstsq(X, y, rcond=None)                               # (p,)
-    resid = y - X @ coef                                                       # (n, p) @ (p,) -> (n,)
-    s2 = resid @ resid / (len(y) - X.shape[1])                                 # σ̂_ε²
-    XtX_inv = np.linalg.solve(X.T @ X, np.eye(X.shape[1]))                     # (X'X)⁻¹：(p, p)
-    return coef, np.sqrt(np.diag(s2 * XtX_inv))
 ```
 
 ## 本章小结
