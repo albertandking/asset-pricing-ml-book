@@ -43,14 +43,14 @@
 │   ├── notation.md        全书记号表
 │   ├── references.bib
 │   ├── _static/custom.css
-│   ├── part0/             第 0 章：ch00-guide.md 为首页，其余各页为它的子页面
+│   ├── part0/             第零部分：第 0 章（ch00-guide.md 为首页，ch00-* 其余各页为它的子页面）与导读页
 │   │   ├── ch00-guide.md
 │   │   ├── ch00-concepts.md
 │   │   ├── ch00-relations.md
-│   │   ├── ch00-regressions.md
 │   │   ├── ch00-model.md
 │   │   ├── ch00-experiments.md
-│   │   └── ch00-exercises.md
+│   │   ├── ch00-exercises.md
+│   │   └── primer-regressions.md   导读：几种回归（第二部分的预习，不属于第 0 章，不编号）
 │   ├── part1/ch01-euler-sdf.md
 │   └── ……                 文件名用英文，标题用中文
 └── scripts/
