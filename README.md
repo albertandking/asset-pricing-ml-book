@@ -31,6 +31,8 @@ sh scripts/build.sh --clean   # 冷构建：先删除执行缓存 book/_build/ex
 sh scripts/serve.sh           # 启动本地服务器，浏览器打开 http://localhost:8000
 ```
 
+`build.sh` 构建后会运行 `scripts/postprocess.sh`：把页面语言改为 `zh-CN`；发布时（见工作流）还会把 sitemap 中 mystmd 写死的 `localhost:3000` 换成线上地址。
+
 构建会缓存代码单元的输出，只有代码单元本身改动时才重新执行。修改了 `src/apsim` 的源码、而章节代码没变时，缓存的输出会过期，这时用 `--clean`。验收必须用 `sh scripts/build.sh --clean`。`--clean` 不会删除 `book/_build/templates`（主题模板缓存），请勿手动删除整个 `book/_build`。
 
 写作时可用实时预览：`cd book && uv run jupyter book start --execute`。

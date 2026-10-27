@@ -18,3 +18,8 @@ article p,
 article li {
   line-height: 1.85;
 }
+
+/* 隐藏左侧目录栏底部的“Made with MyST”标志 */
+.myst-made-with-myst {
+  display: none !important;
+}

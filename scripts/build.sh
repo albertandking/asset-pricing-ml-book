@@ -13,3 +13,4 @@ for arg in "$@"; do
   esac
 done
 uv run jupyter book build --html --execute --strict
+sh ../scripts/postprocess.sh
