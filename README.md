@@ -4,6 +4,7 @@
 
 - 在线阅读：<https://albertandking.github.io/asset-pricing-ml-book/>（推送到 `main` 后由 GitHub Actions 自动冷构建并发布，见 `.github/workflows/deploy.yml`）
 - 许可：正文 CC BY-NC-SA 4.0（见 `LICENSE-CONTENT.md`），代码 MIT（见 `LICENSE`）
+- 反馈与勘误：发现错误或有建议，请到 GitHub Issues 提交：<https://github.com/albertandking/asset-pricing-ml-book/issues>
 
 ## 前提条件
 
@@ -45,7 +46,13 @@ uv run pytest
 
 ## 目录
 
-- `book/`：书的源文件（MyST Markdown）
-- `src/apsim/`：模拟市场生成器与工具函数
+- `book/`：书的源文件（MyST Markdown）；目录在 `book/myst.yml` 中
+  - `index.md`（前言）、`notation.md`（记号表）、`glossary.md`（术语对照：学术与业界）、`references.bib`（参考文献）
+  - `part0/`：第零部分　准备
+    - 第 0 章：`ch00-guide.md` 为首页（含本章阅读路径），子页面依次为 `ch00-concepts.md`（0.2 基本概念速览）、`ch00-relations.md`（因子、特征、载荷的关系）、`ch00-model.md`（0.3～0.6 记号、模型与 SDF 的定价性质）、`ch00-experiments.md`（A 股视角、模拟实验与常见误区）、`ch00-exercises.md`（本章小结、习题与延伸阅读）
+    - `primer-regressions.md`：导读：几种回归（第二部分的预习，不属于第 0 章）
+- `src/apsim/`：模拟市场生成器与工具函数（`market`、`stats`、`plotting`）
 - `tests/`：单元测试
+- `scripts/`：构建、预览与前向引用台账脚本（`build.sh`、`postprocess.sh`、`serve.sh`、`promises.py`）
 - `docs/specs/`：设计文档
+- `docs/promises.md`：前向引用台账，列出正文中指向尚未写出的章节或附录的引用；由 `uv run python scripts/promises.py` 生成，写每一章之前先运行并核对
