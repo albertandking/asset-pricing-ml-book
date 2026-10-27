@@ -125,9 +125,9 @@ $$ (eq-ch1-pd)
 **第四步：计算 $a$。** $\log(m_{t+1}e^{\Delta d_{t+1}}) = \log\delta - \gamma\Delta c_{t+1} + \Delta d_{t+1} = \log\delta - \gamma\mu_c + \mu_d + (\rho\sigma_d - \gamma\sigma_c)\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho^2}\,\nu_{t+1}$，是正态的，方差为 $(\rho\sigma_d - \gamma\sigma_c)^2 + \sigma_d^2(1 - \rho^2) = \sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho\sigma_c\sigma_d$。由式 {eq}`eq-ch1-lognormal` 即得式 {eq}`eq-ch1-a`。
 :::
 
-另一种常见的推导是“猜测并验证”：猜 $P_t = vD_t$，代入 $P_t = \E_t[m_{t+1}(P_{t+1} + D_{t+1})]$，两边除以 $D_t$，得 $v = \E_t[m_{t+1}(v + 1)e^{\Delta d_{t+1}}] = a(v + 1)$，解出 $v = a/(1-a)$。这种方法更快，但它只找到了一个解；为什么价格一定是这个解，要靠横截性条件排除泡沫解（上一小节）。$a < 1$ 也正是 $v > 0$ 的条件。
+另一种常见的推导是“猜测并验证”：猜 $P_t = vD_t$，代入 $P_t = \E_t[m_{t+1}(P_{t+1} + D_{t+1})]$，两边除以 $D_t$，得 $v = \E_t[m_{t+1}(v + 1)e^{\Delta d_{t+1}}] = a(v + 1)$，解出 $v = a/(1-a)$。这种方法更快，但只找到了一个解，排除泡沫解要靠横截性条件（上一小节）。
 
-**$a$ 的含义。** 由第一步，$a$ 是“只获得明年红利”这项资产今天的价格，以当前红利为单位；$a^j$ 是只获得第 $j$ 年红利的资产的价格。$a < 1$ 说明越远的红利今天越不值钱，总价值才是有限的。$a$ 还可以写成 $a = G/\E[R]$，其中 $G = \E[e^{\Delta d}] = e^{\mu_d + \sigma_d^2/2}$ 是红利的期望总增长（下面的收益公式 {eq}`eq-ch1-return` 给出 $\E[R] = G/a$）。于是 $a < 1$ 等价于 $\E[R] > G$：期望收益（折现率）高于红利的期望增长；而式 {eq}`eq-ch1-pd` 化为 $P/D = G/(\E[R] - G)$，这就是熟悉的 Gordon 增长模型。默认参数下 $a \approx 0.9758$，价格—红利比约为 40.4，股息率约为 2.5%。
+**$a$ 的含义。** 由第一步，$a$ 是“只获得明年红利”这项资产今天的价格，以当前红利为单位；$a^j$ 对应第 $j$ 年的红利；$a < 1$ 时越远的红利越不值钱，总价值才有限。$a$ 还可以写成 $a = G/\E[R]$，其中 $G = \E[e^{\Delta d}] = e^{\mu_d + \sigma_d^2/2}$ 是红利的期望总增长（下面的收益公式 {eq}`eq-ch1-return` 给出 $\E[R] = G/a$）。于是 $a < 1$ 等价于 $\E[R] > G$：期望收益（折现率）高于红利的期望增长；而式 {eq}`eq-ch1-pd` 化为 $P/D = G/(\E[R] - G)$，这就是熟悉的 Gordon 增长模型。默认参数下 $a \approx 0.9758$，价格—红利比约为 40.4，股息率约为 2.5%。
 
 下面的代码用三种方法核对 $a$：闭式解（模拟器的属性 `dividend_discount`）、二维 Gauss–Hermite 求积、长样本模拟。模拟部分验证第一步的乘法规则 $\E[M_{t,t+j}D_{t+j}/D_t] = a^j$：把一条 40 万年的模拟路径切成互不重叠的、长度为 $j$ 的区段，每个区段给出一个 $\prod_k m_k e^{\Delta d_k}$ 的独立抽样。
 
@@ -228,7 +228,6 @@ ax.set_title("红利与价格（对数纵轴）")
 ax.text(years[-1] + 1, Pp[-1], "价格", va="center", fontsize=9, color="0.25")
 ax.text(years[-1] + 1, D[-1], "红利", va="center", fontsize=9, color="0.25")
 ax.set_xlim(0, years[-1] + 9)
-ax.legend(loc="upper left", fontsize=8)
 ax = axes[1]
 ax.bar(path.index, 100 * (path["R"] - 1), color="C0", width=0.8, label="年度收益率")
 ax.axhline(100 * (p.risk_free - 1), color="0.3", lw=1, ls="--", label="无风险利率")
@@ -241,7 +240,7 @@ fig.tight_layout()
 plt.show()
 ```
 
-左图中两条线始终平行：对数纵轴上，价格与红利的间距是 $\log(P/D) = \log 40.4$，不随时间变化。右图中收益率的起伏完全来自红利增长的起伏，与过去的收益、与当时的价格—红利比都无关。
+左图中两条线始终平行，间距是 $\log(P/D) = \log 40.4$。右图中收益率的起伏完全来自红利增长，与过去的收益、与价格—红利比都无关。
 
 ### 独立同分布模型的局限
 
@@ -267,7 +266,7 @@ $$
 m_{t+1} \approx \E[m]\left[1 - \gamma(\Delta c_{t+1} - \mu_c)\right], \qquad \frac{m_{t+1}}{\E[m]} = R^f m_{t+1} \approx 1 - \gamma(\Delta c_{t+1} - \mu_c) .
 $$ (eq-ch1-linear)
 
-这个近似的均值恰好等于 $\E[m]$，所以无风险利率不变。本章大纲中写过更粗略的 $m \approx \delta(1 - \gamma\Delta c)$，它是在 $\Delta c = 0$ 处展开的结果，均值 $\delta(1 - \gamma\mu_c)$ 与 $\E[m]$ 不同；在均值处展开并按 $\E[m]$ 归一化更准确，下文都用式 {eq}`eq-ch1-linear`。
+这个近似的均值恰好等于 $\E[m]$，所以无风险利率不变。一种常见的、更粗略的写法是 $m \approx \delta(1 - \gamma\Delta c)$，它是在 $\Delta c = 0$ 处展开的结果，均值 $\delta(1 - \gamma\mu_c)$ 与 $\E[m]$ 不同；在均值处展开并按 $\E[m]$ 归一化更准确，下文都用式 {eq}`eq-ch1-linear`。
 
 把式 {eq}`eq-ch1-linear` 的第二式与第 0 章的式 {eq}`eq-ch0-sdf` $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$ 对照，二者形式完全相同：
 

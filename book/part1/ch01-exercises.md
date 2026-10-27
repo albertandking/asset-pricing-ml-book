@@ -148,7 +148,7 @@ assert sp.diff(logRf_t, muct) == g_s
 1. $M_{t,t+j}D_{t+j}/D_t = \delta^j(C_{t+j}/C_t)^{-\gamma}(C_{t+j}/C_t) = \delta^j\exp\left((1-\gamma)\sum_{k=1}^{j}\Delta c_{t+k}\right)$。各年的 $\Delta c$ 独立同分布，乘积的期望等于期望的乘积，每一个期望由式 {eq}`eq-ch1-lognormal` 为 $a = \delta\exp\left((1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2\right)$，所以 $\E_t[M_{t,t+j}D_{t+j}]/D_t = a^j$。求和得 $P_t/D_t = \sum_{j\ge1}a^j = a/(1-a)$，条件是 $a < 1$，即 $\log\delta + (1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2 < 0$；此时横截性条件 $\E_t[M_{t,t+J}P_{t+J}] = (P/D)\,D_t\,a^J \to 0$ 也成立。这与[命题 %s](#prop-ch1-pd) 取 $\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 的结果一致。
 2. $\gamma = 1$ 时 $(1-\gamma) = 0$，$a = \delta$，$P/D = \delta/(1-\delta)$。原因是对数效用下 $m_{t+1}D_{t+1} = \delta (C_t/C_{t+1}) C_{t+1} = \delta C_t$ 是确定的：增长带来更多红利的“现金流效应”与增长使边际效用下降的“折现效应”恰好抵消，红利的任何变化都被边际效用的变化完全抵消。
 3. $\partial\log a/\partial\mu_c = 1 - \gamma$。$P/D = a/(1-a)$ 是 $a$ 的增函数，所以 $\gamma > 1$ 时预期增长提高使价格—红利比下降，$\gamma < 1$ 时使它上升。直观上，$\mu_c$ 提高使未来红利增加（系数 1），同时由式 {eq}`eq-ch1-logrf` 使利率上升（系数 $\gamma$），净效应为 $1 - \gamma$。
-4. 由 $P_t = vD_t$，$v = a/(1-a)$，$R_{t+1} = (v+1)/v \cdot D_{t+1}/D_t = e^{\Delta c_{t+1}}/a$（式 {eq}`eq-ch1-return`）。于是 $\log R_{t+1} = \Delta c_{t+1} - \log a$，由[命题 %s](#prop-ch1-premium)，$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R) = \gamma\sigma_c^2$。默认的 $\gamma = 2$、$\sigma_c = 2\%$ 下为 0.08%，恰好等于 $\lambda_c$：Lucas 树对消费增长的 β 近似为 1。
+4. 由 $P_t = vD_t$，$v = a/(1-a)$，$R_{t+1} = (v+1)/v \cdot D_{t+1}/D_t = e^{\Delta c_{t+1}}/a$（式 {eq}`eq-ch1-return`）。于是 $\log R_{t+1} = \Delta c_{t+1} - \log a$，由[命题 %s](#prop-ch1-premium)，$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R) = \gamma\sigma_c^2$。默认的 $\gamma = 2$、$\sigma_c = 2\%$ 下为 0.08%，恰好等于 $\lambda_c$。原因是对数收益 $\log R = \Delta c - \log a$ 对消费增长的 β 恰好为 1；总收益的 β 则是 $\Cov(R, \Delta c)/\sigma_c^2 = \E[R] \approx 1.05$（由 1.4 节的 $\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$）。
 
 ```{code-cell} python
 g_s, mu_s, s_s, d_s = sp.symbols("gamma mu_c sigma_c delta", positive=True)
@@ -231,7 +231,7 @@ print(f"理论标准误 {se_theory:.4f}（闭式解的 {se_theory / truth:.1f} �
       f"理论上为负的概率约 Φ(−E[R^e]/se) = {norm.cdf(-truth / se_theory):.1%}；需要约 {years_needed:,} 年")
 assert abs(Rebar.mean() - truth) < 3 * Rebar.std(ddof=1) / math.sqrt(n_rep)
 assert abs(Rebar.std(ddof=1) / se_theory - 1) < 0.1 and se_theory / truth > 6 and Rebar.std(ddof=1) / truth > 6
-assert 0.35 < np.mean(Rebar < 0) < 0.5 and 10_000 < years_needed < 11_000
+assert 0.4 < np.mean(Rebar < 0) < 0.5 and 10_000 < years_needed < 11_000
 ```
 
 1. 500 条路径上样本平均超额收益的均值与闭式解相差不到 3 倍蒙特卡洛标准误，说明样本均值是无偏的；但它的标准差是闭式解的 6 倍以上，有将近一半的路径得到负的样本溢价（数值见上方输出，均由 `assert` 保证）。

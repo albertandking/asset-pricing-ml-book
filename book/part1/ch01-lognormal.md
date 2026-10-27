@@ -32,13 +32,13 @@ from apsim import ConsumptionParams
 p = ConsumptionParams()                                    # 默认的年度假设参数
 ```
 
-1.1～1.3 节的结论对任意分布都成立，但没有告诉我们无风险利率、风险溢价具体是多少，取决于哪些参数。本节加上两条假设：效用是幂效用 {eq}`eq-ch1-power`，消费增长与红利增长服从联合正态分布。在这两条假设下，所有量都有闭式解。这正是 Hansen 与 Singleton 检验消费模型时采用的设定 [@hansen1983stochastic]，本书的模拟器 `apsim.consumption` 也按它实现。
+1.1～1.3 节的结论对任意分布都成立，但没有告诉我们无风险利率、风险溢价具体是多少，取决于哪些参数。本节加上两条假设：效用是幂效用 {eq}`eq-ch1-power`，消费增长与红利增长服从联合正态分布。在这两条假设下，所有量都有闭式解。这与 Hansen 与 Singleton 检验消费模型时采用的对数正态设定同类（他们假设消费增长与资产收益联合对数正态，并允许条件均值随时间变化）[@hansen1983stochastic]，本书的模拟器 `apsim.consumption` 也按它实现。
 
 ## 对数记号
 
 **白话。** 消费、红利、价格都是“水平”，它们的增长是乘法关系：明年的消费等于今年的消费乘以增长因子。取对数之后，乘法变成加法，增长因子的对数就是“对数增长”，它近似等于增长率，又便于套用正态分布。
 
-**例子。** 消费从 100 增长到 102，增长率为 2%，对数增长为 $\log 102 - \log 100 = \log 1.02 \approx 0.0198$，与 2% 很接近。增长率越小，二者越接近；增长率为 −30% 时，对数增长约为 −0.357，差别就明显了。
+**例子。** 消费从 100 增长到 102，增长率为 2%，对数增长为 $\log 102 - \log 100 = \log 1.02 \approx 0.0198$，与 2% 很接近；增长率为 −30% 时，对数增长约为 −0.357，差别就明显了。
 
 **公式。** 本书沿用[记号表](../notation.md)的约定，小写字母表示对应大写变量的（自然）对数：
 
@@ -189,7 +189,7 @@ $$ (eq-ch1-logprem)
 对红利索取权，$\log R = \Delta d - \log a$，减去常数不改变协方差，$\Cov(\Delta c, \log R) = \Cov(\Delta c, \Delta d) = \rho\sigma_c\sigma_d$。
 :::
 
-在联合正态的假设下，式 {eq}`eq-ch1-logprem` 是精确的，没有任何近似。它与式 {eq}`eq-ch1-premium` 说的是同一件事：只有与 $m$ 的协方差得到补偿，在幂效用下就是与消费增长的协方差。不过左边是**期望总收益之比的对数**，不是期望超额收益本身，二者的关系是 $\E[R] - R^f = R^f\left(e^{\gamma\rho\sigma_c\sigma_d} - 1\right)$。
+在联合正态的假设下，式 {eq}`eq-ch1-logprem` 是精确的，没有任何近似。它与式 {eq}`eq-ch1-premium` 说的是同一件事：只有与 $m$ 的协方差得到补偿，在幂效用下就是与消费增长的协方差。不过左边是**期望总收益之比的对数**，下文简称**对数溢价**，它不是期望超额收益本身，二者的关系是 $\E[R] - R^f = R^f\left(e^{\gamma\rho\sigma_c\sigma_d} - 1\right)$。
 
 下面先用 `sympy` 核对红利索取权的结果。1.5 节将推出 $a = \E[m e^{\Delta d}]$ 与 $\E[R] = \E[e^{\Delta d}]/a$；这里先按定义用矩母函数求出它们（$\varepsilon$、$\nu$ 独立，期望可以分开），再核对 $\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$，并与模拟器的属性 `expected_return`、`risk_free`、`log_equity_premium` 比较。
 
@@ -217,7 +217,7 @@ assert 0.00252 < arith_prem < 0.00253
 (sec-ch1-ccapm)=
 ## 消费 CAPM：以消费增长为因子的 β 模型
 
-**白话。** 式 {eq}`eq-ch1-premium` 说期望超额收益由“收益与 $m$ 的协方差”决定，而 $m$ 几乎就是消费增长的线性函数。把这个协方差拆成两个因素的乘积，就得到第 0 章熟悉的 β 定价形式：资产对消费增长的敏感度 $\beta_{\Delta c}$（消费增长每高 1 个百分点，资产收益平均高多少个百分点），乘以每单位这种敏感度所得的补偿 $\lambda_c$。这就是**消费 CAPM**（consumption CAPM）：只有一个因子，因子是消费增长。它与第 0 章的 β 模型有一个根本区别：消费增长是**不可交易的因子**，它不是任何一项资产的收益，市场上没有一项零成本头寸恰好支付 $\Delta c$。
+**白话。** 式 {eq}`eq-ch1-premium` 说期望超额收益由“收益与 $m$ 的协方差”决定，而 $m$ 几乎就是消费增长的线性函数。把这个协方差拆成乘积，就得到第 0 章熟悉的 β 定价形式：资产对消费增长的敏感度 $\beta_{\Delta c}$（消费增长每高 1 个百分点，收益平均高多少个百分点）乘以每单位敏感度的补偿 $\lambda_c$。这就是只有一个因子的**消费 CAPM**（consumption CAPM）。与第 0 章的根本区别是：消费增长是**不可交易的因子**，没有一项零成本头寸恰好支付 $\Delta c$。
 
 **例子。** 默认参数下，红利索取权收益对消费增长的回归系数 $\beta_{\Delta c} = \Cov(R, \Delta c)/\Var(\Delta c) \approx 3.16$：消费增长每高 1 个百分点，它的收益平均高约 3.16 个百分点。每单位 β 的补偿是 $\lambda_c = \gamma\Var(\Delta c) = 2 \times 0.02^2 = 0.0008$，即每年 0.08%。二者相乘得 $3.16 \times 0.08\% \approx 0.2527\%$，与上面的精确值 0.2524% 只差约 0.0003 个百分点。要注意 $\lambda_c$ 只有 0.08%，而消费增长的均值 $\E[\Delta c] = 2\%$，后者是前者的 25 倍；如果误把 $\E[\Delta c]$ 当作风险溢价，预测的期望超额收益就成了 $3.16 \times 2\% \approx 6.3\%$，错了 25 倍。
 
@@ -238,7 +238,7 @@ $$ (eq-ch1-ccapm)
 
 第 0 章 0.2 节说过，当因子本身是超额收益、并且模型为因子自身正确定价时，风险溢价就是因子的均值，$\lambda_k = \E[f_{k,t}]$，理由是把 β 定价式用到因子本身：它对自己的载荷为 1；那里同时说过，消费增长这类不可交易的因子不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值。现在可以看清原因：$\Delta c$ 不是资产收益，定价方程 $0 = \E[m R^e]$ 不能用到 $\Delta c$ 本身，没有任何条件把 $\lambda_c$ 与 $\E[\Delta c]$ 联系起来。$\E[\Delta c] = \mu_c$ 是经济增长的速度，$\lambda_c = \gamma\sigma_c^2$ 由风险厌恶与消费的波动决定，改变 $\mu_c$ 不影响 $\lambda_c$。$\lambda_c$ 的含义是：$\beta_{\Delta c} = 1$ 的资产的期望超额收益。用资产收益构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
 
-下面的代码计算红利索取权的 $\beta_{\Delta c}$。对联合正态的 $(X, Y)$，$\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$（Stein 引理的一个特例），而 $R = e^{\Delta d}/a$，所以 $\Cov(R, \Delta c) = \E[R]\,\rho\sigma_c\sigma_d$。代码先用二维 Gauss–Hermite 求积核对这个协方差，再比较 $\beta_{\Delta c}\lambda_c$、精确的期望超额收益与“误用 $\E[\Delta c]$”的结果。
+下面的代码计算红利索取权的 $\beta_{\Delta c}$。对联合正态的 $(X, Y)$，$\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$（Stein 引理的一个特例），而 $R = e^{\Delta d}/a$，所以 $\Cov(R, \Delta c) = \E[R]\,\rho\sigma_c\sigma_d$。代码先用二维 Gauss–Hermite 求积核对这个协方差：`np.meshgrid(nodes, nodes, indexing="ij")` 生成两个 `(80, 80)` 的网格，`E1[i, j]` 取 $\varepsilon$ 的第 $i$ 个节点、`N1[i, j]` 取 $\nu$ 的第 $j$ 个节点；`np.outer(weights, weights)` 是 `(80, 80)` 的权重矩阵，元素为 $w_i w_j$（$\varepsilon$、$\nu$ 独立，联合权重是边际权重之积）。于是 $\E[g(\varepsilon, \nu)] \approx \sum_{i,j} w_i w_j\, g(\varepsilon_i, \nu_j)$，即代码中的 `(W2 * g).sum()`。随后再比较 $\beta_{\Delta c}\lambda_c$、精确的期望超额收益与“误用 $\E[\Delta c]$”的结果。
 
 ```{code-cell} python
 E1, N1 = np.meshgrid(nodes, nodes, indexing="ij")                     # 两个独立标准正态冲击 ε、ν 的节点 (80, 80)
