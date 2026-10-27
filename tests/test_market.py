@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from apsim import MarketParams, SimulatedMarket, default_gamma, simulate_market
+from apsim import MarketParams, SimulatedMarket, default_gamma, market, simulate_market
 
 
 def test_default_gamma_layout():
@@ -65,6 +65,30 @@ def test_generator_seed():
     rng = np.random.default_rng(5)
     first, second = simulate_market(p, seed=rng), simulate_market(p, seed=rng)
     assert not np.allclose(first.panel["exret"], second.panel["exret"])
+
+
+def test_generator_seed_stable_when_streams_appended(monkeypatch):
+    """同一个 Generator 连续调用两次：在子流列表末尾追加一条子流后，两次调用的结果都不变。"""
+    p = MarketParams(n_stocks=5, n_periods=6)
+
+    def two_calls():
+        rng = np.random.default_rng(5)
+        return simulate_market(p, seed=rng), simulate_market(p, seed=rng)
+
+    before = two_calls()
+    monkeypatch.setattr(market, "_STREAMS", (*market._STREAMS, "future_stream"))
+    assert len(market._STREAMS) == 5
+    after = two_calls()
+    for old, new in zip(before, after):
+        pd.testing.assert_frame_equal(old.factors, new.factors)
+        pd.testing.assert_frame_equal(old.panel, new.panel)
+
+
+def test_generator_seed_takes_one_spawn_key_per_call():
+    """每次调用只从父 Generator 取 1 个 spawn 键。"""
+    rng = np.random.default_rng(5)
+    simulate_market(MarketParams(n_stocks=5, n_periods=6), seed=rng)
+    assert rng.bit_generator.seed_seq.n_children_spawned == 1
 
 
 def test_substreams_independent_of_other_parts():

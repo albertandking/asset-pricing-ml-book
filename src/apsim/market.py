@@ -24,7 +24,8 @@ import numpy as np
 import pandas as pd
 
 # simulate_market 的随机子流，按此顺序由 SeedSequence.spawn 分配。
-# 以后新增随机部分时只在末尾追加，不改变已有子流的抽样。
+# 以后新增随机部分时只在末尾追加，不改变已有子流的抽样：spawn 依次分配键，前面的子流不随子流总数变化；
+# 传入 Generator 时，每次调用也只从它取 1 个键（见 _substreams），后续调用同样不受子流总数影响。
 _STREAMS = ("factors", "initial_chars", "char_shocks", "idio_shocks")
 
 
@@ -163,7 +164,9 @@ class SimulatedMarket:
 
 def _substreams(seed: int | np.random.Generator) -> dict[str, np.random.Generator]:
     if isinstance(seed, np.random.Generator):
-        children = seed.spawn(len(_STREAMS))
+        # 每次调用只从父生成器取 1 个子键，再由它派生全部子流。若直接 seed.spawn(len(_STREAMS))，
+        # 子流数改变时，父生成器被取走的键数随之改变，同一生成器后续调用的结果就会全部改变。
+        children = seed.spawn(1)[0].spawn(len(_STREAMS))
     elif isinstance(seed, (int, np.integer)) and not isinstance(seed, bool):
         children = [np.random.default_rng(s) for s in np.random.SeedSequence(int(seed)).spawn(len(_STREAMS))]
     else:
@@ -180,9 +183,11 @@ def simulate_market(params: MarketParams | None = None, *, seed: int | np.random
     `seed` 必须以关键字传入，没有默认值：
     - 整数：由 `np.random.SeedSequence(seed)` 派生四个独立子流，依次用于因子、初始特征、特征冲击、异质性冲击。
       相同的整数给出完全相同的结果。
-    - `np.random.Generator`：用 `Generator.spawn(4)` 从它派生同样四个子流。同一个 Generator 连续传入多次，
-      每次得到不同的结果（适合蒙特卡洛重复）；两个以相同种子新建的 Generator 给出相同结果。
-    以后新增随机部分时只追加子流，已有部分的抽样不受影响。
+    - `np.random.Generator`：每次调用只从它取 1 个子键（`Generator.spawn(1)`），再由这个子键派生同样四个子流。
+      同一个 Generator 连续传入多次，每次得到不同的结果（适合蒙特卡洛重复）；两个以相同种子新建的 Generator
+      给出相同结果。
+    以后新增随机部分时只追加子流，已有部分的抽样不受影响：整数种子下如此；传入 Generator 时，同一个 Generator
+    的第 1 次、第 2 次……调用的已有部分也都不变。
     """
     p = params if params is not None else MarketParams()
     rng = _substreams(seed)
