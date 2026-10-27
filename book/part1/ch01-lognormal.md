@@ -86,7 +86,7 @@ assert (p.delta, p.gamma, p.mu_c, p.sigma_c, p.mu_d, p.sigma_d, p.rho_cd) == (0.
 - $\eta_{t+1}$：红利增长的标准化冲击，由 $\varepsilon_{t+1}$ 与 $\nu_{t+1}$ 按权重 $\rho$ 与 $\sqrt{1-\rho^2}$ 合成
 - $\rho$：相关系数，没有单位（默认 0.5）
 
-例如某年 $\varepsilon_{t+1} = 1$、$\nu_{t+1} = 0$（消费增长比均值高一个标准差，红利没有独立的消息）：$\Delta c_{t+1} = 0.02 + 0.02 = 4\%$，$\eta_{t+1} = 0.5$，$\Delta d_{t+1} = 0.02 + 0.12 \times 0.5 = 8\%$。若 $\varepsilon_{t+1} = 0$、$\nu_{t+1} = 1$，消费增长恰为均值 2%，而 $\eta_{t+1} = \sqrt{0.75} \approx 0.866$，红利增长约为 12.39%。**向量写法**：把两个增长排成 $2\times 1$ 的列向量，式 {eq}`eq-ch1-model` 就是
+例如某年 $\varepsilon_{t+1} = 1$、$\nu_{t+1} = 0$（对数消费增长比均值高一个标准差，红利没有独立的消息）：对数消费增长 $\Delta c_{t+1} = 0.02 + 0.02 = 0.04$（水平增长 $e^{0.04} - 1 \approx 4.08\%$），$\eta_{t+1} = 0.5$，对数红利增长 $\Delta d_{t+1} = 0.02 + 0.12 \times 0.5 = 0.08$（水平增长约 8.33%）。若 $\varepsilon_{t+1} = 0$、$\nu_{t+1} = 1$，对数消费增长恰为均值 0.02（水平增长约 2.02%），而 $\eta_{t+1} = \sqrt{0.75} \approx 0.866$，对数红利增长 $\Delta d_{t+1} \approx 0.1239$（水平增长约 13.2%）。**向量写法**：把两个增长排成 $2\times 1$ 的列向量，式 {eq}`eq-ch1-model` 就是
 
 ```{math}
 :enumerated: false
@@ -97,7 +97,7 @@ assert (p.delta, p.gamma, p.mu_c, p.sigma_c, p.mu_d, p.sigma_d, p.rho_cd) == (0.
 \underbrace{\mathbf L\mathbf L'}_{2\times 2} = \begin{pmatrix} \sigma_c^2 & \rho\sigma_c\sigma_d \\ \rho\sigma_c\sigma_d & \sigma_d^2 \end{pmatrix} .
 ```
 
-$2\times 2$ 的 $\mathbf L$ 乘 $2\times 1$ 的冲击向量得 $2\times 1$；展开第二行就是 $\Delta d_{t+1} = \mu_d + \rho\sigma_d\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho^2}\,\nu_{t+1} = \mu_d + \sigma_d\eta_{t+1}$。下三角矩阵 $\mathbf L$ 是协方差矩阵 $\mathbf L\mathbf L'$ 的 Cholesky 分解（第 0 章[拆解](#ch0-unpack-factor)中提到的写法）；$\mathbf L\mathbf L'$ 的对角元是两个增长的方差，非对角元是协方差 $\rho\sigma_c\sigma_d$，默认为 $0.5 \times 0.02 \times 0.12 = 0.0012$。**特例**：$\rho = 0$ 时 $\mathbf L$ 是对角矩阵，红利与消费独立；$\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 时第二行与第一行完全相同，就是 Lucas 树。**数据矩阵**：模拟 $T$ 年，把每年的 $(\Delta c_t, \Delta d_t)$ 作为一行，得到 $T\times 2$ 的矩阵，即 `simulate_consumption` 返回值的 `data` 中的 `dc`、`dd` 两列；“模拟实验”一节的实验三中，五项资产共用同一列 `dc`，各有自己的一列 `dd`。
+$2\times 2$ 的 $\mathbf L$ 乘 $2\times 1$ 的冲击向量得 $2\times 1$；展开第二行就是 $\Delta d_{t+1} = \mu_d + \rho\sigma_d\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho^2}\,\nu_{t+1} = \mu_d + \sigma_d\eta_{t+1}$。下三角矩阵 $\mathbf L$ 是协方差矩阵 $\mathbf L\mathbf L'$ 的 Cholesky 分解，即第 0 章的 $\mathbf C$（第 0 章[拆解](#ch0-unpack-factor)中提到的写法）；$\mathbf L\mathbf L'$ 的对角元是两个增长的方差，非对角元是协方差 $\rho\sigma_c\sigma_d$，默认为 $0.5 \times 0.02 \times 0.12 = 0.0012$。**特例**：$\rho = 0$ 时 $\mathbf L$ 是对角矩阵，红利与消费独立；$\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 时第二行与第一行完全相同，就是 Lucas 树。**数据矩阵**：模拟 $T$ 年，把每年的 $(\Delta c_t, \Delta d_t)$ 作为一行，得到 $T\times 2$ 的矩阵，即 `simulate_consumption` 返回值的 `data` 中的 `dc`、`dd` 两列；“模拟实验”一节的实验三中，五项资产共用同一列 `dc`，各有自己的一列 `dd`。
 
 ```{code-cell} python
 # 拆开讲 eq-ch1-model：L = [[σ_c, 0], [ρσ_d, σ_d √(1−ρ²)]]，L L' 为 (Δc, Δd) 的协方差矩阵
@@ -194,7 +194,7 @@ assert math.isclose(math.log(p.risk_free), -math.log(p.delta) + p.gamma * p.mu_c
 | $-\gamma^2\sigma_c^2/2$ | −0.08% | 预防性储蓄 | 未来越不确定，越想多存一点以备坏时候，储蓄需求压低利率 |
 | 合计 $\log R^f$ | 约 4.925% | | $R^f \approx 1.0505$ |
 
-第二项中，消费增长的均值 $\mu_c$ 乘的是 $\gamma$：$\gamma$ 越大，投资者越不愿意让各期消费不均，预期增长对利率的推动越强。$1/\gamma$ 称为**跨期替代弹性**（elasticity of intertemporal substitution，EIS），它衡量利率每变化 1 个百分点，消费增长愿意变化多少个百分点。幂效用下它与风险厌恶系数互为倒数，被同一个 $\gamma$ 绑定（见“常见误区”一节）。第三项在默认参数下很小，因为年度消费增长的标准差只有 2%；但它与 $\gamma^2$ 成正比，$\gamma$ 较大时迅速变大。
+第二项中，对数消费增长的均值 $\mu_c$ 乘的是 $\gamma$：$\gamma$ 越大，投资者越不愿意让各期消费不均，预期增长对利率的推动越强。$1/\gamma$ 称为**跨期替代弹性**（elasticity of intertemporal substitution，EIS），它衡量利率每变化 1 个百分点，消费增长愿意变化多少个百分点。幂效用下它与风险厌恶系数互为倒数，被同一个 $\gamma$ 绑定（见“常见误区”一节）。第三项在默认参数下很小，因为年度对数消费增长的标准差只有 0.02；但它与 $\gamma^2$ 成正比，$\gamma$ 较大时迅速变大。
 
 (ch1-unpack-logrf)=
 **拆开讲式 {eq}`eq-ch1-logrf`。** 左边的 $\log R^f$ 是对数无风险利率，即连续复利的年利率（默认约 4.925%）；通常说的年利率是 $R^f - 1$（默认约 5.05%），二者只差一点，利率越低差得越少。右边各项都是“对数的年利率”，三项的名称与含义见上表，这里补上单位：$-\log\delta$ 在 $\delta$ 接近 1 时约等于 $1 - \delta$（$\delta = 0.99$ 时约 1.005%）；$\gamma\mu_c$ 中 $\mu_c$ 是对数消费增长的年度均值，$\gamma$ 没有单位；$\gamma^2\sigma_c^2/2$ 中 $\sigma_c^2$ 是对数消费增长的年度方差（默认 0.0004）。$R^f$ 不带时间下标，因为在独立同分布的模型中每年都一样：它在每个第 $t$ 期末已知，并且总是同一个常数；[习题 %s](#ex-ch1-logrf) 让预期增长随时间变化，那时 $R^f_t$ 才随 $t$ 变化。**特例**：$\sigma_c = 0$（没有消费风险）时预防性储蓄项消失，$\log R^f = -\log\delta + \gamma\mu_c$；再取 $\mu_c = 0$，只剩耐心项，$R^f = 1/\delta$（1.2 节的[拆解](#ch1-unpack-rf)）；$\gamma = 1$（对数效用）时 $\log R^f = -\log\delta + \mu_c - \sigma_c^2/2$。
@@ -275,14 +275,14 @@ assert math.isclose(arith_prem, p.risk_free * math.expm1(p.log_equity_premium), 
 assert 0.00252 < arith_prem < 0.00253
 ```
 
-默认参数下，红利索取权的期望收益只比无风险利率高约 0.25 个百分点：消费增长的标准差只有 2%，红利与消费的相关系数为 0.5，$\gamma = 2$，三者相乘再乘以红利的波动 12%，协方差很小。这个数小，是因为默认参数小，并不是对任何市场的判断；合理的 $\gamma$ 能否产生数据中的股权溢价，是第 7 章“股权溢价之谜” [@mehra1985equity] 的主题。
+默认参数下，红利索取权的期望收益只比无风险利率高约 0.25 个百分点：对数消费增长的标准差只有 0.02，红利与消费的相关系数为 0.5，$\gamma = 2$，三者相乘再乘以红利的波动 12%，协方差很小。这个数小，是因为默认参数小，并不是对任何市场的判断；合理的 $\gamma$ 能否产生数据中的股权溢价，是第 7 章“股权溢价之谜” [@mehra1985equity] 的主题。
 
 (sec-ch1-ccapm)=
 ## 消费 CAPM：以消费增长为因子的 β 模型
 
 **白话。** 式 {eq}`eq-ch1-premium` 说期望超额收益由“收益与 $m$ 的协方差”决定，而 $m$ 几乎就是消费增长的线性函数。把这个协方差拆成乘积，就得到第 0 章熟悉的 β 定价形式：资产对消费增长的敏感度 $\beta_{\Delta c}$（消费增长每高 1 个百分点，收益平均高多少个百分点）乘以每单位敏感度的补偿 $\lambda_c$。这就是只有一个因子的**消费 CAPM**（consumption CAPM）。与第 0 章的根本区别是：消费增长是**不可交易的因子**，它不是任何一项资产的收益，市场上没有一项零成本头寸恰好支付 $\Delta c$。
 
-**例子。** 默认参数下，红利索取权收益对消费增长的回归系数 $\beta_{\Delta c} = \Cov(R, \Delta c)/\Var(\Delta c) \approx 3.16$：消费增长每高 1 个百分点，它的收益平均高约 3.16 个百分点。每单位 β 的补偿是 $\lambda_c = \gamma\Var(\Delta c) = 2 \times 0.02^2 = 0.0008$，即每年 0.08%。二者相乘得 $3.16 \times 0.08\% \approx 0.2527\%$，与上面的精确值 0.2524% 只差约 0.0003 个百分点。要注意 $\lambda_c$ 只有 0.08%，而消费增长的均值 $\E[\Delta c] = 2\%$，后者是前者的 25 倍；如果误把 $\E[\Delta c]$ 当作风险溢价，预测的期望超额收益就成了 $3.16 \times 2\% \approx 6.3\%$，错了 25 倍。
+**例子。** 默认参数下，红利索取权收益对消费增长的回归系数 $\beta_{\Delta c} = \Cov(R, \Delta c)/\Var(\Delta c) \approx 3.16$：消费增长每高 1 个百分点，它的收益平均高约 3.16 个百分点。每单位 β 的补偿是 $\lambda_c = \gamma\Var(\Delta c) = 2 \times 0.02^2 = 0.0008$，即每年 0.08%。二者相乘得 $3.16 \times 0.08\% \approx 0.2527\%$，与上面的精确值 0.2524% 只差约 0.0003 个百分点。要注意 $\lambda_c$ 只有 0.08%，而对数消费增长的均值 $\E[\Delta c] = 0.02$（即 2%），后者是前者的 25 倍；如果误把 $\E[\Delta c]$ 当作风险溢价，预测的期望超额收益就成了 $3.16 \times 2\% \approx 6.3\%$，错了 25 倍。
 
 **公式。** 把 SDF 写成 $m = \E[m]\exp\left(-\gamma(\Delta c - \mu_c) - \gamma^2\sigma_c^2/2\right)$（两边取期望可以验证），在 $\Delta c = \mu_c$ 处对指数做一阶展开，并略去二阶小量 $\gamma^2\sigma_c^2/2$：
 
@@ -383,7 +383,7 @@ assert approx.loc[2, "线性化相对误差"] < 0.0013 and 0.014 < approx.loc[25
 
 默认参数（$\gamma = 2$）下线性化的相对误差约为 0.12%，可以忽略；$\gamma = 25$ 时约为 1.5%，仍然不大。原因是年度消费增长的波动很小，$m$ 在它的取值范围内几乎是线性的。
 
-**非正态冲击的误差。** 对数正态的公式在冲击服从正态分布时精确，否则只是保留到二阶项的近似。为了看清误差有多大，把 $\varepsilon$ 换成一个均值仍为 0、方差仍为 1、但有一个“灾难”尾部的混合分布（假设参数）：以 98% 的概率来自 $N(m_1, s^2)$，以 2% 的概率来自 $N(-5, s^2)$；$m_1$ 与 $s^2$ 由“均值为 0、方差为 1”两个条件确定。灾难状态下 $\Delta c$ 的均值约为 $0.02 - 5 \times 0.02 = -8\%$。均值、方差不变，式 {eq}`eq-ch1-logrf` 给出的无风险利率也就不变；精确值由混合正态的矩母函数算出：$\E[e^{u\varepsilon}] = 0.98\,e^{u m_1 + u^2 s^2/2} + 0.02\,e^{-5u + u^2 s^2/2}$。
+**非正态冲击的误差。** 对数正态的公式在冲击服从正态分布时精确，否则只是保留到二阶项的近似。为了看清误差有多大，把 $\varepsilon$ 换成一个均值仍为 0、方差仍为 1、但有一个“灾难”尾部的混合分布（假设参数）：以 98% 的概率来自 $N(m_1, s^2)$，以 2% 的概率来自 $N(-5, s^2)$；$m_1$ 与 $s^2$ 由“均值为 0、方差为 1”两个条件确定。灾难状态下对数消费增长 $\Delta c$ 的均值约为 $0.02 - 5 \times 0.02 = -0.08$（水平下降约 7.7%）。均值、方差不变，式 {eq}`eq-ch1-logrf` 给出的无风险利率也就不变；精确值由混合正态的矩母函数算出：$\E[e^{u\varepsilon}] = 0.98\,e^{u m_1 + u^2 s^2/2} + 0.02\,e^{-5u + u^2 s^2/2}$。
 
 ```{code-cell} python
 p_dis, m_dis = 0.02, -5.0                                  # 灾难成分的概率与均值（假设参数）

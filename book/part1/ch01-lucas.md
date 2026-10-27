@@ -195,7 +195,7 @@ assert np.all(np.abs(strips["标准化偏差"]) < 4)
 表中的“标准化偏差”是样本均值与 $a^j$ 之差除以标准误；`assert` 要求它们都在 4 以内。在 $a^j$ 是真值的前提下，标准化偏差近似服从标准正态分布，绝对值超过 4 的概率不到万分之一，所以断言失败几乎只可能说明推导或代码有误，而不是运气不好。
 
 (ch1-unpack-a)=
-**拆开讲式 {eq}`eq-ch1-a`。** $a$ 没有单位：它是“只获得明年红利”的资产今天的价格除以今年的红利 $D_t$（默认约 0.9758，即今年每 1 元红利，对应的明年那笔红利今天值约 0.976 元）。独立同分布时它不随 $t$ 变化，所以期望不带下标。$m_{t+1}e^{\Delta d_{t+1}}$ 是“明年的 SDF 乘以明年的总红利增长”，在第 $t$ 期末随机。把指数中的六项按含义重新排列，逐项看（默认参数，都是年度的对数量）：
+**拆开讲式 {eq}`eq-ch1-a`。** $a$ 没有单位：它是“只获得明年红利”的资产今天的价格除以今年的红利 $D_t$（默认约 0.9758，即今年每 1 元红利，对应的明年那笔红利今天值约 0.976 元）。独立同分布时它不随 $t$ 变化，所以期望不带下标。$m_{t+1}e^{\Delta d_{t+1}}$ 是“明年的 SDF 乘以明年的总红利增长”，在第 $t$ 期末随机。把 $\log a$ 的六项按含义重新排列，逐项看（默认参数，都是年度的对数量）：
 
 | 项 | 默认值 | 含义 |
 |---|---|---|
@@ -326,7 +326,7 @@ plt.show()
 
 **白话。** 第 0 章的 SDF 是因子的线性函数，本章的 SDF 是消费增长的指数函数。年度消费增长的波动很小，在它通常的取值范围内，指数曲线几乎是一条直线，所以用直线近似它误差很小。这条直线就是第 0 章那种线性 SDF 的一维版本，只不过“因子”换成了消费增长。
 
-**例子。** 默认参数下 $\E[m] \approx 0.9519$。若某年消费增长 4%（比均值高一个标准差），精确的 $m = 0.99\,e^{-2 \times 0.04} \approx 0.91389$，线性近似 $\E[m]\left[1 - 2 \times (0.04 - 0.02)\right] \approx 0.91387$，几乎相同。若某年消费下降 8%（低于均值 5 个标准差），精确的 $m = 0.99\,e^{0.16} \approx 1.162$，线性近似 $0.9519 \times (1 + 0.2) \approx 1.142$，低了约 1.7%：离均值越远，直线与指数曲线的差别越大。
+**例子。** 默认参数下 $\E[m] \approx 0.9519$。若某年对数消费增长 $\Delta c = 0.04$（水平增长约 4.08%，比均值高一个标准差），精确的 $m = 0.99\,e^{-2 \times 0.04} \approx 0.91389$，线性近似 $\E[m]\left[1 - 2 \times (0.04 - 0.02)\right] \approx 0.91387$，几乎相同。若某年对数消费增长 $\Delta c = -0.08$（水平下降约 7.7%，低于均值 5 个标准差），精确的 $m = 0.99\,e^{0.16} \approx 1.162$，线性近似 $0.9519 \times (1 + 0.2) \approx 1.142$，低了约 1.7%：离均值越远，直线与指数曲线的差别越大。
 
 **公式。** 由 $\E[m] = \delta\exp(-\gamma\mu_c + \gamma^2\sigma_c^2/2)$（[命题 %s](#prop-ch1-rf)），SDF 可以写成
 
@@ -344,7 +344,7 @@ $$ (eq-ch1-linear)
 这个近似的均值恰好等于 $\E[m]$，所以无风险利率不变。一种常见的、更粗略的写法是 $m \approx \delta(1 - \gamma\Delta c)$，它是在 $\Delta c = 0$ 处展开的结果，均值 $\delta(1 - \gamma\mu_c)$ 与 $\E[m]$ 不同；在均值处展开并按 $\E[m]$ 归一化更准确，下文都用式 {eq}`eq-ch1-linear`。
 
 (ch1-unpack-linear)=
-**拆开讲式 {eq}`eq-ch1-linear`。** $m_{t+1}$ 是年度 SDF，没有单位，在第 $t$ 期末随机；$\E[m] = 1/R^f$（默认约 0.9519）是常数；$\Delta c_{t+1} - \mu_c$ 是第 $t+1$ 年的对数消费增长偏离均值的幅度，随机（例如消费增长 4% 时为 $+0.02$）；$\gamma$ 把这一偏离换算成 SDF 的相对变化：消费增长比均值高 1 个百分点，$m_{t+1}$ 比 $\E[m]$ 约低 $\gamma\%$。第二式两边除以 $\E[m]$，$R^f m_{t+1}$ 的均值为 1，正是第 0 章的归一化（1.2 节）。代入上面的例子：$1 - 2 \times (0.04 - 0.02) = 0.96$，乘以 0.9519 得约 0.91387。**特例**：$\gamma = 0$ 时 $m_{t+1} = \E[m]$ 是常数，投资者风险中性。第二式就是第 0 章线性 SDF $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$（[拆解](#ch0-unpack-sdf)）在 $K = 1$ 时的形式：唯一的因子 $f_{1,t}$ 换成 $\Delta c_{t+1}$，均值 $\mu_1$ 换成 $\mu_c$，系数 $b_1$ 换成 $\gamma$，下表逐项对照。**数据矩阵**：把 $T$ 年的 $R^f m_t$ 排成 $T\times 1$ 的列向量，第 $t$ 个元素约为 $1 - \gamma(\Delta c_t - \mu_c)$；它只带时间下标，所有资产共用这一条序列。
+**拆开讲式 {eq}`eq-ch1-linear`。** $m_{t+1}$ 是年度 SDF，没有单位，在第 $t$ 期末随机；$\E[m] = 1/R^f$（默认约 0.9519）是常数；$\Delta c_{t+1} - \mu_c$ 是第 $t+1$ 年的对数消费增长偏离均值的幅度，随机（例如对数消费增长为 0.04 时为 $+0.02$）；$\gamma$ 把这一偏离换算成 SDF 的相对变化：对数消费增长比均值高 0.01，$m_{t+1}$ 比 $\E[m]$ 约低 $\gamma\%$。第二式两边除以 $\E[m]$，$R^f m_{t+1}$ 的均值为 1，正是第 0 章的归一化（1.2 节）。代入上面的例子：$1 - 2 \times (0.04 - 0.02) = 0.96$，乘以 0.9519 得约 0.91387。**特例**：$\gamma = 0$ 时 $m_{t+1} = \E[m]$ 是常数，投资者风险中性。第二式就是第 0 章线性 SDF $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$（[拆解](#ch0-unpack-sdf)）在 $K = 1$ 时的形式：唯一的因子 $f_{1,t}$ 换成 $\Delta c_{t+1}$，均值 $\mu_1$ 换成 $\mu_c$，系数 $b_1$ 换成 $\gamma$，下表逐项对照。**数据矩阵**：把 $T$ 年的 $R^f m_t$ 排成 $T\times 1$ 的列向量，第 $t$ 个元素约为 $1 - \gamma(\Delta c_t - \mu_c)$；它只带时间下标，所有资产共用这一条序列。
 
 把式 {eq}`eq-ch1-linear` 的第二式与第 0 章的式 {eq}`eq-ch0-sdf` $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$ 对照，二者形式完全相同：
 
@@ -387,7 +387,7 @@ $$ (eq-ch1-linear)
 \mathbf b'\bv\Sigma_f\bv\beta = \sum_{k=1}^{K}\sum_{l=1}^{K} b_k\,\Sigma_{kl}\,\beta_l = \sum_{l=1}^{K}\Bigl(\sum_{k=1}^{K}\Sigma_{lk}\,b_k\Bigr)\beta_l = \sum_{l=1}^{K}\lambda_l\,\beta_l , \qquad \lambda_l = \sum_{k=1}^{K}\Sigma_{lk}\,b_k ,
 ```
 
-第二步用到对称性 $\Sigma_{kl} = \Sigma_{lk}$。白话：第 $l$ 个因子的风险溢价 $\lambda_l$ 是这个因子与“$\mathbf b$ 加权的因子组合” $\mathbf b'\mathbf f$ 的协方差；资产的期望超额收益是它对各因子的载荷乘以各因子的风险溢价，再加总。因子互不相关时 $\lambda_l = \sigma_l^2 b_l$，“风险溢价 = 因子方差 × SDF 系数”逐个因子成立。**特例**：$K = 1$ 时 $\bv\Sigma_f$ 就是一个方差，$\lambda_1 = \Var(f_1)\, b_1$；取 $f_1 = \Delta c$、$b_1 = \gamma$，就是本章的 $\lambda_c = \sigma_c^2\gamma$（上表倒数第二行）。把关系用于第 0 章的 $K$ 个因子本身：第 $k$ 个因子对自己的载荷为 1、对其他因子为 0，把 $K$ 个因子的载荷 $\bv\beta'$ 按行堆叠，就是 $K\times K$ 的单位矩阵 $\mathbf I_K$，于是 $K$ 个因子的期望超额收益为 $\bv\mu = \mathbf I_K\bv\lambda = \bv\lambda$。**数据矩阵**：有 $N$ 项资产时，把它们的 $\bv\beta'$ 按行堆叠成 $N\times K$ 的载荷矩阵 $\mathbf B$，$N$ 项资产的期望超额收益组成的列向量为 $\mathbf B\bv\lambda$（$N\times 1$）；**所有资产共用 $\mathbf b$、$\bv\Sigma_f$ 与 $\bv\lambda$**，每项资产各有一行载荷。第 0 章的模拟市场中 $K = 3$，$\bv\Sigma_f = \operatorname{diag}(0.05^2, 0.03^2, 0.03^2)$，$\mathbf b = (2.4,\ 3.33,\ 4.44)'$，于是 $\bv\lambda = \bv\Sigma_f\mathbf b = (0.0025 \times 2.4,\ 0.0009 \times 3.33,\ 0.0009 \times 4.44)' \approx (0.6\%, 0.3\%, 0.4\%)' = \bv\mu$（下方第二个代码单元核对）。
+第二步用到对称性 $\Sigma_{kl} = \Sigma_{lk}$。白话：第 $l$ 个因子的风险溢价 $\lambda_l$ 是这个因子与“$\mathbf b$ 加权的因子组合” $\mathbf b'\mathbf f$ 的协方差；资产的期望超额收益是它对各因子的载荷乘以各因子的风险溢价，再加总。因子互不相关时 $\lambda_l = \sigma_l^2 b_l$，“风险溢价 = 因子方差 × SDF 系数”逐个因子成立。**特例**：$K = 1$ 时 $\bv\Sigma_f$ 就是一个方差，$\lambda_1 = \Var(f_1)\, b_1$；取 $f_1 = \Delta c$、$b_1 = \gamma$，就是本章的 $\lambda_c = \sigma_c^2\gamma$（上表倒数第二行）。把关系用于第 0 章的 $K$ 个因子本身：第 $k$ 个因子对自己的载荷为 1、对其他因子为 0，把 $K$ 个因子的载荷 $\bv\beta'$ 按行堆叠，就是 $K\times K$ 的单位矩阵 $\mathbf I_K$，于是 $K$ 个因子的期望超额收益为 $\bv\mu = \mathbf I_K\bv\lambda = \bv\lambda$。**数据矩阵**：有 $N$ 项资产时，把它们的 $\bv\beta'$ 按行堆叠成 $N\times K$ 的载荷矩阵 $\mathbf B$，$N$ 项资产的期望超额收益组成的列向量为 $\mathbf B\bv\lambda$（$N\times 1$）；**所有资产共用 $\mathbf b$、$\bv\Sigma_f$ 与 $\bv\lambda$**，每项资产各有一行载荷。第 0 章的模拟市场是**月度**的，$K = 3$，月度协方差矩阵 $\bv\Sigma_f = \operatorname{diag}(0.05^2, 0.03^2, 0.03^2)$，$\mathbf b = (2.4,\ 3.33,\ 4.44)'$（$b_k$ 的单位是“月度收益的倒数”），于是月度风险溢价 $\bv\lambda = \bv\Sigma_f\mathbf b = (0.0025 \times 2.4,\ 0.0009 \times 3.33,\ 0.0009 \times 4.44)' \approx (0.6\%, 0.3\%, 0.4\%)' = \bv\mu$，即每月 0.6%、0.3%、0.4%（下方第二个代码单元核对）；本章的 $\lambda_c = 0.08\%$ 则是年度的，二者不能直接比较大小。
 
 线性近似还继承了第 0 章线性 SDF 的缺点：它可能取负值。$1 - \gamma(\Delta c - \mu_c) < 0$ 的概率为 $\Phi(-1/(\gamma\sigma_c))$（$\Phi$ 是标准正态分布函数），默认参数下 $1/(\gamma\sigma_c) = 25$，概率可以忽略；$\gamma = 25$ 时 $1/(\gamma\sigma_c) = 2$，概率约为 2.3%，不能再忽略。精确的 $m = \delta e^{-\gamma\Delta c}$ 则总是正的。
 
@@ -429,7 +429,8 @@ beta_ex = np.array([0.9, -0.4, -0.3])                                  # 某项�
 double_sum = sum(b0[k] * mp.factor_cov[k, l] * beta_ex[l] for k in range(3) for l in range(3))
 print("b =", b0.round(4), "；λ = Σ_f b =", lam0.round(4), f"；b'Σ_f β = {double_sum:.4%}")
 assert np.allclose(b0, [2.4, 10 / 3, 40 / 9]) and math.isclose(double_sum, beta_ex @ lam0)
-assert np.allclose(np.eye(3) @ lam0, mp.factor_mean)                    # 因子本身：B = I_K，E[f] = λ = μ
+B_self = np.linalg.solve(mp.factor_cov, mp.factor_cov)                 # 因子本身的载荷 Σ_f⁻¹Cov(f, f') (K, K)
+assert np.allclose(B_self, np.eye(3)) and np.allclose(B_self @ lam0, mp.factor_mean)   # B = I_K，E[f] = Bλ = μ
 ```
 
 线性 SDF 对红利索取权留下的定价误差 $\E[m_{\text{lin}}R^e]$ 是负的，量级只有 $10^{-6}$（由 `assert` 保证），对应 1.4 节“哪些关系是近似”中线性化把期望超额收益高估约 0.12%。

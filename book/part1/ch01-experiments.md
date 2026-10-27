@@ -176,7 +176,7 @@ assert abs(lam_hat - lam_c) < 3 * lam_se and abs(lam_hat - p.mu_c) > 20 * lam_se
 \underbrace{\hat{\bv\beta}_{\Delta c}}_{5\times 1} = \begin{pmatrix} \hat\beta_{\Delta c,1} \\ \hat\beta_{\Delta c,2} \\ \vdots \\ \hat\beta_{\Delta c,5} \end{pmatrix} ,
 ```
 
-第 $i$ 个分量依次对应 $(\rho, \sigma_d)$ 为 $(-0.5, 0.12)$、$(0, 0.12)$、$(0.5, 0.12)$、$(1, 0.12)$、$(0.5, 0.24)$ 的资产。不带截距的横截面回归 $\mathbf r_t = \hat{\bv\beta}_{\Delta c}\lambda_t + \text{残差}$ 只有一个斜率，最小二乘解与它的时间平均是
+第 $i$ 个分量依次对应 $(\rho, \sigma_d)$ 为 $(-0.5, 0.12)$、$(0, 0.12)$、$(0.5, 0.12)$、$(1, 0.12)$、$(0.5, 0.24)$ 的资产。这个跨资产排列的 $5\times 1$ 向量，就是 $K = 1$ 时 $N\times K$ 载荷矩阵 $\mathbf B$（[拆解](#ch1-unpack-bsb)）的唯一一列，与单只资产的 $K\times 1$ 载荷向量 $\bv\beta_i$ 不是同一个对象：前者的分量是 5 项资产各自的载荷，后者的分量是一项资产对 $K$ 个因子的载荷。不带截距的横截面回归 $\mathbf r_t = \hat{\bv\beta}_{\Delta c}\lambda_t + \text{残差}$ 只有一个斜率，最小二乘解与它的时间平均是
 
 ```{math}
 :enumerated: false

@@ -12,7 +12,7 @@
 - `book/part0/ch00-concepts-sdf.md:168` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
 - `book/part0/ch00-pricing.md:174` — 这本身并不意味着这些因子之间存在套利：无套利等价于存在某个严格为正的 SDF（第 2 章），而一个特定的线性 $m_t$ 取负值，并不排除另有一个正的 ……
-- `book/part1/ch01-lucas.md:437` — 更一般的理论在后面几章展开：第 2 章说明无套利等价于存在严格为正的 SDF；
+- `book/part1/ch01-lucas.md:438` — 更一般的理论在后面几章展开：第 2 章说明无套利等价于存在严格为正的 SDF；
 
 ## 第 3 章（10 条）
 
@@ -25,7 +25,7 @@
 - `book/part0/ch00-pricing.md:174` — 第 3 章将详细讨论。
 - `book/part1/ch01-euler-sdf.md:41` — ……第 0 章的线性 SDF 是消费 SDF 的一阶近似（1.6 节），由此可以看清“因子是超额收益”与“因子是消费增长”的区别，为第 3、4 章的一般理论做准备。
 - `book/part1/ch01-exercises.md:262` — SDF 的波动与 Hansen–Jagannathan 界见 @hansen1991implications，第 3 章展开。
-- `book/part1/ch01-lucas.md:437` — 第 3 章讨论均值—方差前沿、把 SDF 投影到资产收益张成的空间，以及 Hansen–Jagannathan 界；
+- `book/part1/ch01-lucas.md:438` — 第 3 章讨论均值—方差前沿、把 SDF 投影到资产收益张成的空间，以及 Hansen–Jagannathan 界；
 
 ## 第 4 章（14 条）
 
@@ -42,7 +42,7 @@
 - `book/part1/ch01-experiments.md:206` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
 - `book/part1/ch01-lognormal.md:302` — ……构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
 - `book/part1/ch01-lucas.md:369` — 不是，则需要另行估计（第 4、10 章）。
-- `book/part1/ch01-lucas.md:437` — 第 4 章讨论 SDF 表示与 β 表示的一般等价性，以及包括不可交易因子与模拟组合在内的因子模型。
+- `book/part1/ch01-lucas.md:438` — 第 4 章讨论 SDF 表示与 β 表示的一般等价性，以及包括不可交易因子与模拟组合在内的因子模型。
 
 ## 第 5 章（2 条）
 
@@ -118,7 +118,7 @@
 ## 第 11 章（6 条）
 
 - `book/glossary.md:404` — 消费模型与数据的定量矛盾（股权溢价之谜）见第 7 章 [@mehra1985equity]，用广义矩方法估计偏好参数见第 11 章。
-- `book/notation.md:270` — 第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关
+- `book/notation.md:271` — 第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关
 - `book/part1/ch01-euler-sdf.md:43` — 本章只讲理论与模拟，不讨论实证数字：消费模型在数据中遇到的困难（股权溢价之谜）留到第 7 章，估计偏好参数的广义矩方法（GMM）留到第 11 章。
 - `book/part1/ch01-exercises.md:241` — 要检验定价模型，需要利用横截面上大量资产的信息（第二、三部分）或多个矩的共同约束（第 11 章的 GMM），并始终把估计值与标准误放在一起看。
 - `book/part1/ch01-exercises.md:260` — 用广义矩方法估计偏好参数的方法在第 11 章介绍。
