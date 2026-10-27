@@ -113,7 +113,7 @@
 | `apsim.consumption` | 消费型模型：对数正态消费增长、习惯形成等，用于生成 SDF 与资产价格 | 第 1 章 |
 | `apsim.timeseries` | 时间序列可预测性：AR(1) 预测变量（如股息率）与时变风险溢价 | 第 6 章 |
 | `apsim.frictions` | A 股摩擦：涨跌停、停牌、T+1、卖空限制、ST、上市不满一年、小市值壳股 | 第 15 章 |
-| `apsim.stats` | GRS、Fama–MacBeth、Shanken 修正、Newey–West、GMM、样本外 R²、DM、CW、多重检验 | 第 9 章起 |
+| `apsim.stats` | 第 0 章：最小二乘与同方差标准误、交互项设计矩阵、Fama–MacBeth；第 9 章起：GRS、Shanken 修正、Newey–West、GMM、样本外 R²、DM、CW、多重检验 | 第 0 章 |
 | `apsim.portfolio` | 组合排序、市值/等权加权、因子构造（含 CH3） | 第 15 章 |
 | `apsim.plotting` | 统一的作图风格（中文字体） | 第 0 章 |
 
