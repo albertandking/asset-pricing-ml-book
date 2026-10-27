@@ -48,7 +48,7 @@ gamma0 = MarketParams().resolved_gamma()                    # 默认 Γ: (L+1, K
 r_{i,t} = \alpha_{i,t} + \beta_{1,i,t} f_{1,t} + \beta_{2,i,t} f_{2,t} + \dots + \beta_{K,i,t} f_{K,t} + \varepsilon_{i,t} .
 ```
 
-在默认 $\bv\Gamma$ 下 $\bv\beta_{i,t} = (1,\ 0.5\, z_{1,i,t-1},\ 0.5\, z_{2,i,t-1})'$，上式化为 $r_{i,t} = \alpha_{i,t} + f_{1,t} + 0.5\, z_{1,i,t-1} f_{2,t} + 0.5\, z_{2,i,t-1} f_{3,t} + \varepsilon_{i,t}$：每只股票对 $f_{1,t}$ 的暴露都是 1，$f_{2,t}$ 对一只股票的影响与它的 $z_1$ 成正比。**特例**：$K = 1$、载荷与定价误差都不随时间变化时，上式就是 $r_{i,t} = \alpha_i + \beta_i f_{1,t} + \varepsilon_{i,t}$，即 CAPM 的时间序列形式。**数据矩阵**：同一期的 $N$ 只股票按行堆叠，
+在默认 $\bv\Gamma$ 下 $\bv\beta_{i,t} = (1,\ 0.5\, z_{1,i,t-1},\ 0.5\, z_{2,i,t-1})'$，上式化为 $r_{i,t} = \alpha_{i,t} + f_{1,t} + 0.5\, z_{1,i,t-1} f_{2,t} + 0.5\, z_{2,i,t-1} f_{3,t} + \varepsilon_{i,t}$：每只股票对 $f_{1,t}$ 的暴露都是 1，$f_{2,t}$ 对一只股票的影响与它的 $z_1$ 成正比。**特例**：$K = 1$、载荷与定价误差都不随时间变化时，上式就是单因子模型 $r_{i,t} = \alpha_i + \beta_{1,i} f_{1,t} + \varepsilon_{i,t}$；再要求 $f_{1,t}$ 是市场组合的超额收益、并且 $\alpha_i = 0$，才是 CAPM 的时间序列形式。**数据矩阵**：同一期的 $N$ 只股票按行堆叠，
 
 ```{math}
 :enumerated: false
@@ -80,7 +80,7 @@ $\tilde{\mathbf Z}_{t-1}$ 的第 $i$ 行是股票 $i$ 的 $\tilde{\mathbf z}_{i,
 \underbrace{\mathbf r_t}_{N\times 1} = \begin{pmatrix} r_{1,t} \\ r_{2,t} \\ \vdots \\ r_{N,t} \end{pmatrix} ,
 ```
 
-$w_{i,t}$ 是第 $t$ 期投在股票 $i$ 上的金额（以每条腿 1 元计），正数为买入、负数为卖空，没有单位；$r_{i,t}$ 是股票 $i$ 的超额收益。**维度与展开**：$\mathbf w_t'$ 是 $1\times N$，乘 $N\times 1$ 的 $\mathbf r_t$ 得到一个数；$\mathbf B_t'$ 是 $K\times N$，第 $i$ 列是 $\bv\beta_{i,t}$，乘 $N\times 1$ 的 $\mathbf w_t$ 得到 $K\times 1$ 的向量：
+$w_{i,t}$ 是第 $t$ 期组合在股票 $i$ 上的权重，即每 1 元多头（或空头）中投在股票 $i$ 上的份额，正数为买入、负数为卖空，没有单位；$r_{i,t}$ 是股票 $i$ 的超额收益。**维度与展开**：$\mathbf w_t'$ 是 $1\times N$，乘 $N\times 1$ 的 $\mathbf r_t$ 得到一个数；$\mathbf B_t'$ 是 $K\times N$，第 $i$ 列是 $\bv\beta_{i,t}$，乘 $N\times 1$ 的 $\mathbf w_t$ 得到 $K\times 1$ 的向量：
 
 ```{math}
 :enumerated: false
@@ -89,7 +89,7 @@ $w_{i,t}$ 是第 $t$ 期投在股票 $i$ 上的金额（以每条腿 1 元计）
 \mathbf w_t'\mathbf 1_N = \sum_{i=1}^{N} w_{i,t} .
 ```
 
-白话：组合收益是各只股票收益按金额加权求和，在这里就是高组的平均收益减低组的平均收益；组合载荷的第 $k$ 个分量 $\sum_i w_{i,t}\beta_{k,i,t}$ 是各只股票对因子 $k$ 的载荷按同样的金额加权求和；$\mathbf w_t'\mathbf 1_N = 0$ 表示买入与卖空的金额相等，期初不花钱。例如在上面三只股票中买入 1 元 $z_1 = 2$ 的股票、卖空 1 元 $z_1 = -1$ 的股票，$\mathbf w_t = (-1, 0, 1)'$，组合载荷为 $(1, 1, 0)' - (1, -0.5, 0)' = (0, 1.5, 0)'$。**特例**：$\mathbf w_t$ 只在股票 $i$ 上为 1、其余为 0 时，组合收益与组合载荷就是这只股票自己的 $r_{i,t}$ 与 $\bv\beta_{i,t}$；$\mathbf w_t = \mathbf 1_N/N$（等权买入全部股票）时，组合载荷是全部股票载荷的横截面平均。**数据矩阵**：代码中的 `w_ls` 形状为 `(T, N)`，第 $t$ 行是 $\mathbf w_t'$；权重每期重新计算，`ls_beta` 的第 $t$ 行是 $(\mathbf B_t'\mathbf w_t)'$。
+白话：组合收益是各只股票收益按权重加权求和，在这里就是高组的平均收益减低组的平均收益；组合载荷的第 $k$ 个分量 $\sum_i w_{i,t}\beta_{k,i,t}$ 是各只股票对因子 $k$ 的载荷按同样的权重加权求和；$\mathbf w_t'\mathbf 1_N = 0$ 表示买入与卖空的金额相等，期初不花钱。例如在上面三只股票中买入 1 元 $z_1 = 2$ 的股票、卖空 1 元 $z_1 = -1$ 的股票，$\mathbf w_t = (-1, 0, 1)'$，组合载荷为 $(1, 1, 0)' - (1, -0.5, 0)' = (0, 1.5, 0)'$。**特例**：$\mathbf w_t$ 只在股票 $i$ 上为 1、其余为 0 时，组合收益与组合载荷就是这只股票自己的 $r_{i,t}$ 与 $\bv\beta_{i,t}$；$\mathbf w_t = \mathbf 1_N/N$（等权买入全部股票）时，组合载荷是全部股票载荷的横截面平均。**数据矩阵**：代码中的 `w_ls` 形状为 `(T, N)`，第 $t$ 行是 $\mathbf w_t'$；权重每期重新计算，`ls_beta` 的第 $t$ 行是 $(\mathbf B_t'\mathbf w_t)'$。
 
 ```{code-cell} python
 # 拆开讲组合载荷：买入 1 元 z1 = 2 的股票、卖空 1 元 z1 = -1 的股票，B'w 等于两只股票载荷之差
@@ -167,7 +167,7 @@ $g_{j,t}$（$j \geq 1$）是第 $t$ 期特征 $j$ 每高 1 个标准差、股票
 \underbrace{\tilde{\mathbf Z}_{t-1}'\mathbf r_t}_{2\times 1} = \begin{pmatrix} \sum_i r_{i,t} \\ \sum_i z_{1,i,t-1} r_{i,t} \end{pmatrix} .
 ```
 
-**特例**：$L = 0$（只有常数项）时 $\hat g_{0,t} = N^{-1}\sum_i r_{i,t}$，就是这一期全部股票收益的横截面平均；$L = 1$ 时，斜率 $\hat g_{1,t}$ 等于 $z_1$ 与收益的横截面样本协方差除以 $z_1$ 的横截面样本方差，截距等于收益的横截面均值减去斜率乘以 $z_1$ 的横截面均值。这与“用回归斜率估计载荷”中的单因子公式形式相同，只是求和对象从“同一只股票的 $T$ 个月”换成了“同一个月的 $N$ 只股票”。特征经过标准化、相互独立时 $\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}/N \approx \mathbf I_{L+1}$，于是 $\hat g_{j,t} \approx N^{-1}\sum_i z_{j,i,t-1} r_{i,t}$，近似于一个按特征 $j$ 加权的多空组合的收益。**数据矩阵**：与时间序列回归正好相反。时间序列回归中，所有股票共用一个 $T\times(1+K)$ 的设计矩阵 $[\mathbf 1_T, \mathbf F]$，每只股票各估一套 $\bv\beta_i$；这里每一期有自己的 $N\times(L+1)$ 设计矩阵 $\tilde{\mathbf Z}_{t-1}$（特征每期都在变），这一期的全部股票共用一个系数向量 $\hat{\mathbf g}_t$，每期各估一个。下面代码中的 `X_cs[t]` 是第 $t+1$ 期的设计矩阵，`g_hat` 的形状为 `(T, 3)`，第 $t$ 行是 $\hat{\mathbf g}_t'$。
+**特例**：$L = 0$（只有常数项）时 $\hat g_{0,t} = N^{-1}\sum_i r_{i,t}$，就是这一期全部股票收益的横截面平均；$L = 1$ 时，斜率 $\hat g_{1,t}$ 等于 $z_1$ 与收益的横截面样本协方差除以 $z_1$ 的横截面样本方差，截距等于收益的横截面均值减去斜率乘以 $z_1$ 的横截面均值。这与“用回归斜率估计载荷”中的单因子公式形式相同，只是求和对象从“同一只股票的 $T$ 个月”换成了“同一个月的 $N$ 只股票”。特征经过标准化、相互独立时 $\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}/N \approx \mathbf I_{L+1}$，于是 $\hat g_{j,t} \approx N^{-1}\sum_i z_{j,i,t-1} r_{i,t}$，近似于一个按特征 $j$ 加权的多空组合的收益。**数据矩阵**：与时间序列回归正好相反。时间序列回归中，所有股票共用一个 $T\times(1+K)$ 的设计矩阵 $[\mathbf 1_T, \mathbf F]$，每只股票各估一套 $\bv\beta_i$；这里每一期有自己的 $N\times(L+1)$ 设计矩阵 $\tilde{\mathbf Z}_{t-1}$（特征每期都在变），这一期的全部股票共用一个系数向量 $\hat{\mathbf g}_t$，每期各估一个。下面代码中的回归只放常数与 $z_1$、$z_2$（理由见下文）：`X_cs` 的形状为 `(T, N, 3)`，`X_cs[t-1]` 是第 $t$ 期 $\tilde{\mathbf Z}_{t-1}$ 的前三列（$N\times 3$）；`g_hat` 的形状为 `(T, 3)`，`g_hat[t-1]` 是这个缩减回归在第 $t$ 期的 3 个系数，估计的是 $\mathbf g_t$ 的前三个分量 $(g_{0,t}, g_{1,t}, g_{2,t})$，而不是完整的 $(L+1)$ 维 $\hat{\mathbf g}_t$。
 
 ```{code-cell} python
 # 拆开讲 ĝ_t 的两个特例（第 1 期）：只有常数项时为横截面均值；只有 z1 时斜率为横截面协方差除以方差
@@ -180,7 +180,7 @@ assert np.isclose(g_uni[1], np.cov(z1_p1, r_p1)[0, 1] / np.var(z1_p1, ddof=1))
 assert np.isclose(g_uni[0], r_p1.mean() - g_uni[1] * z1_p1.mean())
 ```
 
-$\bv\varepsilon_t$ 与期初特征和因子独立、均值为 0，所以给定 $\tilde{\mathbf Z}_{t-1}$ 与 $\mathbf f_t$，$\hat{\mathbf g}_t$ 是 $\mathbf g_t$ 的无偏估计，误差的条件协方差矩阵为 $\sigma_\varepsilon^2(\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1})^{-1}$。模拟器中的特征相互独立、服从 $N(\mathbf 0, \mathbf I_L)$，$\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}/N$ 接近 $\mathbf I_{L+1}$，所以误差每个分量的标准差约为 $\sigma_\varepsilon/\sqrt N$：默认 $\sigma_\varepsilon = 0.10$、$N = 500$ 时约为 0.45%。这是同一期横截面上的噪声，随股票数增加而变小。默认 $\bv\Gamma$ 下 $\bv\Gamma\mathbf f_t = (f_{1,t},\ 0.5 f_{2,t},\ 0.5 f_{3,t},\ 0,\ 0,\ 0)'$，于是第 $t$ 期对常数与 $z_1$、$z_2$ 的系数估计为
+$\bv\varepsilon_t$ 与期初特征和因子独立、均值为 0，所以给定 $\tilde{\mathbf Z}_{t-1}$ 与 $\mathbf f_t$，$\hat{\mathbf g}_t$ 是 $\mathbf g_t$ 的无偏估计，误差的条件协方差矩阵为 $\sigma_\varepsilon^2(\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1})^{-1}$（$(L+1)\times(L+1)$ 矩阵，第 $j$ 个对角元是系数估计 $\hat g_{j,t}$ 的条件方差，非对角元是两个系数估计之间的条件协方差）。模拟器中的特征相互独立、服从 $N(\mathbf 0, \mathbf I_L)$，$\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}/N$ 接近 $\mathbf I_{L+1}$，所以误差每个分量的标准差约为 $\sigma_\varepsilon/\sqrt N$：默认 $\sigma_\varepsilon = 0.10$、$N = 500$ 时约为 0.45%。这是同一期横截面上的噪声，随股票数增加而变小。默认 $\bv\Gamma$ 下 $\bv\Gamma\mathbf f_t = (f_{1,t},\ 0.5 f_{2,t},\ 0.5 f_{3,t},\ 0,\ 0,\ 0)'$，于是第 $t$ 期对常数与 $z_1$、$z_2$ 的系数估计为
 
 ```{math}
 :enumerated: false
