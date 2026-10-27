@@ -40,24 +40,7 @@ gamma0 = MarketParams().resolved_gamma()                    # 默认 Γ: (L+1, K
 
 第一个式子说“特征决定载荷”，第二个式子说“载荷乘以因子得到收益”。特征与载荷带下标 $i$，因子不带：因子是全市场共同的，股票之间收益的系统性差别全部来自载荷（以及定价误差 $\alpha_{i,t}$）。
 
-(ch0-unpack-return)=
-**拆开讲这两个式子。** 第一个式子的分量、维度与展开，见上一页“特征”一节的[拆解](#ch0-unpack-gamma)。第二个式子中的四项都是第 $t$ 个月的标量，单位都是月度收益：$r_{i,t}$ 是股票 $i$ 的超额收益；$\alpha_{i,t}$ 是定价误差（[拆解](#ch0-unpack-alpha)）；$\bv\beta_{i,t}'\mathbf f_t$ 是因子部分（[拆解](#ch0-unpack-betaf)）；$\varepsilon_{i,t}$ 是异质性冲击，均值为 0、标准差为 $\sigma_\varepsilon$。把因子部分逐项展开，
-
-```{math}
-:enumerated: false
-r_{i,t} = \alpha_{i,t} + \beta_{1,i,t} f_{1,t} + \beta_{2,i,t} f_{2,t} + \dots + \beta_{K,i,t} f_{K,t} + \varepsilon_{i,t} .
-```
-
-在默认 $\bv\Gamma$ 下 $\bv\beta_{i,t} = (1,\ 0.5\, z_{1,i,t-1},\ 0.5\, z_{2,i,t-1})'$，上式化为 $r_{i,t} = \alpha_{i,t} + f_{1,t} + 0.5\, z_{1,i,t-1} f_{2,t} + 0.5\, z_{2,i,t-1} f_{3,t} + \varepsilon_{i,t}$：每只股票对 $f_{1,t}$ 的暴露都是 1，$f_{2,t}$ 对一只股票的影响与它的 $z_1$ 成正比。**特例**：$K = 1$、载荷与定价误差都不随时间变化时，上式就是单因子模型 $r_{i,t} = \alpha_i + \beta_{1,i} f_{1,t} + \varepsilon_{i,t}$；再要求 $f_{1,t}$ 是市场组合的超额收益、并且 $\alpha_i = 0$，才是 CAPM 的时间序列形式。**数据矩阵**：同一期的 $N$ 只股票按行堆叠，
-
-```{math}
-:enumerated: false
-\underbrace{\mathbf r_t}_{N\times 1} = \underbrace{\bv\alpha_t}_{N\times 1} + \underbrace{\mathbf B_t}_{N\times K}\,\underbrace{\mathbf f_t}_{K\times 1} + \underbrace{\bv\varepsilon_t}_{N\times 1} , \qquad
-\underbrace{\mathbf B_t}_{N\times K} = \underbrace{\tilde{\mathbf Z}_{t-1}}_{N\times(L+1)}\,\underbrace{\bv\Gamma}_{(L+1)\times K} , \qquad
-\tilde{\mathbf Z}_{t-1} = \begin{pmatrix} 1 & z_{1,1,t-1} & \cdots & z_{L,1,t-1} \\ 1 & z_{1,2,t-1} & \cdots & z_{L,2,t-1} \\ \vdots & \vdots & & \vdots \\ 1 & z_{1,N,t-1} & \cdots & z_{L,N,t-1} \end{pmatrix} .
-```
-
-$\tilde{\mathbf Z}_{t-1}$ 的第 $i$ 行是股票 $i$ 的 $\tilde{\mathbf z}_{i,t-1}'$，第 0 列全为 1，第 $j$ 列是全部股票的第 $j$ 个特征；$\mathbf B_t$ 的第 $i$ 行是 $\tilde{\mathbf z}_{i,t-1}'\bv\Gamma = \bv\beta_{i,t}'$。哪些量共用、哪些各有一套，看下标最清楚：$\mathbf f_t$ 由同一期的所有股票共用，$\bv\Gamma$ 与 $\bv\theta$ 由所有股票、所有时期共用；$\tilde{\mathbf z}_{i,t-1}$、$\bv\beta_{i,t}$、$\alpha_{i,t}$、$\varepsilon_{i,t}$ 每只股票每期各有一个。下面代码中的 `B_f` 形状为 `(T, N, K)`，`B_f[t-1]` 就是 $\mathbf B_t$。
+**拆开讲这两个式子。** 第一个式子的分量、维度与展开，见上一页“特征”一节的[拆解](#ch0-unpack-gamma)。第二个式子就是 0.4 节的式 {eq}`eq-ch0-ret`：它的四项的含义与单位、逐项展开，以及同一期 $N$ 只股票按行堆叠成 $\mathbf r_t = \bv\alpha_t + \mathbf B_t\mathbf f_t + \bv\varepsilon_t$、$\mathbf B_t = \tilde{\mathbf Z}_{t-1}\bv\Gamma$ 的结构，统一在 0.3～0.4 节页面的[拆解](#ch0-unpack-return)中讲解。本页只用到其中一点：$N\times K$ 的载荷矩阵 $\mathbf B_t$ 的第 $i$ 行是 $\bv\beta_{i,t}'$。下面代码中的 `B_f` 形状为 `(T, N, K)`，`B_f[t-1]` 就是 $\mathbf B_t$。
 
 **因子往往由特征排序构造。** 三者还有一层容易混淆的关系：实证中的因子，常常是按某个特征排序构造的组合收益。规模因子就是这样得到的：每期按市值把股票排序，买入市值小的一组、卖空市值大的一组，这个“小减大”组合的收益就是规模因子。于是同一个词“规模”可以指三样东西：
 
@@ -149,7 +132,7 @@ r_{i,t} = \bv\theta'\mathbf z_{i,t-1} + \tilde{\mathbf z}_{i,t-1}'\bv\Gamma\math
 \tilde{\mathbf z}_{i,t-1}'\mathbf g_t = g_{0,t} + z_{1,i,t-1}\, g_{1,t} + \dots + z_{L,i,t-1}\, g_{L,t} .
 ```
 
-$g_{j,t}$（$j \geq 1$）是第 $t$ 期特征 $j$ 每高 1 个标准差、股票收益高出的部分，可以理解为特征 $j$ 在这一期的“回报”，单位与收益相同；$g_{0,t}$ 是全部特征处于平均水平的股票的收益（不计异质性冲击）。$g_{j,t}$ 由两部分组成：$\bv\Gamma$ 的第 $j$ 行与 $\mathbf f_t$ 的内积，即特征 $j$ 通过载荷带来的因子收益；以及定价误差系数 $\theta_j$。默认 $\bv\Gamma$ 下 $\mathbf g_t = (f_{1,t},\ 0.5 f_{2,t} + \theta_1,\ 0.5 f_{3,t} + \theta_2,\ \theta_3,\ \theta_4,\ \theta_5)'$。**特例**：Barra 的口径 $K = L+1$、$\bv\Gamma = \mathbf I_{L+1}$ 下，$\mathbf g_t = \mathbf f_t + (0, \bv\theta')'$，每期的回归系数就是“因子收益”（再加上定价误差系数）。**数据矩阵**：同一期 $N$ 只股票共用一个 $\mathbf g_t$，每只股票各有一行特征 $\tilde{\mathbf z}_{i,t-1}'$，堆叠后的设计矩阵就是上面写出的 $N\times(L+1)$ 的 $\tilde{\mathbf Z}_{t-1}$（[拆解](#ch0-unpack-return)）；不同时期的 $\mathbf g_t$ 不同，$T$ 期共有 $T$ 个。
+$g_{j,t}$（$j \geq 1$）是第 $t$ 期特征 $j$ 每高 1 个标准差、股票收益高出的部分，可以理解为特征 $j$ 在这一期的“回报”，单位与收益相同；$g_{0,t}$ 是全部特征处于平均水平的股票的收益（不计异质性冲击）。$g_{j,t}$ 由两部分组成：$\bv\Gamma$ 的第 $j$ 行与 $\mathbf f_t$ 的内积，即特征 $j$ 通过载荷带来的因子收益；以及定价误差系数 $\theta_j$。默认 $\bv\Gamma$ 下 $\mathbf g_t = (f_{1,t},\ 0.5 f_{2,t} + \theta_1,\ 0.5 f_{3,t} + \theta_2,\ \theta_3,\ \theta_4,\ \theta_5)'$。**特例**：Barra 的口径 $K = L+1$、$\bv\Gamma = \mathbf I_{L+1}$ 下，$\mathbf g_t = \mathbf f_t + (0, \bv\theta')'$，每期的回归系数就是“因子收益”（再加上定价误差系数）。**数据矩阵**：同一期 $N$ 只股票共用一个 $\mathbf g_t$，每只股票各有一行特征 $\tilde{\mathbf z}_{i,t-1}'$，堆叠后的设计矩阵就是 0.4 节写出的 $N\times(L+1)$ 的 $\tilde{\mathbf Z}_{t-1}$（[拆解](#ch0-unpack-return)）；不同时期的 $\mathbf g_t$ 不同，$T$ 期共有 $T$ 个。
 
 在第 $t$ 期的横截面上，$\mathbf f_t$ 是所有股票共同的一个已实现值，$\mathbf g_t \in \Real^{L+1}$ 因而是一个对所有股票相同的系数向量：收益是期初特征的精确线性函数，只多了异质性冲击。把 $N$ 只股票按行堆叠，$\mathbf r_t = \tilde{\mathbf Z}_{t-1}\mathbf g_t + \bv\varepsilon_t$，最小二乘估计为
 

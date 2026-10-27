@@ -39,7 +39,7 @@ p = ConsumptionParams()                                    # 默认的年度假�
 1. 两期消费—储蓄问题的一阶条件 $P_t u'(C_t) = \delta\E_t[u'(C_{t+1})x_{t+1}]$：边际代价等于边际收益，对投资者能自由买卖的每一项资产都成立（1.1 节，[拆解](#ch1-unpack-foc)）。
 2. 由此得到基本定价方程 $P_t = \E_t[m_{t+1}x_{t+1}]$，$m_{t+1} = \delta u'(C_{t+1})/u'(C_t)$；幂效用下 $m_{t+1} = \delta(C_{t+1}/C_t)^{-\gamma}$。特例：$R^f_t = 1/\E_t[m_{t+1}]$、$1 = \E_t[m_{t+1}R_{t+1}]$、$0 = \E_t[m_{t+1}R^e_{t+1}]$。理论写法 $R^f_t$ 与第 0 章的面板写法 $R^f_{t-1}$ 只差时点标号；第 0 章的 $m_t$ 对应本章的 $R^f_t m_{t+1}$（1.2 节，[拆解](#ch1-unpack-pricing)）。
 3. 价格等于不考虑风险的价值加上风险调整，$P = \E[x]/R^f + \Cov(m, x)$；期望超额收益 $\E[R^e] = -R^f\Cov(m, R^e)$。坏时候 $m$ 高，在坏时候赚钱的资产像保险，期望收益低，甚至低于无风险利率；与 $m$ 不相关的波动得不到补偿（1.3 节，[拆解](#ch1-unpack-covprice)）。
-4. 对数正态下，$\log R^f = -\log\delta + \gamma\mu_c - \gamma^2\sigma_c^2/2$，三项分别对应耐心、跨期替代与预防性储蓄；$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R)$，对红利索取权为 $\gamma\rho\sigma_c\sigma_d$。二者在联合正态时精确，冲击非正态时只是保留到二阶项的近似（1.4 节，[拆解](#ch1-unpack-logrf)）。
+4. 对数正态下，$\log R^f = -\log\delta + \gamma\mu_c - \gamma^2\sigma_c^2/2$，三项分别对应耐心、跨期替代与预防性储蓄；$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R)$，对红利索取权为 $\gamma\rho_{cd}\sigma_c\sigma_d$。二者在联合正态时精确，冲击非正态时只是保留到二阶项的近似（1.4 节，[拆解](#ch1-unpack-logrf)）。
 5. 消费 CAPM：$\E[R^e] \approx \beta_{\Delta c}\lambda_c$，$\lambda_c = \gamma\Var(\Delta c)$，来自 SDF 的线性化，默认参数下相对误差约 0.12%。消费增长是不可交易的因子，$\lambda_c$ 不等于 $\E[\Delta c]$（1.4 节、模拟实验三，[拆解](#ch1-unpack-ccapm)）。
 6. 多期定价：$P_t = \E_t\sum_{j\ge1}M_{t,t+j}D_{t+j}$，需要横截性条件排除泡沫。独立同分布时价格—红利比为常数 $a/(1-a)$，$a = \E[m e^{\Delta d}] < 1$ 等价于期望收益高于红利的期望增长；收益 $R_{t+1} = e^{\Delta d_{t+1}}/a$ 不可预测。Lucas 树是红利等于消费的特例，$\gamma > 1$ 时预期增长提高反而降低价格—红利比（1.5 节，[拆解](#ch1-unpack-a)）。
 7. 第 0 章的线性 SDF 是消费 SDF 的一阶近似 $m/\E[m] \approx 1 - \gamma(\Delta c - \mu_c)$；两种情形都满足 $\bv\lambda = \bv\Sigma_f\mathbf b$，区别在于可交易因子必须为自身定价，从而 $\mathbf b = \bv\Sigma_f^{-1}\bv\mu$、$\bv\lambda = \bv\mu$（1.6 节，[拆解](#ch1-unpack-bsb)）。
@@ -58,7 +58,7 @@ p = ConsumptionParams()                                    # 默认的年度假�
 :class: dropdown
 “风险越高收益越高”中的风险，只能是与 $m$ 相关的那部分风险。由式 {eq}`eq-ch1-premium`（[拆解](#ch1-unpack-premium)），$\E[R^e] = -R^f\Cov(m, R^e)$：期望超额收益的符号由收益与 $m$ 的协方差决定，与收益自身的方差无关。保险型资产在坏状态（$m$ 高）支付多，$\Cov(m, R^e) > 0$，期望超额收益为负：持有它降低了消费的波动，投资者愿意为此接受低于无风险利率的期望收益，正如为保险支付保费。
 
-在幂效用、对数正态的模型中，由式 {eq}`eq-ch1-logprem`，红利索取权的 $\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$。所以 $\rho < 0$（红利在消费增长低时增长高）的资产期望超额收益为负；$\rho = 0$ 的资产，不论 $\sigma_d$ 多大，期望超额收益都恰好为 0（模拟实验三的第二项资产）。
+在幂效用、对数正态的模型中，由式 {eq}`eq-ch1-logprem`，红利索取权的 $\log(\E[R]/R^f) = \gamma\rho_{cd}\sigma_c\sigma_d$。所以 $\rho_{cd} < 0$（红利在消费增长低时增长高）的资产期望超额收益为负；$\rho_{cd} = 0$ 的资产，不论 $\sigma_d$ 多大，期望超额收益都恰好为 0（模拟实验三的第二项资产）。
 :::
 
 :::{exercise} 提高风险厌恶的代价
@@ -70,7 +70,7 @@ p = ConsumptionParams()                                    # 默认的年度假�
 :class: dropdown
 :::
 
-对数溢价 $\gamma\rho\sigma_c\sigma_d$ 与 $\gamma$ 成正比，从 0.24% 变为 1.2%。无风险利率的三项中，耐心项 $-\log\delta$ 不变；跨期替代项 $\gamma\mu_c$ 从 4% 变为 20%；预防性储蓄项 $-\gamma^2\sigma_c^2/2$ 从 −0.08% 变为 −2%。合计对数无风险利率从约 4.9% 升到约 19%。
+对数溢价 $\gamma\rho_{cd}\sigma_c\sigma_d$ 与 $\gamma$ 成正比，从 0.24% 变为 1.2%。无风险利率的三项中，耐心项 $-\log\delta$ 不变；跨期替代项 $\gamma\mu_c$ 从 4% 变为 20%；预防性储蓄项 $-\gamma^2\sigma_c^2/2$ 从 −0.08% 变为 −2%。合计对数无风险利率从约 4.9% 升到约 19%。
 
 问题在于幂效用把风险厌恶与跨期替代弹性绑在一起：$\gamma = 10$ 意味着跨期替代弹性只有 0.1，投资者极不愿意让各期消费不均，预期对数消费增长为 0.02 时，必须有很高的利率才能让他不借钱提前消费。用提高 $\gamma$ 解释较高的风险溢价，同时会产生过高的无风险利率。这类问题的定量讨论见第 7 章（股权溢价之谜与无风险利率之谜）。
 
@@ -147,7 +147,7 @@ assert sp.diff(logRf_t, muct) == g_s
 :class: dropdown
 :::
 
-1. $M_{t,t+j}D_{t+j}/D_t = \delta^j(C_{t+j}/C_t)^{-\gamma}(C_{t+j}/C_t) = \delta^j\exp\left((1-\gamma)\sum_{k=1}^{j}\Delta c_{t+k}\right)$。各年的 $\Delta c$ 独立同分布，乘积的期望等于期望的乘积，每一个期望由式 {eq}`eq-ch1-lognormal` 为 $a = \delta\exp\left((1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2\right)$（与式 {eq}`eq-ch1-a` 的六项对照，见[拆解](#ch1-unpack-a)：Lucas 树中 $\mu_d - \gamma\mu_c$ 合并为 $(1-\gamma)\mu_c$，三个方差项合并为 $(1-\gamma)^2\sigma_c^2/2$），所以 $\E_t[M_{t,t+j}D_{t+j}]/D_t = a^j$。求和得 $P_t/D_t = \sum_{j\ge1}a^j = a/(1-a)$，条件是 $a < 1$，即 $\log\delta + (1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2 < 0$；此时横截性条件 $\E_t[M_{t,t+J}P_{t+J}] = (P/D)\,D_t\,a^J \to 0$ 也成立。这与[命题 %s](#prop-ch1-pd) 取 $\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 的结果一致。
+1. $M_{t,t+j}D_{t+j}/D_t = \delta^j(C_{t+j}/C_t)^{-\gamma}(C_{t+j}/C_t) = \delta^j\exp\left((1-\gamma)\sum_{k=1}^{j}\Delta c_{t+k}\right)$。各年的 $\Delta c$ 独立同分布，乘积的期望等于期望的乘积，每一个期望由式 {eq}`eq-ch1-lognormal` 为 $a = \delta\exp\left((1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2\right)$（与式 {eq}`eq-ch1-a` 的六项对照，见[拆解](#ch1-unpack-a)：Lucas 树中 $\mu_d - \gamma\mu_c$ 合并为 $(1-\gamma)\mu_c$，三个方差项合并为 $(1-\gamma)^2\sigma_c^2/2$），所以 $\E_t[M_{t,t+j}D_{t+j}]/D_t = a^j$。求和得 $P_t/D_t = \sum_{j\ge1}a^j = a/(1-a)$，条件是 $a < 1$，即 $\log\delta + (1-\gamma)\mu_c + (1-\gamma)^2\sigma_c^2/2 < 0$；此时横截性条件 $\E_t[M_{t,t+J}P_{t+J}] = (P/D)\,D_t\,a^J \to 0$ 也成立。这与[命题 %s](#prop-ch1-pd) 取 $\rho_{cd} = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 的结果一致。
 2. $\gamma = 1$ 时 $(1-\gamma) = 0$，$a = \delta$，$P/D = \delta/(1-\delta)$。原因是对数效用下 $m_{t+1}D_{t+1} = \delta (C_t/C_{t+1}) C_{t+1} = \delta C_t$ 是确定的：增长带来更多红利的“现金流效应”与增长使边际效用下降的“折现效应”恰好抵消，红利的任何变化都被边际效用的变化完全抵消。
 3. $\partial\log a/\partial\mu_c = 1 - \gamma$。$P/D = a/(1-a)$ 是 $a$ 的增函数，所以 $\gamma > 1$ 时预期增长提高使价格—红利比下降，$\gamma < 1$ 时使它上升。直观上，$\mu_c$ 提高使未来红利增加（系数 1），同时由式 {eq}`eq-ch1-logrf` 使利率上升（系数 $\gamma$），净效应为 $1 - \gamma$。
 4. 由 $P_t = vD_t$，$v = a/(1-a)$，$R_{t+1} = (v+1)/v \cdot D_{t+1}/D_t = e^{\Delta c_{t+1}}/a$（式 {eq}`eq-ch1-return`）。于是 $\log R_{t+1} = \Delta c_{t+1} - \log a$，由[命题 %s](#prop-ch1-premium)，$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R) = \gamma\sigma_c^2$。默认的 $\gamma = 2$、$\sigma_c = 2\%$ 下为 0.08%，恰好等于 $\lambda_c$。原因是对数收益 $\log R = \Delta c - \log a$ 对消费增长的 β 恰好为 1；总收益的 β 则是 $\Cov(R, \Delta c)/\sigma_c^2 = \E[R] \approx 1.05$（由 1.4 节的 $\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$）。
@@ -202,7 +202,7 @@ assert math.isclose(g_star, target / (p.rho_cd * p.sigma_c * p.sigma_d), rel_tol
 assert 0.38 < math.log(q_star.risk_free) < 0.39 and 2.1 < q_star.price_dividend_ratio < 2.2
 ```
 
-对数溢价与 $\gamma$ 成正比，$\gamma\rho\sigma_c\sigma_d = 0.03$ 给出 $\gamma = 0.03/(0.5 \times 0.02 \times 0.12) = 25$，求根结果与此一致。但此时对数无风险利率约为 38%，价格—红利比只有 2 倍多，都远远不合常理：$\gamma = 25$ 意味着跨期替代弹性只有 0.04，预期对数消费增长为 0.02 就要求极高的利率；高利率又把所有未来红利的现值压得很低。在幂效用、低消费波动的模型中，单靠提高 $\gamma$ 无法同时得到较高的风险溢价与合理的无风险利率。这正是第 7 章要讨论的问题。
+对数溢价与 $\gamma$ 成正比，$\gamma\rho_{cd}\sigma_c\sigma_d = 0.03$ 给出 $\gamma = 0.03/(0.5 \times 0.02 \times 0.12) = 25$，求根结果与此一致。但此时对数无风险利率约为 38%，价格—红利比只有 2 倍多，都远远不合常理：$\gamma = 25$ 意味着跨期替代弹性只有 0.04，预期对数消费增长为 0.02 就要求极高的利率；高利率又把所有未来红利的现值压得很低。在幂效用、低消费波动的模型中，单靠提高 $\gamma$ 无法同时得到较高的风险溢价与合理的无风险利率。这正是第 7 章要讨论的问题。
 :::{solution-end}
 :::
 

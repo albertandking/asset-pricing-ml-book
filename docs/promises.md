@@ -4,7 +4,7 @@
 
 正文中指向尚未写出的章节或附录的引用，按被引用的章号分组，每条给出文件与行号（如 `book/glossary.md:30`），破折号后是所在句子的上下文。写每一章之前，逐条核对指向本章的承诺：在本章兑现，或改写原处的说法；本章写完后重新生成本文件。
 
-共 149 条，涉及 23 个章节或附录。
+共 150 条，涉及 23 个章节或附录。
 
 ## 第 2 章（5 条）
 
@@ -49,7 +49,7 @@
 - `book/part0/ch00-exercises.md:63` — 这正是第 5 章“条件模型与管理组合”的核心思想：条件矩 $\E[m_t r_{i,t} \mid \mathbf z_{i,t-1}] = 0$ 等价于对所有……
 - `book/part0/ch00-pricing.md:136` — 这正是第 5 章条件模型要处理的问题。
 
-## 第 6 章（13 条）
+## 第 6 章（14 条）
 
 - `book/glossary.md:173` — ……不等于模型中的 $\gamma$ 下降：幂效用模型中 $\gamma$ 是常数，期望收益随时间变化要靠其他机制，例如时变的消费分布或习惯形成（第 6、7 章）。
 - `book/glossary.md:284` — 市场给一只股票高估值，可能是因为预期增长高，也可能是因为折现率低（第 6 章）。
@@ -61,8 +61,9 @@
 - `book/glossary.md:593` — 折现率随时间、也随资产变化 [@cochrane2011presidential]（第 6 章）。
 - `book/glossary.md:597` — 对数形式在第 6 章另行定义。
 - `book/notation.md:174` — 第 6、7 章沿用
-- `book/notation.md:261` — Campbell–Shiller 对数线性化常数（第 6 章）
+- `book/notation.md:262` — 不带下标的 $\rho$ 为一般的相关系数与 Campbell–Shiller 对数线性化常数（第 6 章）；
 - `book/part1/ch01-exercises.md:262` — 估值比率随时间变化、预测收益的证据与“折现率”的含义见 @cochrane2011presidential，第 6 章展开；
+- `book/part1/ch01-lognormal.md:60` — 记号表中不带下标的 $\rho$ 留给一般的相关系数与第 6 章的 Campbell–Shiller 常数）。
 - `book/part1/ch01-lucas.md:322` — 第 6 章引入时变的贴现率，并用 Campbell–Shiller 分解把价格—红利比的变动拆成两部分；
 
 ## 第 7 章（12 条）
@@ -96,7 +97,7 @@
 - `book/part0/ch00-exercises.md:114` — 也就是说，即使存在错误定价，每只股票时间序列回归的截距在总体上也是 0，GRS 一类的时间序列检验（第 9 章）检验的只是平均定价误差，看不到这里的条件错误定价……
 - `book/part0/ch00-guide.md:98` — 它们是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
 - `book/part0/primer-regressions.md:11` — 本页是第二部分（实证计量）的预习，不属于第 0 章的必读内容，第一次阅读可以跳过，读到第 9 章之前再回来。
-- `book/part0/primer-regressions.md:91` — 检验全部 $N$ 个截距同时为 0 的 GRS 检验 [@gibbons1989test]，见第 9 章。
+- `book/part0/primer-regressions.md:88` — 检验全部 $N$ 个截距同时为 0 的 GRS 检验 [@gibbons1989test]，见第 9 章。
 
 ## 第 10 章（14 条）
 
@@ -108,8 +109,8 @@
 - `book/part0/ch00-concepts.md:250` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
 - `book/part0/ch00-pitfalls.md:159` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
 - `book/part0/primer-regressions-sim.md:273` — 处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
-- `book/part0/primer-regressions.md:183` — 这些都在第 10 章展开。
-- `book/part0/primer-regressions.md:184` — 估计风险溢价 $\bv\lambda$（第 10 章）；
+- `book/part0/primer-regressions.md:180` — 这些都在第 10 章展开。
+- `book/part0/primer-regressions.md:181` — 估计风险溢价 $\bv\lambda$（第 10 章）；
 - `book/part1/ch01-experiments.md:168` — 考虑这一误差的 Shanken 修正见第 10 章。
 - `book/part1/ch01-experiments.md:206` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
 - `book/part1/ch01-lognormal.md:302` — ……构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
@@ -118,7 +119,7 @@
 ## 第 11 章（6 条）
 
 - `book/glossary.md:404` — 消费模型与数据的定量矛盾（股权溢价之谜）见第 7 章 [@mehra1985equity]，用广义矩方法估计偏好参数见第 11 章。
-- `book/notation.md:271` — 第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关
+- `book/notation.md:273` — 第 11 章 GMM 的加权矩阵记为 $\mathbf W$（不带下标），二者无关
 - `book/part1/ch01-euler-sdf.md:43` — 本章只讲理论与模拟，不讨论实证数字：消费模型在数据中遇到的困难（股权溢价之谜）留到第 7 章，估计偏好参数的广义矩方法（GMM）留到第 11 章。
 - `book/part1/ch01-exercises.md:241` — 要检验定价模型，需要利用横截面上大量资产的信息（第二、三部分）或多个矩的共同约束（第 11 章的 GMM），并始终把估计值与标准误放在一起看。
 - `book/part1/ch01-exercises.md:260` — 用广义矩方法估计偏好参数的方法在第 11 章介绍。
@@ -130,8 +131,8 @@
 - `book/glossary.md:248` — $t$ 值依赖标准误的算法，要考虑自相关、截面相关与估计误差（第 12 章）；
 - `book/glossary.md:439` — 按时间聚类的标准误见第 12 章。
 - `book/part0/ch00-pitfalls.md:159` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
-- `book/part0/primer-regressions.md:185` — ……t$ 在时间上相关时（例如用月度数据计算未来 12 个月的收益，相邻各期的收益期限重叠），标准误会偏小，需要 Newey–West 一类的调整，见第 12 章。
-- `book/part0/primer-regressions.md:261` — 允许同一期残差任意相关的“按时间聚类”（clustered by time）标准误，见第 12 章。
+- `book/part0/primer-regressions.md:182` — ……t$ 在时间上相关时（例如用月度数据计算未来 12 个月的收益，相邻各期的收益期限重叠），标准误会偏小，需要 Newey–West 一类的调整，见第 12 章。
+- `book/part0/primer-regressions.md:258` — 允许同一期残差任意相关的“按时间聚类”（clustered by time）标准误，见第 12 章。
 
 ## 第 13 章（5 条）
 

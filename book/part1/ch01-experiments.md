@@ -97,7 +97,7 @@ assert np.all(euler["T ≥ 20000 时的最大偏差"] < euler["T ≤ 100 时的�
 
 ### 实验二：风险溢价的闭式解与样本均值
 
-由 1.4 节，红利索取权的期望超额收益精确等于 $\E[R] - R^f = R^f(e^{\gamma\rho\sigma_c\sigma_d} - 1)$（各项见[拆解](#ch1-unpack-logprem)），它由 `expected_return` 与 `risk_free` 两个属性给出。用同一个长样本的样本均值检验它：
+由 1.4 节，红利索取权的期望超额收益精确等于 $\E[R] - R^f = R^f(e^{\gamma\rho_{cd}\sigma_c\sigma_d} - 1)$（各项见[拆解](#ch1-unpack-logprem)），它由 `expected_return` 与 `risk_free` 两个属性给出。用同一个长样本的样本均值检验它：
 
 ```{code-cell} python
 Re = (sim["R"] - sim["Rf"]).to_numpy()                       # (T,)：超额收益 R_t − R^f
@@ -114,22 +114,22 @@ assert abs(z_prem) < 4 and truth / se_Re > 5
 
 ### 实验三：用消费增长做时间序列回归
 
-消费 CAPM {eq}`eq-ch1-ccapm` 说，期望超额收益近似等于 $\beta_{\Delta c}\lambda_c$，$\lambda_c = \gamma\sigma_c^2$。为了得到一个横截面，构造五项红利索取权，它们的红利增长与消费增长的相关系数 $\rho$、红利波动 $\sigma_d$ 不同。由于 `simulate_consumption` 按名称为消费冲击与红利冲击各派生一个随机子流，用同一个种子模拟时，五项资产的消费增长路径完全相同（代码中由 `assert` 核对），它们就像同一个经济中的五项资产。
+消费 CAPM {eq}`eq-ch1-ccapm` 说，期望超额收益近似等于 $\beta_{\Delta c}\lambda_c$，$\lambda_c = \gamma\sigma_c^2$。为了得到一个横截面，构造五项红利索取权，它们的红利增长与消费增长的相关系数 $\rho_{cd}$、红利波动 $\sigma_d$ 不同。由于 `simulate_consumption` 按名称为消费冲击与红利冲击各派生一个随机子流，用同一个种子模拟时，五项资产的消费增长路径完全相同（代码中由 `assert` 核对），它们就像同一个经济中的五项资产。
 
-对每项资产做时间序列回归 $R^e_t = c_0 + \beta_{\Delta c}\Delta c_t + u_t$，用 `apsim.stats.ols`（第 0 章“模拟实验”一节中内联实现并讲解过的最小二乘函数）求出 $\hat\beta_{\Delta c}$ 与它的标准误。与真值 $\beta_{\Delta c} = \E[R]\rho\sigma_c\sigma_d/\sigma_c^2$（1.4 节）、$\beta_{\Delta c}\lambda_c$ 与精确的期望超额收益比较。
+对每项资产做时间序列回归 $R^e_{i,t} = a_i + \beta_{\Delta c,i}\Delta c_t + u_{i,t}$，用 `apsim.stats.ols`（第 0 章“模拟实验”一节中内联实现并讲解过的最小二乘函数）求出 $\hat\beta_{\Delta c,i}$ 与它的标准误。与真值 $\beta_{\Delta c} = \E[R]\rho_{cd}\sigma_c\sigma_d/\sigma_c^2$（1.4 节）、$\beta_{\Delta c}\lambda_c$ 与精确的期望超额收益比较。
 
 (ch1-unpack-tsdc)=
-**拆开讲时间序列回归 $R^e_t = c_0 + \beta_{\Delta c}\Delta c_t + u_t$。** 各项都是第 $t$ 年的标量：$R^e_t$ 是这项资产的年度超额收益（水平，即模拟数据中 `R` 列减去 `Rf` 列）；$c_0$ 是截距，单位与收益相同；$\Delta c_t$ 是第 $t$ 年的对数消费增长；$\beta_{\Delta c}$ 是斜率，含义见式 {eq}`eq-ch1-ccapm` 的[拆解](#ch1-unpack-ccapm)；$u_t$ 是残差。它与[导读](#primer-unpack-ts)中的时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 形式相同，只是 $K = 1$，因子换成了不可交易的 $\Delta c_t$。**数据矩阵**：第 $i$ 项资产（$i = 1, \dots, 5$）的 $T$ 年回归一次写出是
+**拆开讲时间序列回归 $R^e_{i,t} = a_i + \beta_{\Delta c,i}\Delta c_t + u_{i,t}$。** 各项都是第 $t$ 年的标量，下标 $i$ 表示第 $i$ 项资产：$R^e_{i,t}$ 是这项资产的年度超额收益（水平，即模拟数据中 `R` 列减去 `Rf` 列）；$a_i$ 是截距，单位与收益相同；$\Delta c_t$ 是第 $t$ 年的对数消费增长，五项资产相同，不带资产下标；$\beta_{\Delta c,i}$ 是斜率，含义见式 {eq}`eq-ch1-ccapm` 的[拆解](#ch1-unpack-ccapm)；$u_{i,t}$ 是残差。红利贴现常数 $a$ 不带下标；回归截距 $a_i$ 带资产下标，二者不同。它与[导读](#primer-unpack-ts)中的时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 形式相同，只是 $K = 1$，因子换成了不可交易的 $\Delta c_t$。**数据矩阵**：第 $i$ 项资产（$i = 1, \dots, 5$）的 $T$ 年回归一次写出是
 
 ```{math}
 :enumerated: false
 \underbrace{\begin{pmatrix} R^e_{i,1} \\ R^e_{i,2} \\ \vdots \\ R^e_{i,T} \end{pmatrix}}_{T\times 1}
 = \underbrace{\begin{pmatrix} 1 & \Delta c_1 \\ 1 & \Delta c_2 \\ \vdots & \vdots \\ 1 & \Delta c_T \end{pmatrix}}_{T\times 2}
-\underbrace{\begin{pmatrix} c_{0,i} \\ \beta_{\Delta c,i} \end{pmatrix}}_{2\times 1}
+\underbrace{\begin{pmatrix} a_i \\ \beta_{\Delta c,i} \end{pmatrix}}_{2\times 1}
 + \underbrace{\begin{pmatrix} u_{i,1} \\ u_{i,2} \\ \vdots \\ u_{i,T} \end{pmatrix}}_{T\times 1} ,
 ```
 
-$T\times 2$ 的设计矩阵第一列全是 1（估计截距），第二列是 $T$ 年的消费增长序列；$T\times 2$ 乘 $2\times 1$ 得 $T\times 1$，第 $t$ 行就是 $c_{0,i} + \beta_{\Delta c,i}\Delta c_t$。五项资产的消费增长路径相同，所以**五项资产共用同一个 $T\times 2$ 的设计矩阵**（代码中的 `X`，形状为 `(T, 2)`），每项资产各有自己的一列超额收益（`y`，形状为 `(T,)`）与一组系数 $(c_{0,i}, \beta_{\Delta c,i})$（`coef`，形状为 `(2,)`）。
+$T\times 2$ 的设计矩阵第一列全是 1（估计截距），第二列是 $T$ 年的消费增长序列；$T\times 2$ 乘 $2\times 1$ 得 $T\times 1$，第 $t$ 行就是 $a_i + \beta_{\Delta c,i}\Delta c_t$。五项资产的消费增长路径相同，所以**五项资产共用同一个 $T\times 2$ 的设计矩阵**（代码中的 `X`，形状为 `(T, 2)`），每项资产各有自己的一列超额收益（`y`，形状为 `(T,)`）与一组系数 $(a_i, \beta_{\Delta c,i})$（`coef`，形状为 `(2,)`）。
 
 ```{code-cell} python
 lam_c = p.gamma * p.sigma_c**2                                # λ_c = γ σ_c²
@@ -141,7 +141,7 @@ for rho, sd in specs:
     assert np.array_equal(dq["dc"].to_numpy(), sim["dc"].to_numpy())          # 同一种子：消费路径相同
     y = (dq["R"] - dq["Rf"]).to_numpy()                                      # (T,)
     X = np.column_stack([np.ones(T_long), dq["dc"].to_numpy()])              # (T, 2)：常数项与 Δc_t
-    coef, se = ols(X, y)                                                     # coef: (2,) = (c_0, β̂)
+    coef, se = ols(X, y)                                                     # coef: (2,) = (a_i, β̂)
     beta_true = q.expected_return * rho * q.sigma_c * q.sigma_d / q.sigma_c**2
     exact = q.expected_return - q.risk_free
     rows.append({"ρ": rho, "σ_d": sd, "β̂": coef[1], "se(β̂)": se[1], "β 真值": beta_true,
@@ -163,7 +163,7 @@ print(f"λ̂ = {lam_hat:.5f}（标准误 {lam_se:.5f}）；λ_c = γσ_c² = {la
 assert abs(lam_hat - lam_c) < 3 * lam_se and abs(lam_hat - p.mu_c) > 20 * lam_se
 ```
 
-五项资产的 $\hat\beta_{\Delta c}$ 都在真值的 4 倍标准误以内；$\beta_{\Delta c}\lambda_c$ 与精确的期望超额收益相对误差小于 0.5%，这就是 1.4 节算出的线性化误差。$\rho < 0$ 的资产在消费增长低时收益高，$\beta_{\Delta c} < 0$，期望超额收益为负，是一种“保险”；$\rho = 0$ 的资产与消费无关，波动虽大，期望超额收益却为 0。最后两项资产的 $\sigma_d$ 与 $\rho$ 都不同，但 $\rho\sigma_d$ 相同，因而 β 与期望超额收益的真值完全相同（估计值因抽样误差略有差别）；后者的总波动大一倍，却没有得到更多补偿：决定补偿的是与消费的协方差，不是总波动。
+五项资产的 $\hat\beta_{\Delta c}$ 都在真值的 4 倍标准误以内；$\beta_{\Delta c}\lambda_c$ 与精确的期望超额收益相对误差小于 0.5%，这就是 1.4 节算出的线性化误差。$\rho_{cd} < 0$ 的资产在消费增长低时收益高，$\beta_{\Delta c} < 0$，期望超额收益为负，是一种“保险”；$\rho_{cd} = 0$ 的资产与消费无关，波动虽大，期望超额收益却为 0。最后两项资产的 $\sigma_d$ 与 $\rho_{cd}$ 都不同，但 $\rho_{cd}\sigma_d$ 相同，因而 β 与期望超额收益的真值完全相同（估计值因抽样误差略有差别）；后者的总波动大一倍，却没有得到更多补偿：决定补偿的是与消费的协方差，不是总波动。
 
 代码最后用 Fama–MacBeth 程序（[导读：几种回归](#sec-ch0-regs)，`apsim.stats.fama_macbeth`，它与内联实现的核对见[续页](#sec-ch0-regs-sim)）估计 $\lambda_c$：每年把五项资产的超额收益对 $\hat\beta_{\Delta c}$ 做不带截距的横截面回归，再对各年的斜率求平均并计算标准误。估计值与 $\lambda_c = 0.0008$ 相差不到 3 倍标准误，而与 $\E[\Delta c] = 0.02$ 相差超过 20 倍标准误（均由 `assert` 保证）。数据本身告诉我们，不可交易因子的风险溢价不是它的均值。这里把 $\hat\beta$ 当作已知来计算标准误，忽略了 $\hat\beta$ 的估计误差；考虑这一误差的 Shanken 修正见第 10 章。
 
@@ -173,17 +173,17 @@ assert abs(lam_hat - lam_c) < 3 * lam_se and abs(lam_hat - p.mu_c) > 20 * lam_se
 ```{math}
 :enumerated: false
 \underbrace{\mathbf r_t}_{5\times 1} = \begin{pmatrix} r_{1,t} \\ r_{2,t} \\ \vdots \\ r_{5,t} \end{pmatrix} , \qquad
-\underbrace{\hat{\bv\beta}_{\Delta c}}_{5\times 1} = \begin{pmatrix} \hat\beta_{\Delta c,1} \\ \hat\beta_{\Delta c,2} \\ \vdots \\ \hat\beta_{\Delta c,5} \end{pmatrix} ,
+\underbrace{\hat{\mathbf B}}_{5\times 1} = \begin{pmatrix} \hat\beta_{\Delta c,1} \\ \hat\beta_{\Delta c,2} \\ \vdots \\ \hat\beta_{\Delta c,5} \end{pmatrix} ,
 ```
 
-第 $i$ 个分量依次对应 $(\rho, \sigma_d)$ 为 $(-0.5, 0.12)$、$(0, 0.12)$、$(0.5, 0.12)$、$(1, 0.12)$、$(0.5, 0.24)$ 的资产。这个跨资产排列的 $5\times 1$ 向量，就是 $K = 1$ 时 $N\times K$ 载荷矩阵 $\mathbf B$（[拆解](#ch1-unpack-bsb)）的唯一一列，与单只资产的 $K\times 1$ 载荷向量 $\bv\beta_i$ 不是同一个对象：前者的分量是 5 项资产各自的载荷，后者的分量是一项资产对 $K$ 个因子的载荷。不带截距的横截面回归 $\mathbf r_t = \hat{\bv\beta}_{\Delta c}\lambda_t + \text{残差}$ 只有一个斜率，最小二乘解与它的时间平均是
+第 $i$ 个分量依次对应 $(\rho_{cd}, \sigma_d)$ 为 $(-0.5, 0.12)$、$(0, 0.12)$、$(0.5, 0.12)$、$(1, 0.12)$、$(0.5, 0.24)$ 的资产。这个跨资产排列的 $5\times 1$ 列，就是 $K = 1$ 时 $N\times K$ 载荷矩阵 $\mathbf B$（[拆解](#ch1-unpack-bsb)）的估计值 $\hat{\mathbf B}$，它只有一列，与[记号表](../notation.md)中 $\hat{\mathbf B}$ 的写法一致；它与单只资产的 $K\times 1$ 载荷向量 $\bv\beta_i$ 不是同一个对象：前者的分量是 5 项资产各自的载荷，后者的分量是一项资产对 $K$ 个因子的载荷。单只资产的 $\hat\beta_{\Delta c,i}$ 是标量，不加粗。不带截距的横截面回归 $\mathbf r_t = \hat{\mathbf B}\lambda_t + \text{残差}$ 只有一个斜率，最小二乘解与它的时间平均是
 
 ```{math}
 :enumerated: false
-\hat\lambda_t = \bigl(\hat{\bv\beta}_{\Delta c}'\hat{\bv\beta}_{\Delta c}\bigr)^{-1}\hat{\bv\beta}_{\Delta c}'\mathbf r_t = \frac{\sum_{i=1}^{5}\hat\beta_{\Delta c,i}\, r_{i,t}}{\sum_{i=1}^{5}\hat\beta_{\Delta c,i}^2} , \qquad \hat\lambda = \frac1T\sum_{t=1}^{T}\hat\lambda_t .
+\hat\lambda_t = \bigl(\hat{\mathbf B}'\hat{\mathbf B}\bigr)^{-1}\hat{\mathbf B}'\mathbf r_t = \frac{\sum_{i=1}^{5}\hat\beta_{\Delta c,i}\, r_{i,t}}{\sum_{i=1}^{5}\hat\beta_{\Delta c,i}^2} , \qquad \hat\lambda = \frac1T\sum_{t=1}^{T}\hat\lambda_t .
 ```
 
-**维度**：$\hat{\bv\beta}_{\Delta c}'$ 是 $1\times 5$，乘 $5\times 1$ 的 $\hat{\bv\beta}_{\Delta c}$ 或 $\mathbf r_t$ 都得到一个数，所以 $(\hat{\bv\beta}_{\Delta c}'\hat{\bv\beta}_{\Delta c})^{-1}$ 就是一个数的倒数。白话：$\hat\lambda_t$ 是第 $t$ 年每单位消费 β 实际得到的补偿，单位与收益相同；$\hat\lambda$（代码中的 `lam_hat`）是它的时间平均，用来估计 $\lambda_c$。**特例**：这是[导读](#primer-unpack-cs)中横截面回归只有一个解释变量、没有截距时的情形；Fama–MacBeth 的平均与标准误见[拆解](#primer-unpack-fm)。**数据矩阵**：$T$ 年的超额收益按行堆叠为 $T\times 5$ 的矩阵（代码中的 `Re_mat`，第 $t$ 行为 $\mathbf r_t'$）；每年的设计矩阵都是同一列 $\hat{\bv\beta}_{\Delta c}$（$5\times 1$），代码把它复制 $T$ 份，得到形状为 `(T, 5, 1)` 的 `X_fm`。**所有年份共用同一个 $\hat{\bv\beta}_{\Delta c}$**，每年各有一个 $\mathbf r_t$ 与一个 $\hat\lambda_t$。
+**维度**：$\hat{\mathbf B}'$ 是 $1\times 5$，乘 $5\times 1$ 的 $\hat{\mathbf B}$ 或 $\mathbf r_t$ 都得到一个数，所以 $(\hat{\mathbf B}'\hat{\mathbf B})^{-1}$ 就是一个数的倒数。白话：$\hat\lambda_t$ 是第 $t$ 年每单位消费 β 实际得到的补偿，单位与收益相同；$\hat\lambda$（代码中的 `lam_hat`）是它的时间平均，用来估计 $\lambda_c$。**特例**：这是[导读](#primer-unpack-cs)中横截面回归只有一个解释变量、没有截距时的情形；Fama–MacBeth 的平均与标准误见[拆解](#primer-unpack-fm)。**数据矩阵**：$T$ 年的超额收益按行堆叠为 $T\times 5$ 的矩阵（代码中的 `Re_mat`，第 $t$ 行为 $\mathbf r_t'$）；每年的设计矩阵都是同一列 $\hat{\mathbf B}$（$5\times 1$），代码把它复制 $T$ 份，得到形状为 `(T, 5, 1)` 的 `X_fm`。**所有年份共用同一个 $\hat{\mathbf B}$**，每年各有一个 $\mathbf r_t$ 与一个 $\hat\lambda_t$。
 
 ```{code-cell} python
 # 拆开讲横截面这一步：λ̂_t = Σ_i β̂_i r_{i,t} / Σ_i β̂_i²，λ̂ 为其时间平均
@@ -221,7 +221,7 @@ except ValueError as err:
 assert a_bad > 1 and 100 < partial[100] < 200 and partial[1000] > 200 * partial[100] and raised
 ```
 
-**误区四：混淆对数溢价与算术溢价。** 由式 {eq}`eq-ch1-logprem`，$\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$；而由 $\log\E[R] = \E[\log R] + \sigma_d^2/2$，**对数收益的期望**比无风险利率的对数高出 $\gamma\rho\sigma_c\sigma_d - \sigma_d^2/2$（$\log\E[R]$ 是期望总收益的对数，$\E[\log R]$ 是连续复利年收益的期望，二者相差半个方差 $\sigma_d^2/2 = 0.0072$，即式 {eq}`eq-ch1-lognormal` 的第二式，见[拆解](#ch1-unpack-lognormal)）。默认参数下前者为 0.24%，后者为 $0.24\% - 0.72\% = -0.48\%$：红利索取权的算术期望收益高于无风险利率，对数收益的期望却低于它。二者并不矛盾：长期持有时，财富的对数是各年对数收益之和，所以“典型”（中位数）路径上，红利索取权的累积财富增长得比无风险资产慢；但少数路径上它增长得极快，把期望值拉高。比较溢价时一定要说明是哪一种：对数还是算术，“期望收益之比的对数”还是“对数收益的期望”。用长样本核对：
+**误区四：混淆对数溢价与算术溢价。** 由式 {eq}`eq-ch1-logprem`，$\log(\E[R]/R^f) = \gamma\rho_{cd}\sigma_c\sigma_d$；而由 $\log\E[R] = \E[\log R] + \sigma_d^2/2$，**对数收益的期望**比无风险利率的对数高出 $\gamma\rho_{cd}\sigma_c\sigma_d - \sigma_d^2/2$（$\log\E[R]$ 是期望总收益的对数，$\E[\log R]$ 是连续复利年收益的期望，二者相差半个方差 $\sigma_d^2/2 = 0.0072$，即式 {eq}`eq-ch1-lognormal` 的第二式，见[拆解](#ch1-unpack-lognormal)）。默认参数下前者为 0.24%，后者为 $0.24\% - 0.72\% = -0.48\%$：红利索取权的算术期望收益高于无风险利率，对数收益的期望却低于它。二者并不矛盾：长期持有时，财富的对数是各年对数收益之和，所以“典型”（中位数）路径上，红利索取权的累积财富增长得比无风险资产慢；但少数路径上它增长得极快，把期望值拉高。比较溢价时一定要说明是哪一种：对数还是算术，“期望收益之比的对数”还是“对数收益的期望”。用长样本核对：
 
 ```{code-cell} python
 log_ex = (np.log(sim["R"]) - math.log(p.risk_free)).to_numpy()       # (T,)：log R_t − log R^f

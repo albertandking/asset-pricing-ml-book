@@ -15,7 +15,6 @@ numbering:
 
 ```{code-cell} python
 import numpy as np
-import pandas as pd
 
 from apsim import MarketParams, simulate_market, plotting
 
@@ -155,8 +154,27 @@ $$ (eq-ch0-stacked)
 
 这正是 `simulate_market` 的写法：`beta = x @ gamma`（形状 `(T, N, L+1) @ (L+1, K) -> (T, N, K)`，对每一期计算 $\tilde{\mathbf Z}_{t-1}\bv\Gamma$），`alpha = z_lag @ theta`（`(T, N, L) @ (L,) -> (T, N)`），以及 `np.einsum("tnk,tk->tn", beta, f)`，它对每个 $(t, i)$ 把 $\beta_{k,i,t} f_{k,t}$ 沿下标 `k` 求和，得到 $\bv\beta_{i,t}'\mathbf f_t$。`einsum` 的下标字符串按“输入下标 `->` 输出下标”读：出现在输入、却不在输出中的下标被求和。
 
+(ch0-unpack-return)=
+**拆开讲式 {eq}`eq-ch0-ret`。** 载荷 $\bv\beta_{i,t} = \bv\Gamma'\tilde{\mathbf z}_{i,t-1}$ 的分量、维度与展开，见 0.2 节“特征”一节的[拆解](#ch0-unpack-gamma)。式中的四项都是第 $t$ 个月的标量，单位都是月度收益：$r_{i,t}$ 是股票 $i$ 的超额收益；$\alpha_{i,t}$ 是定价误差（[拆解](#ch0-unpack-alpha)）；$\bv\beta_{i,t}'\mathbf f_t$ 是因子部分（[拆解](#ch0-unpack-betaf)）；$\varepsilon_{i,t}$ 是异质性冲击，均值为 0、标准差为 $\sigma_\varepsilon$。把因子部分逐项展开，
+
+```{math}
+:enumerated: false
+r_{i,t} = \alpha_{i,t} + \beta_{1,i,t} f_{1,t} + \beta_{2,i,t} f_{2,t} + \dots + \beta_{K,i,t} f_{K,t} + \varepsilon_{i,t} .
+```
+
+在默认 $\bv\Gamma$ 下 $\bv\beta_{i,t} = (1,\ 0.5\, z_{1,i,t-1},\ 0.5\, z_{2,i,t-1})'$，上式化为 $r_{i,t} = \alpha_{i,t} + f_{1,t} + 0.5\, z_{1,i,t-1} f_{2,t} + 0.5\, z_{2,i,t-1} f_{3,t} + \varepsilon_{i,t}$：每只股票对 $f_{1,t}$ 的暴露都是 1，$f_{2,t}$ 对一只股票的影响与它的 $z_1$ 成正比。**特例**：$K = 1$、载荷与定价误差都不随时间变化时，上式就是单因子模型 $r_{i,t} = \alpha_i + \beta_{1,i} f_{1,t} + \varepsilon_{i,t}$；再要求 $f_{1,t}$ 是市场组合的超额收益、并且 $\alpha_i = 0$，才是 CAPM 的时间序列形式。**数据矩阵**：同一期的 $N$ 只股票按行堆叠，
+
+```{math}
+:enumerated: false
+\underbrace{\mathbf r_t}_{N\times 1} = \underbrace{\bv\alpha_t}_{N\times 1} + \underbrace{\mathbf B_t}_{N\times K}\,\underbrace{\mathbf f_t}_{K\times 1} + \underbrace{\bv\varepsilon_t}_{N\times 1} , \qquad
+\underbrace{\mathbf B_t}_{N\times K} = \underbrace{\tilde{\mathbf Z}_{t-1}}_{N\times(L+1)}\,\underbrace{\bv\Gamma}_{(L+1)\times K} , \qquad
+\tilde{\mathbf Z}_{t-1} = \begin{pmatrix} 1 & z_{1,1,t-1} & \cdots & z_{L,1,t-1} \\ 1 & z_{1,2,t-1} & \cdots & z_{L,2,t-1} \\ \vdots & \vdots & & \vdots \\ 1 & z_{1,N,t-1} & \cdots & z_{L,N,t-1} \end{pmatrix} .
+```
+
+$\tilde{\mathbf Z}_{t-1}$ 的第 $i$ 行是股票 $i$ 的 $\tilde{\mathbf z}_{i,t-1}'$，第 0 列全为 1，第 $j$ 列是全部股票的第 $j$ 个特征；$\mathbf B_t$ 的第 $i$ 行是 $\tilde{\mathbf z}_{i,t-1}'\bv\Gamma = \bv\beta_{i,t}'$。哪些量共用、哪些各有一套，看下标最清楚：$\mathbf f_t$ 由同一期的所有股票共用，$\bv\Gamma$ 与 $\bv\theta$ 由所有股票、所有时期共用；$\tilde{\mathbf z}_{i,t-1}$、$\bv\beta_{i,t}$、$\alpha_{i,t}$、$\varepsilon_{i,t}$ 每只股票每期各有一个。
+
 (ch0-unpack-stacked)=
-**拆开讲式 {eq}`eq-ch0-ret` 与 {eq}`eq-ch0-stacked`。** 式 {eq}`eq-ch0-ret` 的四项及其单位见 0.2 节的[拆解](#ch0-unpack-return)。式 {eq}`eq-ch0-stacked` 是把它对同一期的 $N$ 只股票竖着排起来：
+**拆开讲式 {eq}`eq-ch0-ret` 与 {eq}`eq-ch0-stacked`。** 式 {eq}`eq-ch0-ret` 的四项及其单位见上面的[拆解](#ch0-unpack-return)。式 {eq}`eq-ch0-stacked` 是把它对同一期的 $N$ 只股票竖着排起来：
 
 ```{math}
 :enumerated: false

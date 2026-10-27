@@ -54,12 +54,12 @@ c_t = \log C_t, \qquad d_t = \log D_t, \qquad \Delta c_{t+1} = c_{t+1} - c_t = \
 对数消费增长与对数红利增长独立同分布：
 
 $$
-\Delta c_{t+1} = \mu_c + \sigma_c\varepsilon_{t+1}, \qquad \Delta d_{t+1} = \mu_d + \sigma_d\eta_{t+1}, \qquad \eta_{t+1} = \rho\,\varepsilon_{t+1} + \sqrt{1-\rho^2}\;\nu_{t+1},
+\Delta c_{t+1} = \mu_c + \sigma_c\varepsilon_{t+1}, \qquad \Delta d_{t+1} = \mu_d + \sigma_d\eta_{t+1}, \qquad \eta_{t+1} = \rho_{cd}\,\varepsilon_{t+1} + \sqrt{1-\rho_{cd}^2}\;\nu_{t+1},
 $$ (eq-ch1-model)
 
-其中 $\varepsilon_{t+1}$、$\nu_{t+1}$ 是相互独立的标准正态冲击，各自在时间上独立同分布，所有量都是标量。$\eta_{t+1}$ 也是标准正态的：$\Var(\eta) = \rho^2 + (1 - \rho^2) = 1$，并且 $\Cov(\varepsilon, \eta) = \rho$。所以 $\rho$ 是消费增长与红利增长的相关系数，$\Cov(\Delta c, \Delta d) = \rho\sigma_c\sigma_d$（[记号表](../notation.md)中 $\rho$ 已预留给相关系数）。
+其中 $\varepsilon_{t+1}$、$\nu_{t+1}$ 是相互独立的标准正态冲击，各自在时间上独立同分布，所有量都是标量。$\eta_{t+1}$ 也是标准正态的：$\Var(\eta) = \rho_{cd}^2 + (1 - \rho_{cd}^2) = 1$，并且 $\Cov(\varepsilon, \eta) = \rho_{cd}$。所以 $\rho_{cd}$ 是消费增长与红利增长的相关系数，$\Cov(\Delta c, \Delta d) = \rho_{cd}\sigma_c\sigma_d$（下标 $cd$ 指消费 $c$ 与红利 $d$，与代码字段 `rho_cd` 对应；[记号表](../notation.md)中不带下标的 $\rho$ 留给一般的相关系数与第 6 章的 Campbell–Shiller 常数）。
 
-红利与消费是两个不同的序列：总消费主要由劳动收入等来源支撑，红利只是其中一小部分，波动也大得多。所以模型中的“股票”是一项**红利索取权**（dividend claim），即获得红利流 $D_{t+1}, D_{t+2}, \dots$ 的资产，红利与消费相关但不相等。$\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 时红利增长与消费增长完全相同，这是 1.5 节的 Lucas 树。
+红利与消费是两个不同的序列：总消费主要由劳动收入等来源支撑，红利只是其中一小部分，波动也大得多。所以模型中的“股票”是一项**红利索取权**（dividend claim），即获得红利流 $D_{t+1}, D_{t+2}, \dots$ 的资产，红利与消费相关但不相等。$\rho_{cd} = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 时红利增长与消费增长完全相同，这是 1.5 节的 Lucas 树。
 
 | 记号 | 含义 | 默认值（假设参数） | `ConsumptionParams` 字段 |
 |---|---|---|---|
@@ -67,7 +67,7 @@ $$ (eq-ch1-model)
 | $\gamma$ | 风险厌恶系数 | 2 | `gamma` |
 | $\mu_c$、$\sigma_c$ | 对数消费增长的均值、标准差 | 0.02、0.02 | `mu_c`、`sigma_c` |
 | $\mu_d$、$\sigma_d$ | 对数红利增长的均值、标准差 | 0.02、0.12 | `mu_d`、`sigma_d` |
-| $\rho$ | 消费增长与红利增长的相关系数 | 0.5 | `rho_cd` |
+| $\rho_{cd}$ | 消费增长与红利增长的相关系数 | 0.5 | `rho_cd` |
 
 参数都是年度的，只为说明理论，不是对任何市场的校准。
 
@@ -83,8 +83,8 @@ assert (p.delta, p.gamma, p.mu_c, p.sigma_c, p.mu_d, p.sigma_d, p.rho_cd) == (0.
 - $\mu_c$、$\sigma_c$：对数消费增长的年度均值与标准差（默认都是 0.02），是常数
 - $\Delta d_{t+1}$、$\mu_d$、$\sigma_d$：对数红利增长及其年度均值、标准差（默认 0.02、0.12），含义同上
 - $\varepsilon_{t+1}$、$\nu_{t+1}$：第 $t+1$ 年的两个标准正态冲击，以标准差为单位，彼此独立，在第 $t$ 期末未知
-- $\eta_{t+1}$：红利增长的标准化冲击，由 $\varepsilon_{t+1}$ 与 $\nu_{t+1}$ 按权重 $\rho$ 与 $\sqrt{1-\rho^2}$ 合成
-- $\rho$：相关系数，没有单位（默认 0.5）
+- $\eta_{t+1}$：红利增长的标准化冲击，由 $\varepsilon_{t+1}$ 与 $\nu_{t+1}$ 按权重 $\rho_{cd}$ 与 $\sqrt{1-\rho_{cd}^2}$ 合成
+- $\rho_{cd}$：相关系数，没有单位（默认 0.5）
 
 例如某年 $\varepsilon_{t+1} = 1$、$\nu_{t+1} = 0$（对数消费增长比均值高一个标准差，红利没有独立的消息）：对数消费增长 $\Delta c_{t+1} = 0.02 + 0.02 = 0.04$（水平增长 $e^{0.04} - 1 \approx 4.08\%$），$\eta_{t+1} = 0.5$，对数红利增长 $\Delta d_{t+1} = 0.02 + 0.12 \times 0.5 = 0.08$（水平增长约 8.33%）。若 $\varepsilon_{t+1} = 0$、$\nu_{t+1} = 1$，对数消费增长恰为均值 0.02（水平增长约 2.02%），而 $\eta_{t+1} = \sqrt{0.75} \approx 0.866$，对数红利增长 $\Delta d_{t+1} \approx 0.1239$（水平增长约 13.2%）。**向量写法**：把两个增长排成 $2\times 1$ 的列向量，式 {eq}`eq-ch1-model` 就是
 
@@ -92,12 +92,12 @@ assert (p.delta, p.gamma, p.mu_c, p.sigma_c, p.mu_d, p.sigma_d, p.rho_cd) == (0.
 :enumerated: false
 \underbrace{\begin{pmatrix} \Delta c_{t+1} \\ \Delta d_{t+1} \end{pmatrix}}_{2\times 1}
 = \underbrace{\begin{pmatrix} \mu_c \\ \mu_d \end{pmatrix}}_{2\times 1}
-+ \underbrace{\begin{pmatrix} \sigma_c & 0 \\ \rho\sigma_d & \sigma_d\sqrt{1-\rho^2} \end{pmatrix}}_{\mathbf L\ (2\times 2)}
++ \underbrace{\begin{pmatrix} \sigma_c & 0 \\ \rho_{cd}\sigma_d & \sigma_d\sqrt{1-\rho_{cd}^2} \end{pmatrix}}_{\mathbf L\ (2\times 2)}
 \underbrace{\begin{pmatrix} \varepsilon_{t+1} \\ \nu_{t+1} \end{pmatrix}}_{2\times 1} , \qquad
-\underbrace{\mathbf L\mathbf L'}_{2\times 2} = \begin{pmatrix} \sigma_c^2 & \rho\sigma_c\sigma_d \\ \rho\sigma_c\sigma_d & \sigma_d^2 \end{pmatrix} .
+\underbrace{\mathbf L\mathbf L'}_{2\times 2} = \begin{pmatrix} \sigma_c^2 & \rho_{cd}\sigma_c\sigma_d \\ \rho_{cd}\sigma_c\sigma_d & \sigma_d^2 \end{pmatrix} .
 ```
 
-$2\times 2$ 的 $\mathbf L$ 乘 $2\times 1$ 的冲击向量得 $2\times 1$；展开第二行就是 $\Delta d_{t+1} = \mu_d + \rho\sigma_d\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho^2}\,\nu_{t+1} = \mu_d + \sigma_d\eta_{t+1}$。下三角矩阵 $\mathbf L$ 是协方差矩阵 $\mathbf L\mathbf L'$ 的 Cholesky 分解，即第 0 章的 $\mathbf C$（第 0 章[拆解](#ch0-unpack-factor)中提到的写法）；$\mathbf L\mathbf L'$ 的对角元是两个增长的方差，非对角元是协方差 $\rho\sigma_c\sigma_d$，默认为 $0.5 \times 0.02 \times 0.12 = 0.0012$。**特例**：$\rho = 0$ 时 $\mathbf L$ 是对角矩阵，红利与消费独立；$\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 时第二行与第一行完全相同，就是 Lucas 树。**数据矩阵**：模拟 $T$ 年，把每年的 $(\Delta c_t, \Delta d_t)$ 作为一行，得到 $T\times 2$ 的矩阵，即 `simulate_consumption` 返回值的 `data` 中的 `dc`、`dd` 两列；“模拟实验”一节的实验三中，五项资产共用同一列 `dc`，各有自己的一列 `dd`。
+$2\times 2$ 的 $\mathbf L$ 乘 $2\times 1$ 的冲击向量得 $2\times 1$；展开第二行就是 $\Delta d_{t+1} = \mu_d + \rho_{cd}\sigma_d\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho_{cd}^2}\,\nu_{t+1} = \mu_d + \sigma_d\eta_{t+1}$。下三角矩阵 $\mathbf L$ 是协方差矩阵 $\mathbf L\mathbf L'$ 的 Cholesky 分解，即第 0 章的 $\mathbf C$（第 0 章[拆解](#ch0-unpack-factor)中提到的写法）；$\mathbf L\mathbf L'$ 的对角元是两个增长的方差，非对角元是协方差 $\rho_{cd}\sigma_c\sigma_d$，默认为 $0.5 \times 0.02 \times 0.12 = 0.0012$。**特例**：$\rho_{cd} = 0$ 时 $\mathbf L$ 是对角矩阵，红利与消费独立；$\rho_{cd} = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 时第二行与第一行完全相同，就是 Lucas 树。**数据矩阵**：模拟 $T$ 年，把每年的 $(\Delta c_t, \Delta d_t)$ 作为一行，得到 $T\times 2$ 的矩阵，即 `simulate_consumption` 返回值的 `data` 中的 `dc`、`dd` 两列；“模拟实验”一节的实验三中，五项资产共用同一列 `dc`，各有自己的一列 `dd`。
 
 ```{code-cell} python
 # 拆开讲 eq-ch1-model：L = [[σ_c, 0], [ρσ_d, σ_d √(1−ρ²)]]，L L' 为 (Δc, Δd) 的协方差矩阵
@@ -232,7 +232,7 @@ $$
 \log\frac{\E_t[R_{t+1}]}{R^f_t} = -\Cov_t(\log m_{t+1}, \log R_{t+1}) = \gamma\,\Cov_t(\Delta c_{t+1}, \log R_{t+1}) .
 $$ (eq-ch1-logprem)
 
-对本章模型中的红利索取权，1.5 节将证明 $\log R_{t+1} = \Delta d_{t+1} - \log a$（$a$ 是常数），于是 $\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \Delta d) = \gamma\rho\sigma_c\sigma_d$。
+对本章模型中的红利索取权，1.5 节将证明 $\log R_{t+1} = \Delta d_{t+1} - \log a$（$a$ 是常数），于是 $\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \Delta d) = \gamma\rho_{cd}\sigma_c\sigma_d$。
 :::
 
 :::{prf:proof}
@@ -246,15 +246,15 @@ $\log m$ 与 $\log R$ 都是第 $t+1$ 期才揭晓的随机变量（对数 SDF �
 
 把第 1 条改写为 $\E[\log R] + \tfrac12\Var(\log R) = -\E[\log m] - \tfrac12\Var(\log m) - \Cov(\log m, \log R)$，左边由第 3 条是 $\log\E[R]$，右边前两项由第 2 条是 $\log R^f$，所以 $\log\E[R] - \log R^f = -\Cov(\log m, \log R)$。最后，$\log m = \log\delta - \gamma\Delta c$，$\log\delta$ 是常数，$\Cov(\log m, \log R) = -\gamma\Cov(\Delta c, \log R)$。
 
-对红利索取权，$\log R = \Delta d - \log a$，减去常数不改变协方差，$\Cov(\Delta c, \log R) = \Cov(\Delta c, \Delta d) = \rho\sigma_c\sigma_d$。
+对红利索取权，$\log R = \Delta d - \log a$，减去常数不改变协方差，$\Cov(\Delta c, \log R) = \Cov(\Delta c, \Delta d) = \rho_{cd}\sigma_c\sigma_d$。
 :::
 
-在联合正态的假设下，式 {eq}`eq-ch1-logprem` 是精确的，没有任何近似。它与式 {eq}`eq-ch1-premium` 说的是同一件事：只有与 $m$ 的协方差得到补偿，在幂效用下就是与消费增长的协方差。不过左边是**期望总收益之比的对数**，下文简称**对数溢价**，它不是期望超额收益本身，二者的关系是 $\E[R] - R^f = R^f\left(e^{\gamma\rho\sigma_c\sigma_d} - 1\right)$。
+在联合正态的假设下，式 {eq}`eq-ch1-logprem` 是精确的，没有任何近似。它与式 {eq}`eq-ch1-premium` 说的是同一件事：只有与 $m$ 的协方差得到补偿，在幂效用下就是与消费增长的协方差。不过左边是**期望总收益之比的对数**，下文简称**对数溢价**，它不是期望超额收益本身，二者的关系是 $\E[R] - R^f = R^f\left(e^{\gamma\rho_{cd}\sigma_c\sigma_d} - 1\right)$。
 
 (ch1-unpack-logprem)=
-**拆开讲式 {eq}`eq-ch1-logprem`。** 式中三个量都是“对数”的。$\log(\E_t[R_{t+1}]/R^f_t)$ 是期望总收益与无风险总收益之比的对数，即对数溢价，没有单位，是年度的量（默认 0.24%），在第 $t$ 期末已知。$\log m_{t+1}$ 与 $\log R_{t+1}$ 是 SDF 与总收益的对数，$\log R_{t+1}$ 就是连续复利的年收益；二者在第 $t$ 期末都是随机的，但它们的条件协方差是已知的数。第二个等号用到 $\log m_{t+1} = \log\delta - \gamma\Delta c_{t+1}$：常数 $\log\delta$ 不影响协方差，$-\gamma$ 提到协方差之外。代入红利索取权：$\Cov(\Delta c, \log R) = \Cov(\Delta c, \Delta d) = 0.5 \times 0.02 \times 0.12 = 0.0012$，乘以 $\gamma = 2$ 得 0.0024，即 0.24%；换成期望超额收益，$\E[R] - R^f = 1.0505 \times (e^{0.0024} - 1) \approx 0.2524\%$。**特例**：与消费增长不相关的资产（$\rho = 0$），对数溢价为 0，期望收益等于无风险利率；把式子用于无风险资产本身，$\log R^f$ 是常数，协方差为 0，左边 $\log(R^f/R^f) = 0$，前后一致。
+**拆开讲式 {eq}`eq-ch1-logprem`。** 式中三个量都是“对数”的。$\log(\E_t[R_{t+1}]/R^f_t)$ 是期望总收益与无风险总收益之比的对数，即对数溢价，没有单位，是年度的量（默认 0.24%），在第 $t$ 期末已知。$\log m_{t+1}$ 与 $\log R_{t+1}$ 是 SDF 与总收益的对数，$\log R_{t+1}$ 就是连续复利的年收益；二者在第 $t$ 期末都是随机的，但它们的条件协方差是已知的数。第二个等号用到 $\log m_{t+1} = \log\delta - \gamma\Delta c_{t+1}$：常数 $\log\delta$ 不影响协方差，$-\gamma$ 提到协方差之外。代入红利索取权：$\Cov(\Delta c, \log R) = \Cov(\Delta c, \Delta d) = 0.5 \times 0.02 \times 0.12 = 0.0012$，乘以 $\gamma = 2$ 得 0.0024，即 0.24%；换成期望超额收益，$\E[R] - R^f = 1.0505 \times (e^{0.0024} - 1) \approx 0.2524\%$。**特例**：与消费增长不相关的资产（$\rho_{cd} = 0$），对数溢价为 0，期望收益等于无风险利率；把式子用于无风险资产本身，$\log R^f$ 是常数，协方差为 0，左边 $\log(R^f/R^f) = 0$，前后一致。
 
-下面先用 `sympy` 核对红利索取权的结果。1.5 节将推出 $a = \E[m e^{\Delta d}]$ 与 $\E[R] = \E[e^{\Delta d}]/a$；这里先按定义用矩母函数求出它们（$\varepsilon$、$\nu$ 独立，期望可以分开），再核对 $\log(\E[R]/R^f) = \gamma\rho\sigma_c\sigma_d$，并与模拟器的属性 `expected_return`、`risk_free`、`log_equity_premium` 比较。
+下面先用 `sympy` 核对红利索取权的结果。1.5 节将推出 $a = \E[m e^{\Delta d}]$ 与 $\E[R] = \E[e^{\Delta d}]/a$；这里先按定义用矩母函数求出它们（$\varepsilon$、$\nu$ 独立，期望可以分开），再核对 $\log(\E[R]/R^f) = \gamma\rho_{cd}\sigma_c\sigma_d$，并与模拟器的属性 `expected_return`、`risk_free`、`log_equity_premium` 比较。
 
 ```{code-cell} python
 # log(m e^{Δd}) = log δ − γμ_c + μ_d + (ρσ_d − γσ_c) ε + σ_d √(1−ρ²) ν
@@ -309,9 +309,9 @@ $$ (eq-ch1-ccapm)
 - $\beta_{\Delta c} = \Cov(R^e, \Delta c)/\Var(\Delta c)$：消费增长每高 1 个百分点，超额收益平均高多少个百分点，没有单位（默认约 3.16）；这是总体值，用数据估计时由时间序列回归的斜率 $\hat\beta_{\Delta c}$ 代替
 - $\lambda_c = \gamma\Var(\Delta c)$：每单位 $\beta_{\Delta c}$ 得到的年度补偿，单位与收益相同（默认 $2 \times 0.0004 = 0.0008$，即 0.08%）
 
-式中没有时间下标，因为独立同分布时条件矩与无条件矩相同。**展开运算**：$\beta_{\Delta c}\lambda_c \approx 3.16 \times 0.0008 \approx 0.2527\%$，它也等于 $\gamma\Cov(\Delta c, R^e) = 2 \times (3.16 \times 0.0004)$，即“风险厌恶乘以与消费增长的协方差”。**特例**：$\beta_{\Delta c} = 0$ 的资产期望超额收益为 0；$\beta_{\Delta c} = 1$ 的资产期望超额收益恰为 $\lambda_c$。**数据矩阵**：有 $N$ 项资产时，$N\times 1$ 的期望超额收益向量约等于 $N\times 1$ 的 $\beta_{\Delta c}$ 向量乘以标量 $\lambda_c$；**所有资产共用同一个 $\lambda_c$ 与同一条消费增长序列**，每项资产各有一个 $\beta_{\Delta c}$。估计时的设计矩阵与横截面回归见“模拟实验”一节实验三的[拆解](#ch1-unpack-tsdc)。
+式中没有时间下标，因为独立同分布时条件矩与无条件矩相同。**展开运算**：$\beta_{\Delta c}\lambda_c \approx 3.16 \times 0.0008 \approx 0.2527\%$，它也等于 $\gamma\Cov(\Delta c, R^e) = 2 \times (3.16 \times 0.0004)$，即“风险厌恶乘以与消费增长的协方差”。**特例**：$\beta_{\Delta c} = 0$ 的资产期望超额收益为 0；$\beta_{\Delta c} = 1$ 的资产期望超额收益恰为 $\lambda_c$。**数据矩阵**：有 $N$ 项资产时，$N\times 1$ 的期望超额收益向量约等于 $N\times 1$ 的载荷列 $\mathbf B$ 乘以标量 $\lambda_c$；$\mathbf B$ 就是 $K = 1$ 时的载荷矩阵（只有一列，记法见[记号表](../notation.md)），第 $i$ 个元素是第 $i$ 项资产的 $\beta_{\Delta c,i}$，它是标量，不加粗；**所有资产共用同一个 $\lambda_c$ 与同一条消费增长序列**，每项资产各有一个 $\beta_{\Delta c,i}$。估计时的设计矩阵与横截面回归见“模拟实验”一节实验三的[拆解](#ch1-unpack-tsdc)。
 
-下面的代码计算红利索取权的 $\beta_{\Delta c}$。对联合正态的 $(X, Y)$，$\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$（Stein 引理的一个特例），而 $R = e^{\Delta d}/a$，所以 $\Cov(R, \Delta c) = \E[R]\,\rho\sigma_c\sigma_d$。代码先用二维 Gauss–Hermite 求积核对这个协方差：`np.meshgrid(nodes, nodes, indexing="ij")` 生成两个 `(80, 80)` 的网格，`E1[i, j]` 取 $\varepsilon$ 的第 $i$ 个节点、`N1[i, j]` 取 $\nu$ 的第 $j$ 个节点；`np.outer(weights, weights)` 是 `(80, 80)` 的权重矩阵，元素为 $w_i w_j$（$\varepsilon$、$\nu$ 独立，联合权重是边际权重之积）。于是 $\E[g(\varepsilon, \nu)] \approx \sum_{i,j} w_i w_j\, g(\varepsilon_i, \nu_j)$，即代码中的 `(W2 * g).sum()`。随后再比较 $\beta_{\Delta c}\lambda_c$、精确的期望超额收益与“误用 $\E[\Delta c]$”的结果。
+下面的代码计算红利索取权的 $\beta_{\Delta c}$。对联合正态的 $(X, Y)$，$\Cov(e^X, Y) = \E[e^X]\Cov(X, Y)$（Stein 引理的一个特例），而 $R = e^{\Delta d}/a$，所以 $\Cov(R, \Delta c) = \E[R]\,\rho_{cd}\sigma_c\sigma_d$。代码先用二维 Gauss–Hermite 求积核对这个协方差：`np.meshgrid(nodes, nodes, indexing="ij")` 生成两个 `(80, 80)` 的网格，`E1[i, j]` 取 $\varepsilon$ 的第 $i$ 个节点、`N1[i, j]` 取 $\nu$ 的第 $j$ 个节点；`np.outer(weights, weights)` 是 `(80, 80)` 的权重矩阵，元素为 $w_i w_j$（$\varepsilon$、$\nu$ 独立，联合权重是边际权重之积）。于是 $\E[g(\varepsilon, \nu)] \approx \sum_{i,j} w_i w_j\, g(\varepsilon_i, \nu_j)$，即代码中的 `(W2 * g).sum()`。随后再比较 $\beta_{\Delta c}\lambda_c$、精确的期望超额收益与“误用 $\E[\Delta c]$”的结果。
 
 ```{code-cell} python
 E1, N1 = np.meshgrid(nodes, nodes, indexing="ij")                     # 两个独立标准正态冲击 ε、ν 的节点 (80, 80)
@@ -359,9 +359,9 @@ print("二维求积与 w'Gw 一致；E[Δc] 的二维求积 =", round((W2 * dc_q
 | $P = \E[mx]$、$R^f = 1/\E[m]$、$\E[R^e] = -R^f\Cov(m, R^e)$ | 任意分布，精确 | 无 |
 | $\log R^f = -\log\delta + \gamma\mu_c - \gamma^2\sigma_c^2/2$、$\log(\E[R]/R^f) = \gamma\Cov(\Delta c, \log R)$ | 联合正态时精确 | 冲击不是正态时，相当于只保留到方差（二阶项），略去了偏度、峰度等更高阶的项 |
 | $\E[R^e] \approx \beta_{\Delta c}\lambda_c = \gamma\Cov(\Delta c, R^e)$ | 近似 | 把 $m$ 在 $\Delta c = \mu_c$ 处线性化，略去 $(\Delta c - \mu_c)$ 的二次及更高次项 |
-| $\E[R]/R^f - 1 \approx \gamma\rho\sigma_c\sigma_d$ | 近似 | 用 $\log(1 + y) \approx y$ 把对数溢价当作算术溢价 |
+| $\E[R]/R^f - 1 \approx \gamma\rho_{cd}\sigma_c\sigma_d$ | 近似 | 用 $\log(1 + y) \approx y$ 把对数溢价当作算术溢价 |
 
-**线性化的误差。** 在本章模型中两种近似的误差都可以精确算出。记 $x = \gamma\rho\sigma_c\sigma_d$。由 $\log(\E[R]/R^f) = x$，精确的期望超额收益为 $\E[R] - R^f = \E[R](1 - e^{-x})$；由 $\Cov(R, \Delta c) = \E[R]\rho\sigma_c\sigma_d$，线性化的结果为 $\beta_{\Delta c}\lambda_c = \gamma\Cov(R, \Delta c) = \E[R]\,x$。二者之比为 $x/(1 - e^{-x}) \approx 1 + x/2$，所以线性化**高估**期望超额收益，相对误差约为 $x/2$；同理，把 $x$ 当作 $\E[R]/R^f - 1$ 则低估，相对误差约为 $-x/2$。误差随 $\gamma$ 线性增长。下表的代码对几个 $\gamma$ 计算这两种误差。
+**线性化的误差。** 在本章模型中两种近似的误差都可以精确算出。记 $x = \gamma\rho_{cd}\sigma_c\sigma_d$。由 $\log(\E[R]/R^f) = x$，精确的期望超额收益为 $\E[R] - R^f = \E[R](1 - e^{-x})$；由 $\Cov(R, \Delta c) = \E[R]\rho_{cd}\sigma_c\sigma_d$，线性化的结果为 $\beta_{\Delta c}\lambda_c = \gamma\Cov(R, \Delta c) = \E[R]\,x$。二者之比为 $x/(1 - e^{-x}) \approx 1 + x/2$，所以线性化**高估**期望超额收益，相对误差约为 $x/2$；同理，把 $x$ 当作 $\E[R]/R^f - 1$ 则低估，相对误差约为 $-x/2$。误差随 $\gamma$ 线性增长。下表的代码对几个 $\gamma$ 计算这两种误差。
 
 ```{code-cell} python
 rows = []

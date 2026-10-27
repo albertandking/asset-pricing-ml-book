@@ -11,12 +11,12 @@ numbering:
 (sec-ch0-concepts)=
 # 0.2 基本概念速览
 
-**本页准备。** 本书每个页面的代码在独立的内核中运行。下面的单元导入本页用到的模块。
+**本页准备。** 本书每个页面的代码在独立的内核中运行。下面的单元导入本页用到的模块：`numpy`，以及读取模拟器默认参数用的 `MarketParams`（本页不生成模拟数据）。
 
 ```{code-cell} python
 import numpy as np
 
-from apsim import MarketParams, simulate_market
+from apsim import MarketParams
 ```
 
 从 0.3 节起，正文会直接使用超额收益、因子、载荷、风险溢价、特征、定价误差、随机贴现因子这些术语，0.4 节的模型就是把它们写成方程。本节先逐个讲清楚它们的含义。每个概念都按同一个顺序介绍：先用一两句白话说明它是什么，再举一个数值例子，最后给出公式，并指出它在本章模型中对应哪个符号。例子借用读者熟悉的 A 股情形，但**例子中的股票都不指具体公司，所有数字都是为说明概念而假设的**，不是实际数据。每个例子后面的代码单元用 `numpy` 复算其中的数字，并用 `assert` 核对。
@@ -136,7 +136,7 @@ assert np.allclose(f_month, [0.03, 0.03, -0.01])
 把 $N$ 只股票的 $\bv\beta_i'$ 按行堆叠成 $N\times K$ 矩阵 $\mathbf B$（上表的前三列数字就是 $4\times 3$ 的 $\mathbf B$），$\mathbf B\mathbf f_t$（$N\times 1$）的第 $i$ 个元素就是 $\bv\beta_i'\mathbf f_t$。本章模型中载荷随时间变化，记作 $\bv\beta_{i,t} \in \Real^K$，由式 {eq}`eq-ch0-beta` 给出，对应面板的 `panel["beta1"]`……`panel["betaK"]` 列；堆叠后的矩阵为 $\mathbf B_t$。
 
 (ch0-unpack-betaf)=
-**拆开讲 $\bv\beta_i'\mathbf f_t$。** 写出分量，以大盘银行股为例：
+**拆开讲 $\bv\beta_i'\mathbf f_t$。** 这一段对应记号表中的[范例](#notation-unpack)：那里用同一只大盘银行股、同一组数字示范了拆开讲的五个步骤，这里在正文中就地讲一遍。写出分量，以大盘银行股为例：
 
 ```{math}
 :enumerated: false

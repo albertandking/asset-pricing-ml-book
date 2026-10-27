@@ -120,14 +120,14 @@ assert math.isclose(1.02 / (1 / 0.95 - 1.02), pv_det, rel_tol=1e-12)    # Gordon
 
 **价格—红利比。** 本节的核心变量是**价格—红利比** $P_t/D_t$（price-dividend ratio，简记 $P/D$）：价格是当年红利的多少倍。例如股价 40 元、每股年度红利 1 元，价格—红利比为 40。它不是市盈率。市盈率是价格与盈利之比 $P/E$（E 指每股收益），而公司通常只把盈利的一部分作为红利分配，其余留存。设上例中每股收益为 2 元、分红比例 50%，市盈率为 20，价格—红利比为 40。A 股更常用的是**股息率** $D/P$，即价格—红利比的倒数，上例中为 2.5%。
 
-**Lucas 树。** Lucas 的交换经济 [@lucas1978asset] 是这一节的原型：经济中有一棵（或许多棵）果树，每年结出的果实是唯一的消费品，不能储存。代表性投资者持有果树，均衡时他吃掉全部果实，所以消费等于红利，$C_t = D_t$。价格调整到让投资者恰好既不多买也不少买果树，于是欧拉方程中的 $m$ 由等于红利的消费决定。在模型 {eq}`eq-ch1-model` 中取 $\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 就得到 Lucas 树；一般情形下红利与消费不同，但只要二者的增长都独立同分布，推导完全一样。
+**Lucas 树。** Lucas 的交换经济 [@lucas1978asset] 是这一节的原型：经济中有一棵（或许多棵）果树，每年结出的果实是唯一的消费品，不能储存。代表性投资者持有果树，均衡时他吃掉全部果实，所以消费等于红利，$C_t = D_t$。价格调整到让投资者恰好既不多买也不少买果树，于是欧拉方程中的 $m$ 由等于红利的消费决定。在模型 {eq}`eq-ch1-model` 中取 $\rho_{cd} = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$ 就得到 Lucas 树；一般情形下红利与消费不同，但只要二者的增长都独立同分布，推导完全一样。
 
 :::{prf:proposition} 独立同分布时的价格—红利比
 :label: prop-ch1-pd
 在幂效用 {eq}`eq-ch1-power` 与模型 {eq}`eq-ch1-model` 下，令
 
 $$
-a = \E\left[m_{t+1}e^{\Delta d_{t+1}}\right] = \delta\exp\left(\mu_d - \gamma\mu_c + \tfrac12\left(\sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho\sigma_c\sigma_d\right)\right) .
+a = \E\left[m_{t+1}e^{\Delta d_{t+1}}\right] = \delta\exp\left(\mu_d - \gamma\mu_c + \tfrac12\left(\sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho_{cd}\sigma_c\sigma_d\right)\right) .
 $$ (eq-ch1-a)
 
 若 $a < 1$，满足横截性条件的红利索取权价格为
@@ -155,7 +155,7 @@ $$ (eq-ch1-pd)
 
 **第三步：横截性条件。** 当 $a < 1$ 时，令 $v = a/(1-a)$，$P_{t+J} = vD_{t+J}$，由第一步，$\E_t[M_{t,t+J}P_{t+J}] = v\,D_t\,a^J \to 0$，式 {eq}`eq-ch1-tvc` 成立。
 
-**第四步：计算 $a$。** $\log(m_{t+1}e^{\Delta d_{t+1}}) = \log\delta - \gamma\Delta c_{t+1} + \Delta d_{t+1} = \log\delta - \gamma\mu_c + \mu_d + (\rho\sigma_d - \gamma\sigma_c)\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho^2}\,\nu_{t+1}$，是正态的，方差为 $(\rho\sigma_d - \gamma\sigma_c)^2 + \sigma_d^2(1 - \rho^2) = \sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho\sigma_c\sigma_d$。由式 {eq}`eq-ch1-lognormal` 即得式 {eq}`eq-ch1-a`。
+**第四步：计算 $a$。** $\log(m_{t+1}e^{\Delta d_{t+1}}) = \log\delta - \gamma\Delta c_{t+1} + \Delta d_{t+1} = \log\delta - \gamma\mu_c + \mu_d + (\rho_{cd}\sigma_d - \gamma\sigma_c)\varepsilon_{t+1} + \sigma_d\sqrt{1-\rho_{cd}^2}\,\nu_{t+1}$，是正态的，方差为 $(\rho_{cd}\sigma_d - \gamma\sigma_c)^2 + \sigma_d^2(1 - \rho_{cd}^2) = \sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho_{cd}\sigma_c\sigma_d$。由式 {eq}`eq-ch1-lognormal` 即得式 {eq}`eq-ch1-a`。
 :::
 
 另一种常见的推导是“猜测并验证”：猜 $P_t = vD_t$，代入 $P_t = \E_t[m_{t+1}(P_{t+1} + D_{t+1})]$，两边除以 $D_t$，得 $v = \E_t[m_{t+1}(v + 1)e^{\Delta d_{t+1}}] = a(v + 1)$，解出 $v = a/(1-a)$。这种方法更快，但只找到了一个解，排除泡沫解要靠横截性条件（上一小节）。$a < 1$ 也正是这个解为正的条件：$a > 1$ 时 $v = a/(1-a) < 0$，不是有意义的价格。
@@ -204,10 +204,10 @@ assert np.all(np.abs(strips["标准化偏差"]) < 4)
 | $\tfrac12\gamma^2\sigma_c^2$ | 0.08% | $m$ 的凸性修正，与无风险利率中的预防性储蓄项对应 |
 | $\mu_d$ | 2% | 红利的预期对数增长 |
 | $\tfrac12\sigma_d^2$ | 0.72% | 红利水平的凸性修正 |
-| $-\gamma\rho\sigma_c\sigma_d$ | −0.24% | 风险调整：红利与消费同涨同跌，价格被压低 |
+| $-\gamma\rho_{cd}\sigma_c\sigma_d$ | −0.24% | 风险调整：红利与消费同涨同跌，价格被压低 |
 | 合计 $\log a$ | 约 −2.445% | $a = e^{-0.02445} \approx 0.9758$ |
 
-前三项之和是 $-\log R^f$（式 {eq}`eq-ch1-logrf`），中间两项之和是 $\log G$（$G = e^{\mu_d + \sigma_d^2/2}$ 为红利的期望总增长），最后一项是对数溢价的相反数，所以 $\log a = \log G - \log R^f - \gamma\rho\sigma_c\sigma_d$，即 $a = G/(R^f e^{\gamma\rho\sigma_c\sigma_d}) = G/\E[R]$，与上面“$a$ 的含义”一段的结论一致。**特例**：$\sigma_c = \sigma_d = 0$（没有风险）时 $a = \delta e^{\mu_d - \gamma\mu_c}$；Lucas 树的特例见下文。
+前三项之和是 $-\log R^f$（式 {eq}`eq-ch1-logrf`），中间两项之和是 $\log G$（$G = e^{\mu_d + \sigma_d^2/2}$ 为红利的期望总增长），最后一项是对数溢价的相反数，所以 $\log a = \log G - \log R^f - \gamma\rho_{cd}\sigma_c\sigma_d$，即 $a = G/(R^f e^{\gamma\rho_{cd}\sigma_c\sigma_d}) = G/\E[R]$，与上面“$a$ 的含义”一段的结论一致。**特例**：$\sigma_c = \sigma_d = 0$（没有风险）时 $a = \delta e^{\mu_d - \gamma\mu_c}$；Lucas 树的特例见下文。
 
 (ch1-unpack-pd)=
 **拆开讲式 {eq}`eq-ch1-pd`。** $P_t$ 是第 $t$ 期末、当年红利派发之后的价格（元），$D_t$ 是第 $t$ 年派发的红利（元），二者在第 $t$ 期末都已知；$P_t/D_t$ 是价格相当于年度红利的多少倍，没有单位。展开 $a/(1-a) = a + a^2 + a^3 + \cdots$，每一项是一年红利的价格（以 $D_t$ 为单位）。默认参数下 $0.9758/(1 - 0.9758) \approx 40.4$ 倍，年度股息率 $D/P \approx 2.48\%$。**特例**：$a \to 1$ 时 $P/D \to \infty$；对数效用的 Lucas 树中 $a = \delta$，$P/D = \delta/(1-\delta) = 99$（见下文的表）。
@@ -224,7 +224,7 @@ assert math.isclose(math.log(a), math.log(G) - math.log(p.risk_free) - p.log_equ
 assert round(100 / pd_ratio, 2) == 2.48 and 40.3 < a / (1 - a) < 40.5
 ```
 
-**Lucas 树的特例。** 代入 $\rho = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$，式 {eq}`eq-ch1-a` 中 $\sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho\sigma_c\sigma_d = (1 - \gamma)^2\sigma_c^2$，于是
+**Lucas 树的特例。** 代入 $\rho_{cd} = 1$、$\sigma_d = \sigma_c$、$\mu_d = \mu_c$，式 {eq}`eq-ch1-a` 中 $\sigma_d^2 + \gamma^2\sigma_c^2 - 2\gamma\rho_{cd}\sigma_c\sigma_d = (1 - \gamma)^2\sigma_c^2$，于是
 
 ```{math}
 :enumerated: false

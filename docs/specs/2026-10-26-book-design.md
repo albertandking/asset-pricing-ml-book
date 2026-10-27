@@ -54,8 +54,14 @@
 │   │   ├── ch00-experiments.md
 │   │   ├── ch00-pitfalls.md
 │   │   ├── ch00-exercises.md
-│   │   └── primer-regressions.md   导读：几种回归（第二部分的预习，不属于第 0 章，不编号）
-│   ├── part1/ch01-euler-sdf.md
+│   │   ├── primer-regressions.md   导读：几种回归（第二部分的预习，不属于第 0 章，不编号）
+│   │   └── primer-regressions-sim.md   导读（续）：同一份数据上的模拟实验与业界口径
+│   ├── part1/             第一部分：第 1 章（ch01-euler-sdf.md 为首页，其余各页为它的子页面）
+│   │   ├── ch01-euler-sdf.md       学习目标、动机、本章阅读路径、1.1～1.3 节
+│   │   ├── ch01-lognormal.md       1.4 幂效用与对数正态消费
+│   │   ├── ch01-lucas.md           1.5～1.6 Lucas 树与回到第 0 章
+│   │   ├── ch01-experiments.md     A 股视角、模拟实验与常见误区
+│   │   └── ch01-exercises.md       本章小结、习题与延伸阅读
 │   └── ……                 文件名用英文，标题用中文
 └── scripts/
     ├── build.sh
