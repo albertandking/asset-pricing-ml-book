@@ -217,11 +217,11 @@
 | $\varepsilon_{i,t}$ | 异质性冲击 | $\varepsilon_{i,t} \sim N(0, \sigma_\varepsilon^2)$ |
 | $\mathbf g_t \in \Real^{L+1}$ | 第 $t$ 期收益对 $\tilde{\mathbf z}_{i,t-1}$ 的横截面系数，$\mathbf g_t = \bv\Gamma\mathbf f_t + (0, \bv\theta')'$ | $\hat{\mathbf g}_t$ 为第 $t$ 期的最小二乘估计，分量 $\hat g_{j,t}$，$j = 0, \dots, L$；见第 0 章 0.2 节“因子、特征、载荷的关系” |
 | $\bv\beta_i \in \Real^K$ | 时间序列回归 $r_{i,t} = a_i + \bv\beta_i'\mathbf f_t + u_{i,t}$ 中股票 $i$ 的常数载荷（不带下标 $t$） | 即第 0 章习题“时间序列回归的截距”中的 $\mathbf h_i$；本书模型中总体值为 $\E[\bv\beta_{i,t}]$ |
-| $a_i$、$\hat a_i$；$\hat{\bv\beta}_i \in \Real^K$ | 股票 $i$ 时间序列回归的截距（标量）及其估计，常数载荷 $\bv\beta_i$ 的估计 | 载荷时变、且载荷与因子的实现值独立时（本模拟器满足，真实数据中条件 CAPM 一类的设定会破坏它），给定特征路径，$\hat{\bv\beta}_i$ 估计样本期内的平均载荷；$\hat{\mathbf B} \in \Real^{N\times K}$ 的第 $i$ 行为 $\hat{\bv\beta}_i'$；见[导读：几种回归](#sec-ch0-regs) |
+| $a_i$、$\hat a_i$；$\hat{\bv\beta}_i \in \Real^K$ | 股票 $i$ 时间序列回归的截距（标量）及其估计，常数载荷 $\bv\beta_i$ 的估计 | 载荷时变、且载荷与因子的实现值独立时（本模拟器满足，真实数据中条件 CAPM 一类的设定会破坏它），给定特征路径，$\hat{\bv\beta}_i$ 估计样本期内的平均载荷；$\hat{\mathbf B} \in \Real^{N\times K}$ 的第 $i$ 行为 $\hat{\bv\beta}_i'$（[拆解](#primer-unpack-cs)）；见[导读：几种回归](#sec-ch0-regs)，模拟验证见[续页](#sec-ch0-regs-sim) |
 | $\mathbf F \in \Real^{T\times K}$ | 因子按期堆叠，第 $t$ 行为 $\mathbf f_t'$ | 时间序列回归的设计矩阵为 $[\mathbf 1_T, \mathbf F]$；`factors.to_numpy()` |
-| $\bar{\mathbf g} \in \Real^{L+1}$ | Fama–MacBeth 点估计 $T^{-1}\sum_t\hat{\mathbf g}_t$ | 标准误逐分量为 $\hat g_{j,t}$ 的时间序列标准差除以 $\sqrt T$；见[导读：几种回归](#sec-ch0-regs) |
-| $\lambda_{0,t}$、$\hat{\bv\lambda}_t \in \Real^K$、$\bar{\bv\lambda}$ | 第 $t$ 期收益对载荷估计值横截面回归的截距与斜率（每单位载荷的实现补偿），及斜率的时间平均 | 两步法的第二步；$\bar{\bv\lambda}$ 估计风险溢价 $\bv\lambda$ |
-| $\hat{\mathbf g}^{\mathrm P} \in \Real^{L+1}$ | 混合回归（pooled）的系数估计 | $\hat{\mathbf g}^{\mathrm P} = \sum_t\mathbf W_t\hat{\mathbf g}_t$，$\mathbf W_t = (\sum_s\tilde{\mathbf Z}_{s-1}'\tilde{\mathbf Z}_{s-1})^{-1}\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}$ 为 $(L+1)\times(L+1)$ 权重矩阵 |
+| $\bar{\mathbf g} \in \Real^{L+1}$ | Fama–MacBeth 点估计 $T^{-1}\sum_t\hat{\mathbf g}_t$ | 标准误逐分量为 $\hat g_{j,t}$ 的时间序列标准差除以 $\sqrt T$；见[导读：几种回归](#sec-ch0-regs)（[拆解](#primer-unpack-fm)） |
+| $\lambda_{0,t}$、$\hat{\bv\lambda}_t \in \Real^K$、$\bar{\bv\lambda}$ | 第 $t$ 期收益对载荷估计值横截面回归的截距与斜率（每单位载荷的实现补偿），及斜率的时间平均 | 两步法的第二步；$\bar{\bv\lambda}$ 估计风险溢价 $\bv\lambda$（[拆解](#primer-unpack-cs)） |
+| $\hat{\mathbf g}^{\mathrm P} \in \Real^{L+1}$ | 混合回归（pooled）的系数估计 | $\hat{\mathbf g}^{\mathrm P} = \sum_t\mathbf W_t\hat{\mathbf g}_t$，$\mathbf W_t = (\sum_s\tilde{\mathbf Z}_{s-1}'\tilde{\mathbf Z}_{s-1})^{-1}\tilde{\mathbf Z}_{t-1}'\tilde{\mathbf Z}_{t-1}$ 为 $(L+1)\times(L+1)$ 权重矩阵（[拆解](#primer-unpack-w)） |
 | $\mathbf w_t \in \Real^N$ | 第 $t$ 期的组合权重向量 | 组合收益 $\mathbf w_t'\mathbf r_t$，组合载荷 $\mathbf B_t'\mathbf w_t$；零成本多空组合满足 $\mathbf w_t'\mathbf 1_N = 0$ |
 
 ## 特征与载荷矩阵

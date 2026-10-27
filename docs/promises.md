@@ -94,9 +94,9 @@
 - `book/glossary.md:606` — 一是两种回归：时间序列回归对每只资产沿时间回归，得到载荷与截距（第 9 章）；
 - `book/index.md:106` — 导读：几种回归是第二部分的预习，读到第 9 章之前读即可。
 - `book/part0/ch00-exercises.md:114` — 也就是说，即使存在错误定价，每只股票时间序列回归的截距在总体上也是 0，GRS 一类的时间序列检验（第 9 章）检验的只是平均定价误差，看不到这里的条件错误定价……
-- `book/part0/ch00-guide.md:98` — 它是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
+- `book/part0/ch00-guide.md:98` — 它们是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
 - `book/part0/primer-regressions.md:11` — 本页是第二部分（实证计量）的预习，不属于第 0 章的必读内容，第一次阅读可以跳过，读到第 9 章之前再回来。
-- `book/part0/primer-regressions.md:65` — 检验全部 $N$ 个截距同时为 0 的 GRS 检验 [@gibbons1989test]，见第 9 章。
+- `book/part0/primer-regressions.md:91` — 检验全部 $N$ 个截距同时为 0 的 GRS 检验 [@gibbons1989test]，见第 9 章。
 
 ## 第 10 章（14 条）
 
@@ -107,9 +107,9 @@
 - `book/part0/ch00-concepts.md:61` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
 - `book/part0/ch00-concepts.md:250` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
 - `book/part0/ch00-pitfalls.md:159` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
-- `book/part0/primer-regressions.md:102` — 这些都在第 10 章展开。
-- `book/part0/primer-regressions.md:103` — 估计风险溢价 $\bv\lambda$（第 10 章）；
-- `book/part0/primer-regressions.md:367` — 处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
+- `book/part0/primer-regressions-sim.md:273` — 处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
+- `book/part0/primer-regressions.md:183` — 这些都在第 10 章展开。
+- `book/part0/primer-regressions.md:184` — 估计风险溢价 $\bv\lambda$（第 10 章）；
 - `book/part1/ch01-experiments.md:155` — 考虑这一误差的 Shanken 修正见第 10 章。
 - `book/part1/ch01-experiments.md:168` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
 - `book/part1/ch01-lognormal.md:239` — ……构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
@@ -130,8 +130,8 @@
 - `book/glossary.md:248` — $t$ 值依赖标准误的算法，要考虑自相关、截面相关与估计误差（第 12 章）；
 - `book/glossary.md:439` — 按时间聚类的标准误见第 12 章。
 - `book/part0/ch00-pitfalls.md:159` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
-- `book/part0/primer-regressions.md:104` — ……t$ 在时间上相关时（例如用月度数据计算未来 12 个月的收益，相邻各期的收益期限重叠），标准误会偏小，需要 Newey–West 一类的调整，见第 12 章。
-- `book/part0/primer-regressions.md:137` — 允许同一期残差任意相关的“按时间聚类”（clustered by time）标准误，见第 12 章。
+- `book/part0/primer-regressions.md:185` — ……t$ 在时间上相关时（例如用月度数据计算未来 12 个月的收益，相邻各期的收益期限重叠），标准误会偏小，需要 Newey–West 一类的调整，见第 12 章。
+- `book/part0/primer-regressions.md:261` — 允许同一期残差任意相关的“按时间聚类”（clustered by time）标准误，见第 12 章。
 
 ## 第 13 章（5 条）
 

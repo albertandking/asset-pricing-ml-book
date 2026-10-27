@@ -152,7 +152,7 @@ assert abs(lam_hat - lam_c) < 3 * lam_se and abs(lam_hat - p.mu_c) > 20 * lam_se
 
 五项资产的 $\hat\beta_{\Delta c}$ 都在真值的 4 倍标准误以内；$\beta_{\Delta c}\lambda_c$ 与精确的期望超额收益相对误差小于 0.5%，这就是 1.4 节算出的线性化误差。$\rho < 0$ 的资产在消费增长低时收益高，$\beta_{\Delta c} < 0$，期望超额收益为负，是一种“保险”；$\rho = 0$ 的资产与消费无关，波动虽大，期望超额收益却为 0。最后两项资产的 $\sigma_d$ 与 $\rho$ 都不同，但 $\rho\sigma_d$ 相同，因而 β 与期望超额收益的真值完全相同（估计值因抽样误差略有差别）；后者的总波动大一倍，却没有得到更多补偿：决定补偿的是与消费的协方差，不是总波动。
 
-代码最后用 Fama–MacBeth 程序（[导读：几种回归](#sec-ch0-regs)，`apsim.stats.fama_macbeth`）估计 $\lambda_c$：每年把五项资产的超额收益对 $\hat\beta_{\Delta c}$ 做不带截距的横截面回归，再对各年的斜率求平均并计算标准误。估计值与 $\lambda_c = 0.0008$ 相差不到 3 倍标准误，而与 $\E[\Delta c] = 0.02$ 相差超过 20 倍标准误（均由 `assert` 保证）。数据本身告诉我们，不可交易因子的风险溢价不是它的均值。这里把 $\hat\beta$ 当作已知来计算标准误，忽略了 $\hat\beta$ 的估计误差；考虑这一误差的 Shanken 修正见第 10 章。
+代码最后用 Fama–MacBeth 程序（[导读：几种回归](#sec-ch0-regs)，`apsim.stats.fama_macbeth`，它与内联实现的核对见[续页](#sec-ch0-regs-sim)）估计 $\lambda_c$：每年把五项资产的超额收益对 $\hat\beta_{\Delta c}$ 做不带截距的横截面回归，再对各年的斜率求平均并计算标准误。估计值与 $\lambda_c = 0.0008$ 相差不到 3 倍标准误，而与 $\E[\Delta c] = 0.02$ 相差超过 20 倍标准误（均由 `assert` 保证）。数据本身告诉我们，不可交易因子的风险溢价不是它的均值。这里把 $\hat\beta$ 当作已知来计算标准误，忽略了 $\hat\beta$ 的估计误差；考虑这一误差的 Shanken 修正见第 10 章。
 
 (sec-ch1-pitfalls)=
 ## 常见误区

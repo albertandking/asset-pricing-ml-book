@@ -45,6 +45,8 @@ project:
             - file: part0/ch00-exercises.md
         # 导读页：第二部分的预习，不属于第 0 章，不编号
         - file: part0/primer-regressions.md
+          children:
+            - file: part0/primer-regressions-sim.md
     - title: 第一部分　资产定价理论
       children:
         - file: part1/ch01-euler-sdf.md
