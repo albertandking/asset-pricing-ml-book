@@ -28,7 +28,7 @@ jobs:
       - name: 安装中文字体（作图用）
         run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
 
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.2
 
       - uses: actions/setup-node@v7
         with:
