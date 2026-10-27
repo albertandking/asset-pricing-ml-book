@@ -6,7 +6,15 @@ import numpy as np
 
 
 def substreams(seed: int | np.random.Generator, n: int) -> list[np.random.Generator]:
-    """由 seed 派生 n 个相互独立的子流；新增子流只在末尾追加，不扰动已有子流。"""
+    """由 seed 派生 n 个相互独立的子流；新增子流只在末尾追加，不扰动已有子流。
+
+    n 须为正整数：不是整数（bool、float 等）时抛出 TypeError，n < 1 时抛出 ValueError。
+    """
+    if isinstance(n, bool) or not isinstance(n, (int, np.integer)):
+        raise TypeError(f"n 须为整数（int 或 NumPy 整数），而不是 {type(n).__name__}")
+    if n < 1:
+        raise ValueError(f"n 须为正整数，而不是 {n}")
+    n = int(n)
     if isinstance(seed, np.random.Generator):
         # 每次调用只从父生成器取 1 个子键，再由它派生全部子流。若直接 seed.spawn(n)，
         # 子流数改变时，父生成器被取走的键数随之改变，同一生成器后续调用的结果就会全部改变。

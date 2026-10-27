@@ -79,20 +79,38 @@ def test_layout_and_reproducibility():
         simulate_consumption()
 
 
+# 错误类型的统一规则（与 market 一致）：类型错误（bool、浮点数当整数、非实数）抛 TypeError，
+# 取值错误（越界、NaN、非正）抛 ValueError。
 @pytest.mark.parametrize(
     "kw",
     [dict(gamma=0.0), dict(delta=0.0), dict(sigma_c=-0.1), dict(rho_cd=1.5),
-     dict(mu_c=float("nan")), dict(gamma=True)],
+     dict(mu_c=float("nan")), dict(sigma_d=float("inf"))],
 )
-def test_invalid_params(kw):
+def test_invalid_param_values_raise_valueerror(kw):
     with pytest.raises(ValueError):
         ConsumptionParams(**kw)
 
 
-@pytest.mark.parametrize("n", [0, 2.5, True])
-def test_invalid_n_years(n):
+@pytest.mark.parametrize("kw", [dict(gamma=True), dict(delta="0.99"), dict(rho_cd=None), dict(mu_c=1 + 0j)])
+def test_invalid_param_types_raise_typeerror(kw):
+    with pytest.raises(TypeError):
+        ConsumptionParams(**kw)
+
+
+@pytest.mark.parametrize("n", [0, -5, np.int64(0)])
+def test_nonpositive_n_years_raises_valueerror(n):
     with pytest.raises(ValueError):
         simulate_consumption(seed=0, n_years=n)
+
+
+@pytest.mark.parametrize("n", [2.5, 3.0, True, "10", None])
+def test_non_integer_n_years_raises_typeerror(n):
+    with pytest.raises(TypeError):
+        simulate_consumption(seed=0, n_years=n)
+
+
+def test_numpy_integer_n_years_accepted():
+    assert len(simulate_consumption(seed=0, n_years=np.int64(4)).data) == 4
 
 
 def test_golden_values():

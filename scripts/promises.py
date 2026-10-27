@@ -10,7 +10,9 @@
 
 运行方式（在项目根目录下）::
 
-    uv run python scripts/promises.py
+    uv run python scripts/promises.py                      # 写入 docs/promises.md
+    uv run python scripts/promises.py --output PATH        # 写到指定文件
+    uv run python scripts/promises.py --help               # 只打印用法，不写文件
 
 规则
 ----
@@ -29,6 +31,7 @@
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from collections import defaultdict
@@ -220,13 +223,39 @@ def render(promises: dict[tuple[str, int | str], list[tuple[str, int, str]]]) ->
     return "\n".join(out)
 
 
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """命令行参数：只有一个可选的 ``--output``，默认取模块级的 ``OUTPUT``。"""
+    parser = argparse.ArgumentParser(
+        prog="promises.py",
+        description="扫描 book/**/*.md，生成前向引用台账（正文中指向尚未写出的章节或附录的引用）。",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=OUTPUT,
+        metavar="PATH",
+        help="台账的输出文件（默认 docs/promises.md）",
+    )
+    return parser
+
+
+def _display(path: Path) -> str:
+    """输出路径在项目内时显示相对路径，否则原样显示。"""
+    try:
+        return path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)  # --help 在这里打印用法并退出，不扫描、不写文件
+    output: Path = args.output
     promises = collect()
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(render(promises), encoding="utf-8", newline="\n")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(render(promises), encoding="utf-8", newline="\n")
     total = sum(len(v) for v in promises.values())
     top = sorted(promises.items(), key=lambda kv: (-len(kv[1]), sort_key(kv[0])))[:5]
-    print(f"已写入 {OUTPUT.relative_to(ROOT).as_posix()}：共 {total} 条")
+    print(f"已写入 {_display(output)}：共 {total} 条")
     print("被引用最多：" + "，".join(f"{label(r)} {len(v)} 条" for r, v in top))
     return 0
 

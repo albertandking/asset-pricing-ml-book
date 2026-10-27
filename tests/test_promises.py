@@ -3,6 +3,8 @@
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 _PATH = Path(__file__).resolve().parent.parent / "scripts" / "promises.py"
 _spec = importlib.util.spec_from_file_location("promises", _PATH)
 promises = importlib.util.module_from_spec(_spec)
@@ -69,3 +71,27 @@ def test_collect_skips_written_chapters_and_navigation(tmp_path, monkeypatch):
     assert ("chapter", 1) not in got  # 已写出的章节不列入
     assert [e[1] for e in got[("chapter", 2)]] == [3]
     assert ("chapter", 3) not in got  # “进入第 3 章”是导航
+
+
+def test_help_prints_usage_and_writes_nothing(tmp_path, monkeypatch, capsys):
+    out = tmp_path / "promises.md"
+    monkeypatch.setattr(promises, "OUTPUT", out)
+    with pytest.raises(SystemExit) as exc:
+        promises.main(["--help"])
+    assert exc.value.code == 0
+    assert "--output" in capsys.readouterr().out
+    assert not out.exists()
+
+
+def test_output_option_writes_to_given_path(tmp_path, monkeypatch):
+    default = tmp_path / "default.md"
+    target = tmp_path / "sub" / "custom.md"
+    monkeypatch.setattr(promises, "OUTPUT", default)
+    monkeypatch.setattr(promises, "collect", lambda: {("chapter", 2): [("book/x.md", 3, "见第 2 章。")]})
+    assert promises.main(["--output", str(target)]) == 0
+    assert target.read_text(encoding="utf-8").startswith("# 前向引用台账")
+    assert not default.exists()
+
+
+def test_default_output_path():
+    assert promises.build_parser().parse_args([]).output == promises.ROOT / "docs" / "promises.md"

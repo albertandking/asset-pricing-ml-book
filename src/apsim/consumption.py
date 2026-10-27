@@ -29,7 +29,12 @@ _FIELDS = ("delta", "gamma", "mu_c", "sigma_c", "mu_d", "sigma_d", "rho_cd")
 
 @dataclass(frozen=True)
 class ConsumptionParams:
-    """消费模型的参数（年度）。默认值是教学用的假设参数，不是对任何市场的校准。"""
+    """消费模型的参数（年度）。默认值是教学用的假设参数，不是对任何市场的校准。
+
+    错误类型与 `MarketParams` 一致：类型不对（bool、字符串、复数等非实数）抛出 TypeError；
+    取值不对（NaN 或 inf、delta 或 gamma 非正、波动率为负、rho_cd 不在 [-1, 1] 内）抛出 ValueError。
+    理论上 0 < delta < 1，这里只要求 delta > 0；价格是否有限由 a < 1 判断（见 `price_dividend_ratio`）。
+    """
 
     delta: float = 0.99
     gamma: float = 2.0
@@ -43,7 +48,7 @@ class ConsumptionParams:
         for name in _FIELDS:
             v = getattr(self, name)
             if isinstance(v, bool) or not isinstance(v, (int, float, np.integer, np.floating)):
-                raise ValueError(f"{name} 须为实数")
+                raise TypeError(f"{name} 须为实数（int、float 或 NumPy 实数），而不是 {type(v).__name__}")
             if not math.isfinite(v):
                 raise ValueError(f"{name} 须为有限值")
             object.__setattr__(self, name, float(v))
@@ -109,10 +114,18 @@ def simulate_consumption(
     """模拟 n_years 年的消费增长、红利增长、SDF 与红利索取权的收益。
 
     seed 必须以关键字传入，可以是整数或 np.random.Generator（规则同 simulate_market）。
+
+    n_years 是函数参数，而不像 `MarketParams.n_periods` 那样放在参数类中：`ConsumptionParams`
+    只描述偏好（delta、gamma）与增长的分布，它的闭式解属性（R^f、a、P/D、E[R] 等）都与样本长度无关；
+    同一组参数常常要模拟不同长度的样本（例如 50 年与 20 万年）。n_years 须为整数（接受 NumPy 整数，
+    bool、float 等其他类型抛出 TypeError），且须为正（否则抛出 ValueError）。
     """
     p = params if params is not None else ConsumptionParams()
-    if isinstance(n_years, bool) or not isinstance(n_years, (int, np.integer)) or n_years < 1:
+    if isinstance(n_years, bool) or not isinstance(n_years, (int, np.integer)):
+        raise TypeError(f"n_years 须为整数（int 或 NumPy 整数），而不是 {type(n_years).__name__}")
+    if n_years < 1:
         raise ValueError("n_years 须为正整数")
+    n_years = int(n_years)
     a = p.dividend_discount
     p.price_dividend_ratio  # a ≥ 1 时抛出 ValueError
     rng_c, rng_d = substreams(seed, len(_STREAMS))
