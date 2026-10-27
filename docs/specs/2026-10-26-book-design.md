@@ -43,7 +43,14 @@
 │   ├── notation.md        全书记号表
 │   ├── references.bib
 │   ├── _static/custom.css
-│   ├── part0/ch00-guide.md
+│   ├── part0/             第 0 章：ch00-guide.md 为首页，其余各页为它的子页面
+│   │   ├── ch00-guide.md
+│   │   ├── ch00-concepts.md
+│   │   ├── ch00-relations.md
+│   │   ├── ch00-regressions.md
+│   │   ├── ch00-model.md
+│   │   ├── ch00-experiments.md
+│   │   └── ch00-exercises.md
 │   ├── part1/ch01-euler-sdf.md
 │   └── ……                 文件名用英文，标题用中文
 └── scripts/
@@ -145,6 +152,7 @@
 11. **概念先白话、后例子、再公式**：专业概念首次出现时，先用一两句白话说明，再给具体数值例子，最后给公式；全书遵守。
 12. **术语对照**：每章写完后，把本章新出现的、学术与业界含义不同的术语补入 `book/glossary.md`（《术语对照：学术与业界》），按“学术含义—业界常见含义—本书用法—常见混淆”的格式撰写，并更新页末总表。
 13. **符号读法**：每章出现新的希腊字母、修饰符号或运算符时，补充到 `book/notation.md` 的“符号读法”一节（读法与本书含义）。
+14. **长章拆页**：每章源文件若超过约 3 万字符，按节拆成子页面，在 `myst.yml` 中作为该章首页的 `children`。mystmd 中每个页面使用独立的内核，所以每页开头加一个“本页准备”代码单元，只导入并重建本页需要的对象，参数与种子与原处完全相同；各页的 frontmatter 都写 `numbering.enumerator`，公式编号跨页接续时用 `numbering.equation.continue: true`，保证整章编号唯一。
 
 ## 8. 完成标准
 
