@@ -10,9 +10,9 @@ numbering:
     template: 习题 %s
 ---
 
-# A 股视角、模拟实验与常见误区
+# A 股视角与模拟实验
 
-**本页准备。** 本书每个页面的代码在独立的内核中运行，前面页面定义的变量在这里不可用。下面的单元导入本页用到的模块，并按与 0.4 节、0.6 节完全相同的参数和种子，重建本页用到的两个模拟市场及由它们算出的数组。
+**本页准备。** 本书每个页面的代码在独立的内核中运行，前面页面定义的变量在这里不可用。下面的单元导入本页用到的模块，并按与 0.4 节完全相同的参数和种子，重建本页用到的默认市场及由它算出的数组。
 
 ```{code-cell} python
 import numpy as np
@@ -26,12 +26,6 @@ mkt = simulate_market(params, seed=0)
 L, K = params.n_chars, params.n_factors
 beta = mkt.panel[[f"beta{k}" for k in range(1, K + 1)]].to_numpy()                  # (TN, K)，每行 β_{i,t}'
 f_row = mkt.factors.reindex(mkt.panel.index.get_level_values("period")).to_numpy()  # (TN, K)，每行 f_t'
-
-# 0.6 节“模拟验证”的长样本（θ1 = 0.01，种子 2026），误区一用到
-long_params = MarketParams(n_stocks=20, n_periods=20_000, alpha_coef=(0.01, 0.0, 0.0, 0.0, 0.0))
-long_mkt = simulate_market(long_params, seed=2026)
-MR = long_mkt.sdf().to_numpy()[:, None] * long_mkt.panel["exret"].unstack("stock").to_numpy()   # (T, N)：m_t r_{i,t}
-Z1 = long_mkt.panel["z1"].unstack("stock").to_numpy()                                         # (T, N)
 ```
 
 ## A 股视角
@@ -59,6 +53,16 @@ $$ (eq-ch0-interact)
 
 其中 $\tilde z_{0,i,t-1} = 1$，$\tilde z_{j,i,t-1} = z_{j,i,t-1}$（$j \geq 1$）。这是一个以 $(L+1)K$ 个“特征 × 因子”交互项为解释变量、以 $\bv\Gamma$ 的各元素为系数的线性回归。
 
+(ch0-unpack-interact)=
+**拆开讲式 {eq}`eq-ch0-interact`。** 第一个等号右边的 $\tilde{\mathbf z}_{i,t-1}'\bv\Gamma\mathbf f_t$ 是 $1\times(L+1)$、$(L+1)\times K$、$K\times 1$ 三者之积，结果是一个数，就是因子部分 $\bv\beta_{i,t}'\mathbf f_t$（$\tilde{\mathbf z}_{i,t-1}$ 与 $\bv\Gamma$ 的分量见[拆解](#ch0-unpack-gamma)）。第二个等号把矩阵乘法逐项展开：先算 $\bv\Gamma\mathbf f_t$ 的第 $j$ 个分量 $\sum_k \Gamma_{j,k} f_{k,t}$，再乘以 $\tilde z_{j,i,t-1}$、对 $j$ 求和，一共 $(L+1)K$ 项，每一项是“系数 $\Gamma_{j,k}$ 乘以交互项 $\tilde z_{j,i,t-1} f_{k,t}$”。交互项是特征（以横截面标准差为单位）与因子收益之积，单位与收益相同；$j = 0$ 的交互项 $\tilde z_{0,i,t-1} f_{k,t} = f_{k,t}$ 就是因子本身。默认参数下 $L = 5$、$K = 3$，共 18 项，但默认 $\bv\Gamma$ 只有三个非零元素：
+
+```{math}
+:enumerated: false
+r_{i,t} = \Gamma_{0,1} f_{1,t} + \Gamma_{1,2}\, z_{1,i,t-1} f_{2,t} + \Gamma_{2,3}\, z_{2,i,t-1} f_{3,t} + \varepsilon_{i,t} = f_{1,t} + 0.5\, z_{1,i,t-1} f_{2,t} + 0.5\, z_{2,i,t-1} f_{3,t} + \varepsilon_{i,t} ,
+```
+
+其余 15 个交互项的真实系数为 0，回归要从数据中发现这一点。**特例**：$L = 0$（没有特征）时只剩 $\sum_k \Gamma_{0,k} f_{k,t}$，所有股票的载荷相同，回归退化为所有股票共用一组斜率、截距为 0 的时间序列回归；$L = 1$、$K = 1$ 时 $r_{i,t} = \Gamma_{0,1} f_{1,t} + \Gamma_{1,1}\, z_{1,i,t-1} f_{1,t} + \varepsilon_{i,t}$，即载荷 $\beta_{1,i,t} = \Gamma_{0,1} + \Gamma_{1,1} z_{1,i,t-1}$ 随一个特征线性变化，$f_{1,t}$ 取市场因子时就是条件 CAPM 常用的“载荷随特征变化”的回归。**数据矩阵**：每个观测 $(i, t)$ 贡献一行 $(L+1)K$ 个交互项，$TN$ 个观测叠成下文的 $\mathbf X$；**$\bv\Gamma$ 由所有股票、所有时期共用**，所以只需估计 $(L+1)K$ 个系数，而不是每只股票一套。
+
 **写成标准的回归形式。** 要把 $\bv\Gamma$ 的元素排成一个系数向量，需要用到 vec 算子与 Kronecker 积。$\operatorname{vec}(\mathbf A)$ 把矩阵 $\mathbf A$ 的各列从左到右依次叠成一个长的列向量（列优先）；Kronecker 积 $\mathbf a \otimes \mathbf c$ 把 $\mathbf a$ 的每个元素 $a_j$ 换成块 $a_j \mathbf c$。二者由恒等式
 
 $$
@@ -73,9 +77,59 @@ $$ (eq-ch0-kron)
 
 这里用到 $(\tilde{\mathbf z}_{i,t-1}' \otimes \mathbf f_t') = (\tilde{\mathbf z}_{i,t-1} \otimes \mathbf f_t)'$。系数向量 $\operatorname{vec}(\bv\Gamma')$ 按列叠放 $\bv\Gamma'$，也就是按行叠放 $\bv\Gamma$：先是第 0 行 $(\Gamma_{0,1}, \dots, \Gamma_{0,K})$，再是第 1 行，依此类推，$j$ 在外层、$k$ 在内层；设计矩阵的第 $(i,t)$ 行 $(\tilde{\mathbf z}_{i,t-1} \otimes \mathbf f_t)'$ 的元素也按同样的顺序排列为 $\tilde z_{j,i,t-1} f_{k,t}$。把全部 $TN$ 个观测按行叠成 $\mathbf X \in \Real^{TN\times(L+1)K}$ 与 $\mathbf y \in \Real^{TN}$，因子可观测时，对 $\mathbf y$ 关于 $\mathbf X$ 做最小二乘，就能估计 $\operatorname{vec}(\bv\Gamma')$。
 
+(ch0-unpack-vec)=
+**拆开讲 vec、Kronecker 积与式 {eq}`eq-ch0-vec`。** 先看两个最小的例子：$2\times 2$ 矩阵按列叠放，以及 $2\times 1$ 与 $3\times 1$ 两个列向量的 Kronecker 积，
+
+```{math}
+:enumerated: false
+\operatorname{vec}\begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix} = \begin{pmatrix} a_{11} \\ a_{21} \\ a_{12} \\ a_{22} \end{pmatrix} , \qquad
+\begin{pmatrix} a_1 \\ a_2 \end{pmatrix} \otimes \begin{pmatrix} c_1 \\ c_2 \\ c_3 \end{pmatrix} = \begin{pmatrix} a_1\mathbf c \\ a_2\mathbf c \end{pmatrix} = \begin{pmatrix} a_1 c_1 \\ a_1 c_2 \\ a_1 c_3 \\ a_2 c_1 \\ a_2 c_2 \\ a_2 c_3 \end{pmatrix} .
+```
+
+**维度**：$m\times n$ 矩阵的 vec 是 $mn\times 1$ 的列向量；$m\times 1$ 的 $\mathbf a$ 与 $n\times 1$ 的 $\mathbf c$ 的 Kronecker 积是 $mn\times 1$，$\mathbf a$ 的下标在外层（变化慢），$\mathbf c$ 的下标在内层（变化快）。一般地，$m\times n$ 的 $\mathbf A$ 与 $p\times q$ 的 $\mathbf B$ 的 Kronecker 积 $\mathbf A\otimes\mathbf B$ 是 $mp\times nq$ 的分块矩阵，第 $(j, l)$ 块为 $a_{jl}\mathbf B$。式 {eq}`eq-ch0-vec` 两边的维度：设 $\mathbf A$ 为 $m\times n$、$\mathbf B$ 为 $n\times p$、$\mathbf C$ 为 $p\times q$，左边 $\operatorname{vec}(\mathbf A\mathbf B\mathbf C)$ 是 $mq\times 1$；右边 $\mathbf C'\otimes\mathbf A$ 是 $qm\times pn$，乘 $np\times 1$ 的 $\operatorname{vec}(\mathbf B)$，也是 $mq\times 1$。**特例**：$\mathbf A = \mathbf a'$（$1\times n$）、$\mathbf C = \mathbf c$（$p\times 1$）时左边是标量 $\mathbf a'\mathbf B\mathbf c$，恒等式化为
+
+```{math}
+:enumerated: false
+\mathbf a'\mathbf B\mathbf c = (\mathbf c'\otimes\mathbf a')\operatorname{vec}(\mathbf B) = \sum_{k=1}^{p}\sum_{j=1}^{n} c_k\, a_j\, B_{jk} ,
+```
+
+右边就是双重求和 $\sum_j\sum_k a_j B_{jk} c_k$ 换了一种排列：$\operatorname{vec}(\mathbf B)$ 中 $B_{jk}$ 的行下标 $j$ 变化快，$\mathbf c'\otimes\mathbf a'$ 中 $a_j$ 的下标 $j$ 也变化快，两者逐个对齐。式 {eq}`eq-ch0-kron` 正是取 $\mathbf a = \mathbf f_t$、$\mathbf B = \bv\Gamma'$、$\mathbf c = \tilde{\mathbf z}_{i,t-1}$ 的这一特例。
+
+(ch0-unpack-kron)=
+**拆开讲式 {eq}`eq-ch0-kron`。** 写出分量，设计矩阵一行（转置成列）与系数向量是
+
+```{math}
+:enumerated: false
+\underbrace{\tilde{\mathbf z}_{i,t-1}\otimes\mathbf f_t}_{(L+1)K\times 1} = \begin{pmatrix} 1\cdot\mathbf f_t \\ z_{1,i,t-1}\,\mathbf f_t \\ \vdots \\ z_{L,i,t-1}\,\mathbf f_t \end{pmatrix} = \begin{pmatrix} f_{1,t} \\ \vdots \\ f_{K,t} \\ z_{1,i,t-1}f_{1,t} \\ \vdots \\ z_{L,i,t-1}f_{K,t} \end{pmatrix} , \qquad
+\underbrace{\operatorname{vec}(\bv\Gamma')}_{(L+1)K\times 1} = \begin{pmatrix} \Gamma_{0,1} \\ \vdots \\ \Gamma_{0,K} \\ \Gamma_{1,1} \\ \vdots \\ \Gamma_{L,K} \end{pmatrix} .
+```
+
+两者都分成 $L+1$ 段、每段 $K$ 个元素：第 $j$ 段分别是 $\tilde z_{j,i,t-1}\mathbf f_t$ 与 $\bv\Gamma$ 的第 $j$ 行（转置成列）。**维度**：$1\times(L+1)K$ 的行乘 $(L+1)K\times 1$ 的列，得到一个数。**展开运算**：对应位置相乘再加总，就是式 {eq}`eq-ch0-interact` 的双重求和 $\sum_j\sum_k \Gamma_{j,k}\,\tilde z_{j,i,t-1}f_{k,t}$。以 0.2 节的股票 A 为例（$z_1 = 2$、其余特征为 0，$\mathbf f_t = (4\%, 2\%, -1\%)'$，见[拆解](#ch0-unpack-gamma)）：$\tilde{\mathbf z}_{A,t-1}\otimes\mathbf f_t$ 的前两段为 $(4\%, 2\%, -1\%)$ 与 $(8\%, 4\%, -2\%)$，其余 12 个元素为 0；默认 $\operatorname{vec}(\bv\Gamma')$ 的前两段为 $(1, 0, 0)$ 与 $(0, 0.5, 0)$，于是内积为 $1 \times 4\% + 0.5 \times 4\% = 6\%$，与 0.2 节算出的因子部分相同（下方代码核对）。**特例**：$L = 0$ 时 $\tilde{\mathbf z}_{i,t-1} = 1$，$\tilde{\mathbf z}_{i,t-1}\otimes\mathbf f_t = \mathbf f_t$，$\operatorname{vec}(\bv\Gamma')$ 就是所有股票共同的载荷向量。**数据矩阵**：$\mathbf X$ 与 $\mathbf y$ 的行按“期在外层、股票在内层”排列：先是第 1 期的 $N$ 只股票，再是第 2 期的 $N$ 只股票，依此类推，与面板的 `(period, stock)` 顺序相同；第 $(i, t)$ 行是 $(\tilde{\mathbf z}_{i,t-1}\otimes\mathbf f_t)'$，$\mathbf y$ 的对应元素是 $r_{i,t}$。同一期的 $N$ 行共用同一个 $\mathbf f_t$，各行的 $\tilde{\mathbf z}_{i,t-1}$ 不同；系数向量 $\operatorname{vec}(\bv\Gamma')$ 由全部 $TN$ 行共用。默认参数下 $\mathbf X$ 为 $120000\times 18$。
+
+```{code-cell} python
+# 拆开讲 vec 与 eq-ch0-kron：vec 按列叠放；股票 A（z1 = 2，其余为 0）在 f_t = (4%, 2%, -1%)' 下，(z̃ ⊗ f)' vec(Γ') = 6%
+assert np.array_equal(np.array([[11, 12], [21, 22]]).ravel(order="F"), [11, 21, 12, 22])   # vec：列优先
+zt_A = np.array([1.0, 2.0, 0.0, 0.0, 0.0, 0.0])                   # z̃_A: (L+1,) = (6,)
+f_A = np.array([0.04, 0.02, -0.01])                               # f_t: (K,) = (3,)
+x_A = np.kron(zt_A, f_A)                                          # z̃ ⊗ f: ((L+1)K,) = (18,)
+print("z̃ ⊗ f 的前两段：", x_A[:6], "；与 vec(Γ') 的内积", round(x_A @ mkt.gamma.ravel(), 4))
+assert np.allclose(x_A[:6], [0.04, 0.02, -0.01, 0.08, 0.04, -0.02]) and np.allclose(x_A[6:], 0)
+assert np.isclose(x_A @ mkt.gamma.ravel(), 0.06) and np.isclose(x_A @ mkt.gamma.ravel(), zt_A @ mkt.gamma @ f_A)
+```
+
 **与代码的对应。** 下面的 `interaction_design` 用广播构造 $\mathbf X$：`zt[:, :, None] * ff[:, None, :]` 的形状为 `(TN, L+1, K)`，其 `[n, j, k]` 元素是 $\tilde z_j f_k$；NumPy 的 `reshape` 默认按行优先（C 顺序）展开，最后一维 `k` 变化最快，所以展开后每一行正是 $(\tilde{\mathbf z} \otimes \mathbf f)'$。同理，`gamma.ravel()`（行优先）就是 $\operatorname{vec}(\bv\Gamma')$，而列优先的 `gamma.ravel(order="F")` 才是 $\operatorname{vec}(\bv\Gamma)$；系数向量用 `coef.reshape(L+1, K)` 还原为 $\hat{\bv\Gamma}$。数学上的 vec 是列优先，NumPy 的默认展开是行优先，两者差一个转置，这是最容易出错的地方，下面的代码单元用 `np.kron` 与 `assert` 核对这一对应。
 
 由于 $\varepsilon_{i,t}$ 与 $(\mathbf z_{i,t-1}, \mathbf f_t)$ 独立，解释变量严格外生，最小二乘估计量无偏，其条件协方差矩阵为 $\sigma_\varepsilon^2 (\mathbf X'\mathbf X)^{-1}$（$(L+1)K \times (L+1)K$）。函数 `ols` 用 `lstsq` 求系数、用 `solve` 求 $(\mathbf X'\mathbf X)^{-1}$，而不调用 `inv`。这两个函数也收在 `apsim.stats` 中，代码单元用 `assert` 核对二者与这里的定义结果相同，后面的页面直接调用 `apsim.stats`。下面用默认参数（$N = 500$、$T = 240$）检验这一点。
+
+(ch0-unpack-xtx)=
+**拆开讲 $\sigma_\varepsilon^2(\mathbf X'\mathbf X)^{-1}$。** 记 $\mathbf x_{i,t} = \tilde{\mathbf z}_{i,t-1}\otimes\mathbf f_t$，它是设计矩阵第 $(i, t)$ 行的转置，为 $(L+1)K\times 1$。$(L+1)K\times TN$ 的 $\mathbf X'$ 乘 $TN\times(L+1)K$ 的 $\mathbf X$，得到 $(L+1)K\times(L+1)K$ 的方阵，它等于全部观测的外积之和；$\mathbf X'\mathbf y$ 是 $(L+1)K\times 1$：
+
+```{math}
+:enumerated: false
+\mathbf X'\mathbf X = \sum_{t=1}^{T}\sum_{i=1}^{N} \mathbf x_{i,t}\mathbf x_{i,t}' , \qquad \mathbf X'\mathbf y = \sum_{t=1}^{T}\sum_{i=1}^{N} \mathbf x_{i,t}\, r_{i,t} , \qquad \operatorname{vec}(\hat{\bv\Gamma}') = (\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf y .
+```
+
+$\mathbf X'\mathbf X$ 中对应 $\Gamma_{j,k}$ 与 $\Gamma_{l,m}$ 的元素是 $\sum_{t}\sum_{i}\tilde z_{j,i,t-1}\tilde z_{l,i,t-1}f_{k,t}f_{m,t}$，即两个交互项的乘积之和。$\sigma_\varepsilon^2(\mathbf X'\mathbf X)^{-1}$ 的第 $p$ 个对角元是第 $p$ 个系数估计的条件方差，开平方就是标准误（代码中的 `np.sqrt(np.diag(s2 * XtX_inv))`）；非对角元是两个系数估计之间的条件协方差。$\sigma_\varepsilon^2$ 未知，代码用残差平方和除以“观测数减系数个数”估计，即 `s2`。**特例**：只有一个解释变量 $x_n$ 时，$\mathbf X'\mathbf X = \sum_n x_n^2$ 是一个数，系数估计的方差为 $\sigma_\varepsilon^2/\sum_n x_n^2$：解释变量变化越大，系数估计越准，这也是下文“第一个因子一列的标准误更小”的原因。
 
 ```{code-cell} python
 def interaction_design(market):
@@ -150,6 +204,26 @@ assert np.all(se_grid[:, 0] < se_grid[:, 1:].min(axis=1))
 
 如果 $\bv\theta \neq \mathbf 0$，式 {eq}`eq-ch0-interact` 遗漏了 $\alpha_{i,t} = \bv\theta' \mathbf z_{i,t-1}$。遗漏项与解释变量相关吗？交互项 $z_{j,i,t-1} f_{k,t}$ 与 $z_{j,i,t-1}$ 的协方差为 $\E[z_{j,i,t-1}^2]\,\E[f_{k,t}] = \mu_k \neq 0$，所以答案是肯定的：只用交互项的回归有遗漏变量偏误。
 
+逐项看这个协方差：$\Cov(z_{j,i,t-1}f_{k,t},\ z_{j,i,t-1}) = \E[z_{j,i,t-1}^2 f_{k,t}] - \E[z_{j,i,t-1}f_{k,t}]\,\E[z_{j,i,t-1}]$。特征与因子独立，第一项等于 $\E[z_{j,i,t-1}^2]\,\E[f_{k,t}] = 1 \times \mu_k$；第二项中 $\E[z_{j,i,t-1}] = 0$。所以协方差等于因子均值 $\mu_k$，单位与收益相同，例如默认参数下 $z_1 f_1$ 与 $z_1$ 的协方差为 $\mu_1 = 0.6\%$。遗漏项 $\theta_j z_{j,i,t-1}$ 因而有一部分会被交互项 $z_{j,i,t-1}f_{k,t}$“冒名顶替”。
+
+(ch0-unpack-ovb)=
+**先拆开下面推导要用到的几个矩阵。**
+
+- 因子矩阵 $\mathbf F$ 是 $T\times K$，第 $t$ 行为 $\mathbf f_t'$（结构见[拆解](#ch0-unpack-f)）。$\mathbf F'\mathbf F$ 是 $K\times T$ 乘 $T\times K$，得 $K\times K$，等于 $\sum_t \mathbf f_t\mathbf f_t'$，$(k, l)$ 元素为 $\sum_t f_{k,t}f_{l,t}$；$\mathbf F'\mathbf 1_T$ 是 $K\times 1$，第 $k$ 个元素为 $\sum_t f_{k,t}$，即 $T$ 乘以第 $k$ 个因子的样本均值。
+- $\tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'$ 是 $(L+1)\times(L+1)$ 的外积，$(j, l)$ 元素为 $\tilde z_{j,i,t-1}\tilde z_{l,i,t-1}$。特征相互独立、均值为 0、方差为 1，所以横截面平均后对角元趋于 1，非对角元（包括常数项与特征的交叉，即特征的均值）趋于 0，整体趋于 $\mathbf I_{L+1}$。$\tilde{\mathbf z}_{i,t-1}\mathbf z_{i,t-1}'\bv\theta = \tilde{\mathbf z}_{i,t-1}\,\alpha_{i,t}$ 是 $(L+1)\times 1$，横截面平均后第 0 个分量趋于 $\E[\alpha_{i,t}] = 0$，第 $j$ 个分量趋于 $\E[z_{j,i,t-1}\,\bv\theta'\mathbf z_{i,t-1}] = \theta_j$，整体趋于 $(0, \bv\theta')'$。
+- 混合乘积规则要求 $\mathbf A\mathbf C$ 与 $\mathbf B\mathbf D$ 都能相乘。用于设计矩阵的一行：$\mathbf x_{i,t}\mathbf x_{i,t}' = (\tilde{\mathbf z}_{i,t-1}\otimes\mathbf f_t)(\tilde{\mathbf z}_{i,t-1}'\otimes\mathbf f_t') = (\tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}')\otimes(\mathbf f_t\mathbf f_t')$，是 $(L+1)\times(L+1)$ 矩阵与 $K\times K$ 矩阵的 Kronecker 积，为 $(L+1)K\times(L+1)K$；同理 $\mathbf x_{i,t}\,\alpha_{i,t} = (\tilde{\mathbf z}_{i,t-1}\alpha_{i,t})\otimes\mathbf f_t$。同一期的 $\mathbf f_t$ 不随 $i$ 变化，所以对 $i$ 的平均只作用在特征一侧。
+- $\bv\alpha$ 是 $TN\times 1$，元素按 $\mathbf y$ 的顺序排列，第 $(i, t)$ 个为 $\alpha_{i,t} = \bv\theta'\mathbf z_{i,t-1}$。
+
+极限中的两个 Kronecker 积写出来是
+
+```{math}
+:enumerated: false
+\mathbf I_{L+1}\otimes\mathbf F'\mathbf F = \begin{pmatrix} \mathbf F'\mathbf F & \mathbf 0 & \cdots & \mathbf 0 \\ \mathbf 0 & \mathbf F'\mathbf F & \cdots & \mathbf 0 \\ \vdots & \vdots & \ddots & \vdots \\ \mathbf 0 & \mathbf 0 & \cdots & \mathbf F'\mathbf F \end{pmatrix} , \qquad
+\begin{pmatrix} 0 \\ \bv\theta \end{pmatrix}\otimes\mathbf F'\mathbf 1_T = \begin{pmatrix} 0\cdot\mathbf F'\mathbf 1_T \\ \theta_1\,\mathbf F'\mathbf 1_T \\ \vdots \\ \theta_L\,\mathbf F'\mathbf 1_T \end{pmatrix} .
+```
+
+前者是分块对角矩阵，对角线上是 $L+1$ 个相同的 $K\times K$ 块 $\mathbf F'\mathbf F$，其余为 0：不同特征的交互项在极限中互不相关，$L+1$ 段系数可以分开求解；分块对角矩阵的逆就是把每一块各自求逆，即 $\mathbf I_{L+1}\otimes(\mathbf F'\mathbf F)^{-1}$。后者是 $(L+1)K\times 1$，第 $j$ 段为 $\theta_j\mathbf F'\mathbf 1_T$。
+
 偏误的大小可以算出来。记 $\mathbf F = (\mathbf f_1, \dots, \mathbf f_T)' \in \Real^{T\times K}$（第 $t$ 行为 $\mathbf f_t'$），$\mathbf 1_T$ 为 $T$ 维全 1 向量。以因子路径 $\mathbf F$ 为条件，令 $N \to \infty$。每一期的横截面平均满足 $N^{-1}\sum_i \tilde{\mathbf z}_{i,t-1} \tilde{\mathbf z}_{i,t-1}' \to \mathbf I_{L+1}$、$N^{-1}\sum_i \tilde{\mathbf z}_{i,t-1} \mathbf z_{i,t-1}' \bv\theta \to (0, \bv\theta')'$。由式 {eq}`eq-ch0-kron`，设计矩阵的行是 $(\tilde{\mathbf z}_{i,t-1} \otimes \mathbf f_t)'$；利用 Kronecker 积的混合乘积规则 $(\mathbf A \otimes \mathbf B)(\mathbf C \otimes \mathbf D) = \mathbf A\mathbf C \otimes \mathbf B\mathbf D$，
 
 ```{math}
@@ -174,6 +248,43 @@ $$
 $$ (eq-ch0-bias-limit)
 
 分母中的 $\bv\mu'\bv\Sigma_f^{-1}\bv\mu$ 是标量。偏误的方向正是 SDF 系数 $\mathbf b$ 的方向。解决办法很简单：在回归中加入特征本身作为解释变量，其系数估计的就是 $\bv\theta$。IPCA 在载荷之外允许一个由特征驱动的截距，也是出于同样的考虑 [@kelly2019characteristics]。下面的代码在 $\bv\theta = (0.01, 0, 0, 0, 0)'$ 下比较两种回归。两者使用同一份数据，二者之差几乎不含异质性冲击带来的抽样噪声，可以直接与式 {eq}`eq-ch0-bias` 的 $\theta_1 \mathbf c'$ 比较。
+
+(ch0-unpack-bias)=
+**拆开讲式 {eq}`eq-ch0-bias`。** 第一个等号是把 $\mathbf y = \mathbf X\operatorname{vec}(\bv\Gamma') + \bv\alpha + \bv\varepsilon$ 代入最小二乘公式 $\operatorname{vec}(\hat{\bv\Gamma}') = (\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf y$（[拆解](#ch0-unpack-xtx)），再放入上面的两个极限（$\bv\varepsilon$ 一项在 $N\to\infty$ 时消失）。按 $\operatorname{vec}(\bv\Gamma')$ 的分段写出偏误向量：
+
+```{math}
+:enumerated: false
+\underbrace{\begin{pmatrix} 0 \\ \bv\theta \end{pmatrix}}_{(L+1)\times 1}\otimes\underbrace{\mathbf c}_{K\times 1}
+= \begin{pmatrix} 0\cdot\mathbf c \\ \theta_1\mathbf c \\ \vdots \\ \theta_L\mathbf c \end{pmatrix} , \qquad
+\mathbf c = \begin{pmatrix} c_1 \\ c_2 \\ \vdots \\ c_K \end{pmatrix} ,
+```
+
+第 0 段（常数项一行）为 0，第 $j$ 段为 $\theta_j\mathbf c$，即 $\hat\Gamma_{j,k}$ 的偏误是 $\theta_j c_k$。**$\mathbf c$ 的含义**：$(\mathbf F'\mathbf F)^{-1}\mathbf F'\mathbf 1_T$ 是把 $T\times 1$ 的全 1 向量对 $T\times K$ 的 $\mathbf F$ 做不带截距的最小二乘回归所得的系数，$\mathbf c'\mathbf f_t$ 是用因子对常数 1 的最佳线性逼近，$c_k$ 的单位是“收益的倒数”。这给出偏误的直观：遗漏项 $\theta_j z_{j,i,t-1} = \theta_j z_{j,i,t-1}\cdot 1 \approx \theta_j z_{j,i,t-1}\,\mathbf c'\mathbf f_t = \sum_k \theta_j c_k\,(z_{j,i,t-1}f_{k,t})$，回归只能用交互项 $z_{j,i,t-1}f_{k,t}$ 去“模仿”它，于是这些交互项的系数多出 $\theta_j c_k$；常数项一行的交互项就是 $\mathbf f_t$ 本身，而 $\alpha_{i,t}$ 的横截面平均为 0，那一行没有偏误。
+
+(ch0-unpack-c)=
+**拆开讲式 {eq}`eq-ch0-bias-limit`。** $T\to\infty$ 时 $\mathbf F'\mathbf F/T = T^{-1}\sum_t\mathbf f_t\mathbf f_t' \to \E[\mathbf f_t\mathbf f_t'] = \bv\Sigma_f + \bv\mu\bv\mu'$，其 $(k, l)$ 元素为 $\E[f_{k,t}f_{l,t}] = \Sigma_{kl} + \mu_k\mu_l$（$\Sigma_{kl}$ 是 $\bv\Sigma_f$ 的 $(k, l)$ 元素）；$\mathbf F'\mathbf 1_T/T \to \bv\mu$。两个 $T$ 约掉，$\mathbf c \to (\bv\Sigma_f + \bv\mu\bv\mu')^{-1}\bv\mu$。Sherman–Morrison 公式中，$\mathbf A$ 是 $K\times K$ 的可逆矩阵，$\mathbf u$、$\mathbf v$ 是 $K\times 1$ 向量，$\mathbf u\mathbf v'$ 是 $K\times K$ 的外积（秩为 1），$\mathbf v'\mathbf A^{-1}\mathbf u$ 是标量：矩阵加上一个秩 1 的修正后，逆矩阵也只差一个秩 1 的修正。取 $\mathbf A = \bv\Sigma_f$、$\mathbf u = \mathbf v = \bv\mu$，并记标量 $s = \bv\mu'\bv\Sigma_f^{-1}\bv\mu$（即 0.5 节的 $\Var(m_t)$，[拆解](#ch0-unpack-varm)），式 {eq}`eq-ch0-bias-limit` 的各步是
+
+```{math}
+:enumerated: false
+(\bv\Sigma_f + \bv\mu\bv\mu')^{-1}\bv\mu = \bv\Sigma_f^{-1}\bv\mu - \frac{\bv\Sigma_f^{-1}\bv\mu\,(\bv\mu'\bv\Sigma_f^{-1}\bv\mu)}{1 + \bv\mu'\bv\Sigma_f^{-1}\bv\mu} = \mathbf b - \frac{s}{1+s}\,\mathbf b = \frac{\mathbf b}{1+s} ,
+```
+
+第一步是 Sherman–Morrison 公式右乘 $\bv\mu$，分子中 $\mathbf v'\mathbf A^{-1}\bv\mu = \bv\mu'\bv\Sigma_f^{-1}\bv\mu = s$ 是一个数；第二步用到 $\bv\Sigma_f^{-1}\bv\mu = \mathbf b$，$K\times 1$ 的 $\mathbf b$ 乘标量 $s/(1+s)$。**特例**：$K = 1$ 时 $\mathbf c$ 就是数 $c = \sum_t f_t/\sum_t f_t^2$，极限为 $\mu/(\sigma^2 + \mu^2) = (\mu/\sigma^2)/(1 + \mu^2/\sigma^2)$；只取默认的第一个因子（$\mu_1 = 0.6\%$、$\sigma_1 = 5\%$）时 $c \approx 2.37$。默认三个因子下 $s \approx 0.0422$，$\mathbf b \approx (2.4, 3.33, 4.44)'$，于是 $\mathbf c$ 的极限约为 $(2.30, 3.20, 4.26)'$，$\theta_1 = 0.01$ 时 $z_1$ 一行的偏误约为 $(0.023, 0.032, 0.043)$：$\Gamma_{1,1}$、$\Gamma_{1,3}$ 的真值为 0，偏误让 $z_1$ 看起来也影响对第一、三个因子的载荷（下方代码核对）。**数据矩阵**：$\mathbf c$ 只依赖因子路径 $\mathbf F$，由所有股票共用，所以偏误对所有股票相同；有限 $T$ 下它取决于本样本实际出现的因子，而不是总体矩（下文的输出会看到这一点）。
+
+```{code-cell} python
+# 拆开讲 c 的极限：s = μ'Σ_f⁻¹μ，c → b / (1 + s)；只有第一个因子时 c → μ / (σ² + μ²)
+mu_d, Sig_d = np.asarray(params.factor_mean), params.factor_cov            # μ: (K,)，Σ_f: (K, K)
+b_d = np.linalg.solve(Sig_d, mu_d)                                         # b: (K,)
+s_d = mu_d @ b_d                                                           # μ'Σ_f⁻¹μ：标量
+c_lim = b_d / (1 + s_d)                                                    # (K,)
+c_one = mu_d[0] / (Sig_d[0, 0] + mu_d[0] ** 2)                             # K = 1 时的极限
+print(f"s = {s_d:.4f}；c 的极限 {c_lim.round(2)}；θ1·c {(0.01 * c_lim).round(3)}；只有第一个因子时 c = {c_one:.2f}")
+assert np.allclose(c_lim, np.linalg.solve(Sig_d + np.outer(mu_d, mu_d), mu_d))
+assert np.allclose(c_lim.round(2), [2.30, 3.20, 4.26]) and np.allclose((0.01 * c_lim).round(3), [0.023, 0.032, 0.043])
+assert 0.0421 < s_d < 0.0422 and np.isclose(round(c_one, 2), 2.37)
+```
+
+下面的代码中，`c` 是本样本的 $\mathbf c$，`lhs` 与 `rhs` 是它的极限的两种算法。
 
 ```{code-cell} python
 mis_params = MarketParams(alpha_coef=(0.01, 0.0, 0.0, 0.0, 0.0))
@@ -212,101 +323,4 @@ assert f_bar_mis[1] > 1.2 * mu_v[1]
 
 两种回归之差与式 {eq}`eq-ch0-bias` 的预测相符：$z_1$ 一行之差与 $\theta_1 \mathbf c'$ 的各分量相对差别在 15% 以内，常数项一行之差接近 0（均由 `assert` 保证）；有限 $N$ 下横截面平均与总体矩之间仍有小的差别，所以二者不完全相等。还要注意，本例中 $\mathbf c$ 与它的极限 {eq}`eq-ch0-bias-limit` 有明显差别：三个分量都比极限大，其中第二个分量偏离最大，约大四成（相对偏离见上方输出，由 `assert` 守护）。原因是 240 个月的样本中，因子样本均值本身就有可观的抽样误差——本样本中第二个因子的样本均值比真值高出两成以上——而偏误取决于样本中实际出现的因子路径，而不是总体矩。
 
-(sec-ch0-pitfalls)=
-## 常见误区
-
-**误区一：把同期特征当作期初特征。** 用 $\mathbf z_{i,t}$ 而不是 $\mathbf z_{i,t-1}$ 去解释 $r_{i,t}$，在真实数据中可能造成严重的前视偏差：许多特征（市值、动量、换手率）与当期收益机械相关，例如第 $t$ 期末的市值本身就包含了第 $t$ 期的收益。在本章的模拟器中，特征更新的冲击 $\mathbf e_{i,t}$ 与收益无关，所以错用同期特征不会产生虚假的预测力，只会削弱真实的关系：由式 {eq}`eq-ch0-char` 与 $\mathbf e_{i,t}$ 的独立性，
-
-```{math}
-:enumerated: false
-\underbrace{\E[m_t r_{i,t} \mathbf z_{i,t}]}_{L\times 1} = \phi\,\E[m_t r_{i,t} \mathbf z_{i,t-1}] + \sqrt{1-\phi^2}\,\E[m_t r_{i,t} \mathbf e_{i,t}] = \phi\,\bv\theta + \mathbf 0 .
-```
-
-这个例子说明了模拟的局限：模拟器不会自动暴露所有错误，只能暴露我们放进模型的那些机制。下面用 $\phi = 0.9$ 的长样本验证。两个样本矩都带有抽样误差，而且误差高度相关；所以除了把它们分别与理论值比较，还检验二者之差是否满足推导给出的关系：用 $\overline{m r z_1}$ 表示 $m_t r_{i,t} z_{1,i,t-1}$ 对全部 $(i,t)$ 的样本均值、$\overline{m r z_1^{+}}$ 表示把 $z_{1,i,t-1}$ 换成同期 $z_{1,i,t}$ 后的样本均值，则 $\overline{m r z_1^{+}} - \phi\, \overline{m r z_1}$ 只剩下 $\sqrt{1-\phi^2}\, \overline{m r e_1}$（$e_{1,i,t}$ 为 $\mathbf e_{i,t}$ 的第一个分量），理论值为 0。
-
-```{code-cell} python
-Z1_now = long_mkt.panel["z1"].unstack("stock").shift(-1).to_numpy()   # (T, N)，第 t 行放 z_{1,i,t}
-valid = ~np.isnan(Z1_now[:, 0])                                        # 最后一期没有 z_{i,T}
-now = (MR[valid] * Z1_now[valid]).mean()
-lag = (MR[valid] * Z1[valid]).mean()
-phi = long_params.char_persistence
-print(f"用期初特征 z_(t-1)：{lag:.5f}（理论值 θ1 = {long_params.alpha_coef[0]}）")
-print(f"用同期特征 z_t    ：{now:.5f}（理论值 φθ1 = {phi * 0.01:.4f}）")
-resid_term = (MR[valid] * (Z1_now[valid] - phi * Z1[valid])).mean(axis=1)   # 每期横截面平均：(T-1,)
-se_resid = resid_term.std() / np.sqrt(resid_term.size)
-print(f"now − φ·lag = {now - phi * lag:.5f}，标准误约 {se_resid:.5f}（理论值 0）")
-assert abs(now - phi * lag) < 3 * se_resid
-```
-
-二者之差与 0 的距离在 3 倍标准误以内（由 `assert` 保证）。这里的标准误同样先对每期求横截面平均再计算。
-
-**误区二：把样本均值当作总体值。** 默认参数下第一个因子的月均值 $\mu_1 = 0.6\%$、波动率 $5\%$，240 个月样本均值的标准误为 $0.05/\sqrt{240} \approx 0.32\%$，样本均值完全可能偏离真值一半以上。更隐蔽的错误是用样本矩构造 SDF，再在同一样本中“验证”它。若 $\hat{\mathbf b} = \hat{\bv\Sigma}_f^{-1}\bar{\mathbf f}$（$\hat{\bv\Sigma}_f$ 为除以 $T$ 的样本协方差矩阵，$\bar{\mathbf f}$ 为样本均值向量），$\hat m_t = 1 - \hat{\mathbf b}'(\mathbf f_t - \bar{\mathbf f})$，则把[定理 %s](#thm-ch0-sdf) 第 2 条证明中的总体矩逐一换成样本矩，可得样本内 $T^{-1}\sum_t \hat m_t \mathbf f_t = \bar{\mathbf f} - \hat{\bv\Sigma}_f \hat{\mathbf b} = \mathbf 0$ **恒成立**，无论模型对错。这样的“检验”什么也没有检验。
-
-```{code-cell} python
-F240 = mkt.factors.to_numpy()                              # (T, K)
-f_bar = F240.mean(axis=0)                                  # (K,)
-Sigma_hat = np.cov(F240, rowvar=False, ddof=0)             # (K, K)
-b_hat = np.linalg.solve(Sigma_hat, f_bar)                  # 解 Σ̂_f b̂ = f̄
-m_hat = 1 - (F240 - f_bar) @ b_hat                         # (T, K) @ (K,) -> (T,)
-in_sample = (m_hat[:, None] * F240).mean(axis=0)
-true_pricing = (mkt.sdf().to_numpy()[:, None] * F240).mean(axis=0)
-print("因子样本均值", f_bar.round(4), "真值", params.factor_mean, "标准误", (np.asarray(params.factor_vol) / np.sqrt(len(F240))).round(4))
-print("b 的样本估计", b_hat.round(2), "真值", mkt.sdf_weights.round(2))
-print("样本内 mean(m̂ f) =", in_sample)
-print("真实 m 的 mean(m f) =", true_pricing.round(5))
-assert np.max(np.abs(in_sample)) < 1e-12 and np.max(np.abs(true_pricing)) > 1e-4
-```
-
-样本内的 $T^{-1}\sum_t \hat m_t \mathbf f_t$ 在机器精度内为 $\mathbf 0$，而真实 SDF 在同一样本中的样本定价误差并不为 0——后者才反映了抽样误差的真实大小。真正的检验需要样本外数据，或者把估计误差计入检验统计量，这是第二部分的主题。
-
-**误区三：忽视随机种子。** 没有固定种子的随机数每次运行都不同，书中的数字因此无法复现。为了避免这种错误，`apsim.simulate_market` 要求必须以关键字传入 `seed`，省略它或写成 `seed=None` 都会报错；确实需要不可复现的随机数时，只能显式传入一个未设种子的 `np.random.default_rng()`。反过来的错误同样常见：在蒙特卡洛循环中每次都用同一个种子，得到的“独立重复”其实完全相同，估计量的抽样方差被算成 0。
-
-```{code-cell} python
-small = MarketParams(n_stocks=50, n_periods=60)
-try:
-    simulate_market(small)
-except TypeError as err:
-    print("省略 seed：TypeError：", err)
-
-first = simulate_market(small, seed=np.random.default_rng()).panel["exret"].iloc[0]
-second = simulate_market(small, seed=np.random.default_rng()).panel["exret"].iloc[0]
-print(f"未设种子的 Generator 两次运行的第一个收益：{first:.4f} 与 {second:.4f}")
-
-same = [simulate_market(small, seed=0).factors["f1"].mean() for _ in range(5)]
-diff = [simulate_market(small, seed=100 + r).factors["f1"].mean() for r in range(5)]
-print("同一种子重复 5 次，f1 样本均值的标准差：", np.std(same))
-print("不同种子重复 5 次，f1 样本均值的标准差：", round(float(np.std(diff)), 4))
-assert np.std(same) == 0 and np.std(diff) > 0
-```
-
-（第二行的两个数字每次重新执行都会变化，这正是问题所在。）本书的约定是：单次演示用固定的整数种子；蒙特卡洛重复用“基础种子 + 重复编号”，保证各次重复互不相同，而整体可以复现。另一种同样可复现的做法，是新建一个带种子的 `rng = np.random.default_rng(2026)`（2026 为基础种子），在循环中反复传入 `seed=rng`：`simulate_market` 每次都从它派生新的子流，各次重复互不相同。
-
-**误区四：把可预测性等同于错误定价。** 即使 $\bv\theta = \mathbf 0$，特征也能预测收益。由式 {eq}`eq-ch0-ret` 与独立性，$\E[r_{i,t} \mid \mathbf z_{i,t-1}] = \alpha_{i,t} + \bv\beta_{i,t}'\bv\mu$，而 $\bv\beta_{i,t}$ 随特征变化。默认参数下 $\E[r_{i,t} \mid \mathbf z_{i,t-1}] = \mu_1 + 0.5\mu_2\, z_{1,i,t-1} + 0.5\mu_3\, z_{2,i,t-1}$：特征 $z_1$、$z_2$ 能预测收益，完全是因为它们决定了风险暴露，这正是“特征即协方差”的含义 [@kelly2019characteristics]。判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。下面用 $\bv\theta = \mathbf 0$ 的长样本做 $r_{i,t}$ 对 $\tilde{\mathbf z}_{i,t-1}$ 的混合回归。由于 $\E[r_{i,t} \mid \mathbf z_{i,t-1}] = \bv\beta_{i,t}'\bv\mu = \tilde{\mathbf z}_{i,t-1}'\bv\Gamma\bv\mu$，系数的理论值为 $\bv\Gamma\bv\mu$（$(L+1)\times K$ 乘 $K\times 1$，为 $L+1$ 维向量）。
-
-逐期回归的代码用 `reshape(n_t, n_i, -1)` 把 $TN$ 行的设计矩阵还原为“期 × 股票 × 变量”的三维数组。面板按 `(period, stock)` 排序、期在外层，所以前 $N$ 行是第 1 期，接下来的 $N$ 行是第 2 期，行优先的 `reshape` 恰好按期切开。
-
-```{code-cell} python
-pred = simulate_market(MarketParams(n_stocks=100, n_periods=5_000), seed=11)
-Xp = np.column_stack([np.ones(len(pred.panel)), pred.panel[[f"z{j}" for j in range(1, 6)]].to_numpy()])  # (TN, L+1)
-coef_p, se_p = ols(Xp, pred.panel["exret"].to_numpy())
-truth_p = pred.gamma @ np.asarray(pred.params.factor_mean)               # Γμ：(L+1, K) @ (K,) -> (L+1,)
-
-# 逐期横截面回归，用各期系数的时间序列标准差计算标准误（Fama–MacBeth 的做法，第 10 章详述）
-n_t, n_i = pred.params.n_periods, pred.params.n_stocks
-Xp3 = Xp.reshape(n_t, n_i, -1)                                           # (TN, L+1) -> (T, N, L+1)
-yp3 = pred.panel["exret"].to_numpy().reshape(n_t, n_i)                   # (TN,) -> (T, N)
-per_period = np.array([np.linalg.lstsq(Xp3[t], yp3[t], rcond=None)[0] for t in range(n_t)])   # (T, L+1)
-se_fm = per_period.std(axis=0, ddof=1) / np.sqrt(n_t)
-fm_p = stats.fama_macbeth(Xp3, yp3)                                      # 同一程序的 apsim.stats 版本：比较 coefs、mean、se
-assert all(np.allclose(a, b) for a, b in [(fm_p.coefs, per_period), (fm_p.mean, per_period.mean(axis=0)), (fm_p.se, se_fm)])
-print(pd.DataFrame({"理论值 Γμ": truth_p, "混合回归估计": coef_p, "同方差标准误": se_p, "逐期回归标准误": se_fm},
-                   index=["常数", "z1", "z2", "z3", "z4", "z5"]).round(5))
-ratio = se_fm / se_p
-print("逐期回归标准误 / 同方差标准误：", ratio.round(2))
-assert np.all(np.abs(coef_p - truth_p) < 2 * se_fm)                    # 偏离在两倍逐期回归标准误以内
-assert np.all(coef_p[1:3] / se_fm[1:3] > 3)                            # z1、z2 的系数显著为正
-assert np.all(ratio[:3] > 1.3) and np.all(np.abs(ratio[3:] - 1) < 0.2)
-```
-
-系数的估计值与理论值 $\bv\Gamma\bv\mu$ 相符（偏离都在两倍逐期回归标准误以内）：$z_1$、$z_2$ 的系数显著为正（均由 `assert` 保证），而 $\bv\theta = \mathbf 0$，市场中没有任何错误定价。表中还有一个第二部分会反复出现的问题：“同方差标准误”低估了真实的不确定性。同一期的所有股票共同受到 $\mathbf f_t$ 的冲击，残差在横截面上相关，混合回归把 $NT$ 个观测当作相互独立，高估了信息量。按期做横截面回归、再看各期系数的时间序列波动，得到的标准误更接近真实的抽样误差，这就是 Fama–MacBeth 标准误（[导读：几种回归](#sec-ch0-regs)，第 10、12 章）：常数项与 $z_1$、$z_2$ 的逐期回归标准误明显大于同方差标准误（比值见上方输出），因为它们的系数随 $\mathbf f_t$ 逐期波动；$z_3$～$z_5$ 与因子无关，两种标准误相近。估计值与理论值的偏离，应当按这种更大的标准误来判断。
-
+四个常见误区见下一页[常见误区](#sec-ch0-pitfalls)。

@@ -49,7 +49,7 @@ uv run pytest
 - `book/`：书的源文件（MyST Markdown）；目录在 `book/myst.yml` 中
   - `index.md`（前言）、`notation.md`（记号表）、`glossary.md`（术语对照：学术与业界）、`references.bib`（参考文献）
   - `part0/`：第零部分　准备
-    - 第 0 章：`ch00-guide.md` 为首页（含本章阅读路径），子页面依次为 `ch00-concepts.md`（0.2 基本概念速览）、`ch00-concepts-sdf.md`（0.2 续：特征、定价误差与随机贴现因子）、`ch00-relations.md`（因子、特征、载荷的关系）、`ch00-model.md`（0.3～0.6 记号、模型与 SDF 的定价性质）、`ch00-experiments.md`（A 股视角、模拟实验与常见误区）、`ch00-exercises.md`（本章小结、习题与延伸阅读）
+    - 第 0 章：`ch00-guide.md` 为首页（含本章阅读路径），子页面依次为 `ch00-concepts.md`（0.2 基本概念速览）、`ch00-concepts-sdf.md`（0.2 续：特征、定价误差与随机贴现因子）、`ch00-relations.md`（因子、特征、载荷的关系）、`ch00-model.md`（0.3～0.4 记号与模拟市场的模型）、`ch00-pricing.md`（0.5～0.6 SDF 的定价性质与代码验证）、`ch00-experiments.md`（A 股视角与模拟实验）、`ch00-pitfalls.md`（常见误区）、`ch00-exercises.md`（本章小结、习题与延伸阅读）
     - `primer-regressions.md`：导读：几种回归（第二部分的预习，不属于第 0 章）
   - `part1/`：第一部分　资产定价理论
     - 第 1 章：`ch01-euler-sdf.md` 为首页（学习目标、1.1～1.3 节与本章阅读路径），子页面依次为 `ch01-lognormal.md`（1.4 幂效用与对数正态消费）、`ch01-lucas.md`（1.5～1.6 Lucas 树与回到第 0 章）、`ch01-experiments.md`（A 股视角、模拟实验与常见误区）、`ch01-exercises.md`（本章小结、习题与延伸阅读）

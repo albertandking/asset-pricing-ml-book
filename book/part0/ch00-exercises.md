@@ -10,7 +10,7 @@ numbering:
 
 # 本章小结、习题与延伸阅读
 
-**本页准备。** 本书每个页面的代码在独立的内核中运行，前面页面定义的变量在这里不可用。下面的单元导入本页用到的模块，以及上一页“模拟实验”一节讲解过的两个函数 `interaction_design` 与 `ols`（它们收在 `apsim.stats` 中）。
+**本页准备。** 本书每个页面的代码在独立的内核中运行，前面页面定义的变量在这里不可用。下面的单元导入本页用到的模块，以及[“模拟实验”一节](#sec-ch0-interact)讲解过的两个函数 `interaction_design` 与 `ols`（它们收在 `apsim.stats` 中）。
 
 ```{code-cell} python
 import numpy as np
@@ -25,12 +25,12 @@ K = MarketParams().n_factors                                # 因子个数 K = 3
 ## 本章小结
 
 1. 本书用 Jupyter Book 2 构建，`sh scripts/build.sh --clean` 会清除执行缓存并执行全部代码；全书的数字与图形都可以在本地复现，正文引用的数字由代码中的 `assert` 守护。
-2. 基本概念（0.2 节）：资产定价研究超额收益；本章的因子是可交易组合的超额收益；载荷 $\bv\beta_{i,t}$ 是股票对因子的敏感度，可以用回归斜率估计；风险溢价 $\bv\lambda$ 是每单位载荷的补偿，$\E[r_i] = \bv\beta_i'\bv\lambda$；本章模型中载荷由特征决定，$\bv\beta_{i,t} = \bv\Gamma'\tilde{\mathbf z}_{i,t-1}$；定价误差 $\alpha$ 是载荷解释不了的期望收益；SDF $m$ 衡量各状态下一块钱的价值，$P = \E[mx]$。
+2. 基本概念（0.2 节）：资产定价研究超额收益；本章的因子是可交易组合的超额收益；载荷 $\bv\beta_{i,t}$ 是股票对因子的敏感度，可以用回归斜率估计；风险溢价 $\bv\lambda$ 是每单位载荷的补偿，$\E[r_i] = \bv\beta_i'\bv\lambda$；本章模型中载荷由特征决定，$\bv\beta_{i,t} = \bv\Gamma'\tilde{\mathbf z}_{i,t-1}$；定价误差 $\alpha$ 是载荷解释不了的期望收益；SDF $m$ 衡量各状态下一块钱的价值，$P = \E[mx]$。这些式子的拆解依次见[载荷](#ch0-unpack-betaf)、[风险溢价](#ch0-unpack-lambda)、[特征](#ch0-unpack-gamma)、[定价误差](#ch0-unpack-alpha)与[随机贴现因子](#ch0-unpack-sdf)。
 3. 全书记号见[记号表](../notation.md)。标量用斜体，向量用小写粗体（列向量），矩阵用大写粗体；代码数组“观测在行”，一行是公式中列向量的转置。时点约定是：下标 $t$ 表示第 $t$ 期末已知；面板中第 $t$ 期的一行存放期初特征 $\mathbf z_{i,t-1}$ 与本期收益 $r_{i,t}$，特征比收益早一期。`period` 从 1 开始编号，`stock` 从 0 开始编号。
-4. 模拟市场由式 {eq}`eq-ch0-factor`～{eq}`eq-ch0-sdf` 定义：独立同分布的因子、平稳的 AR(1) 特征、由特征决定的载荷 $\bv\beta_{i,t} = \bv\Gamma' \tilde{\mathbf z}_{i,t-1}$ 与定价误差 $\alpha_{i,t} = \bv\theta' \mathbf z_{i,t-1}$；按横截面堆叠即 $\mathbf r_t = \mathbf Z_{t-1}\bv\theta + \tilde{\mathbf Z}_{t-1}\bv\Gamma\mathbf f_t + \bv\varepsilon_t$。
-5. SDF $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$，$\mathbf b = \bv\Sigma_f^{-1}\bv\mu$ 为因子正确定价，并使 $\E[m_t r_{i,t} \mid \mathbf z_{i,t-1}] = \alpha_{i,t}$（[定理 %s](#thm-ch0-sdf)）。证明的关键是 $\mathbf f_t$、$\varepsilon_{i,t}$ 与 $\mathbf z_{i,t-1}$ 相互独立。模拟器中因子相互独立，$\mathbf b$ 化为 $b_k = \mu_k / \sigma_k^2$。
+4. 模拟市场由式 {eq}`eq-ch0-factor`～{eq}`eq-ch0-sdf` 定义：独立同分布的因子、平稳的 AR(1) 特征、由特征决定的载荷 $\bv\beta_{i,t} = \bv\Gamma' \tilde{\mathbf z}_{i,t-1}$ 与定价误差 $\alpha_{i,t} = \bv\theta' \mathbf z_{i,t-1}$；按横截面堆叠即 $\mathbf r_t = \mathbf Z_{t-1}\bv\theta + \tilde{\mathbf Z}_{t-1}\bv\Gamma\mathbf f_t + \bv\varepsilon_t$（[拆解](#ch0-unpack-stacked)）。
+5. SDF $m_t = 1 - \mathbf b'(\mathbf f_t - \bv\mu)$，$\mathbf b = \bv\Sigma_f^{-1}\bv\mu$ 为因子正确定价，并使 $\E[m_t r_{i,t} \mid \mathbf z_{i,t-1}] = \alpha_{i,t}$（[定理 %s](#thm-ch0-sdf)）。证明的关键是 $\mathbf f_t$、$\varepsilon_{i,t}$ 与 $\mathbf z_{i,t-1}$ 相互独立。模拟器中因子相互独立，$\mathbf b$ 化为 $b_k = \mu_k / \sigma_k^2$（一般 $\bv\Sigma_f$ 下的拆解见[这里](#ch0-unpack-sdfb)）。
 6. 存在错误定价时，单只股票的无条件定价误差仍可能为 0，错误定价要通过以特征加权的管理组合才能看到（[推论 %s](#cor-ch0-managed)）。
-7. 交互回归可以恢复 $\bv\Gamma$，其系数向量是 $\operatorname{vec}(\bv\Gamma')$，对应 NumPy 的行优先展开；存在错误定价而不加入特征本身时，估计有遗漏变量偏误，其大小由样本因子路径决定，大样本下方向趋于 SDF 系数 $\mathbf b$ 的方向。
+7. 交互回归可以恢复 $\bv\Gamma$，其系数向量是 $\operatorname{vec}(\bv\Gamma')$（[拆解](#ch0-unpack-kron)），对应 NumPy 的行优先展开；存在错误定价而不加入特征本身时，估计有遗漏变量偏误，其大小由样本因子路径决定，大样本下方向趋于 SDF 系数 $\mathbf b$ 的方向（[拆解](#ch0-unpack-bias)）。
 8. 检验“是否恢复真值”时，要把偏离与标准误比较，必要时用多次重复模拟检查标准误本身是否正确。
 
 ## 习题
@@ -48,7 +48,7 @@ K = MarketParams().n_factors                                # 因子个数 K = 3
 :::{solution} ex-ch0-timing
 :class: dropdown
 1. 第 $t$ 期末的市值是价格 $P_{i,t}$ 乘以股本，而 $P_{i,t}$ 已经包含了第 $t$ 期的收益。按它分组，再看同一期的收益，相当于用结果去解释结果：第 $t$ 期上涨的股票市值变大、下跌的变小，于是“小市值组”机械地集中了本期下跌的股票。正确的做法是按第 $t-1$ 期末的市值分组，计算第 $t$ 期的收益；在本书的面板中，就是用同一行的 `z` 列解释 `exret` 列。研究者发现的“大市值组收益更高”，正是这种机械效应的结果，与期望收益无关。
-2. 不会。模拟器中 $\mathbf z_{i,t} = \phi \mathbf z_{i,t-1} + \sqrt{1-\phi^2} \mathbf e_{i,t}$，更新冲击 $\mathbf e_{i,t}$ 与 $r_{i,t}$ 独立，所以 $\mathbf z_{i,t}$ 只是 $\mathbf z_{i,t-1}$ 的一个含噪声的版本，错用它只会把真实的关系衰减为原来的 $\phi$ 倍（见“常见误区”一节的推导与代码）。真实数据中，特征的更新与当期收益相关（市值、动量、换手率、波动率等都直接由当期价格或成交量计算），所以错用同期特征会制造虚假的预测力。这也提醒我们：模拟只能检验我们放进模型的机制。
+2. 不会。模拟器中 $\mathbf z_{i,t} = \phi \mathbf z_{i,t-1} + \sqrt{1-\phi^2} \mathbf e_{i,t}$（[拆解](#ch0-unpack-char)），更新冲击 $\mathbf e_{i,t}$ 与 $r_{i,t}$ 独立，所以 $\mathbf z_{i,t}$ 只是 $\mathbf z_{i,t-1}$ 的一个含噪声的版本，错用它只会把真实的关系衰减为原来的 $\phi$ 倍（见“常见误区”一节的推导与代码）。真实数据中，特征的更新与当期收益相关（市值、动量、换手率、波动率等都直接由当期价格或成交量计算），所以错用同期特征会制造虚假的预测力。这也提醒我们：模拟只能检验我们放进模型的机制。
 :::
 
 :::{exercise} 无条件定价误差为零，是否说明没有错误定价？
@@ -83,6 +83,9 @@ r_{i,t} = a_i + \mathbf h_i' \mathbf f_t + u_{i,t}, \qquad \E[u_{i,t}] = 0,\ \Co
 
 总体最小二乘的斜率与截距为 $\mathbf h_i = \Var(\mathbf f_t)^{-1}\Cov(\mathbf f_t, r_{i,t})$（$K\times K$ 乘 $K\times 1$），$a_i = \E[r_{i,t}] - \mathbf h_i'\bv\mu$。把 $r_{i,t} = \alpha_{i,t} + \bv\beta_{i,t}' \mathbf f_t + \varepsilon_{i,t}$ 代入，逐项计算。
 
+(ch0-unpack-tsh)=
+**拆开讲。** 题中的回归与 0.2 节的时间序列回归形式相同，各项的含义与单位见[拆解](#ch0-unpack-ts)，堆叠后的设计矩阵 $[\mathbf 1_T, \mathbf F]$ 见[记号表的范例](#notation-unpack)；这里把斜率记作 $\mathbf h_i = (h_{1,i}, \dots, h_{K,i})'$，以区别于时变的真实载荷 $\bv\beta_{i,t}$。$\Var(\mathbf f_t)^{-1} = \bv\Sigma_f^{-1}$ 是 $K\times K$，$\Cov(\mathbf f_t, r_{i,t})$ 是 $K\times 1$、第 $k$ 个分量为 $\Cov(f_{k,t}, r_{i,t})$；因子互不相关时 $h_{k,i} = \Cov(f_{k,t}, r_{i,t})/\sigma_k^2$。$a_i = \E[r_{i,t}] - \mathbf h_i'\bv\mu = \E[r_{i,t}] - \sum_k h_{k,i}\mu_k$ 是标量，单位与收益相同。下面的代码中，所有股票共用同一个设计矩阵 `design_ts`（$T\times(1+K)$），每只股票各得一组 $(a_i, \mathbf h_i')$。
+
 **协方差。** $\Cov(\mathbf f_t, r_{i,t}) = \Cov(\mathbf f_t, \alpha_{i,t}) + \Cov(\mathbf f_t, \bv\beta_{i,t}' \mathbf f_t) + \Cov(\mathbf f_t, \varepsilon_{i,t})$，每一项都是 $K\times 1$ 向量。
 
 - $\alpha_{i,t}$ 是 $\mathbf z_{i,t-1}$ 的函数，与 $\mathbf f_t$ 独立，故 $\Cov(\mathbf f_t, \alpha_{i,t}) = \mathbf 0$；$\varepsilon_{i,t}$ 与 $\mathbf f_t$ 独立，故第三项为 $\mathbf 0$。
@@ -94,6 +97,8 @@ r_{i,t} = a_i + \mathbf h_i' \mathbf f_t + u_{i,t}, \qquad \E[u_{i,t}] = 0,\ \Co
   ```
 
   由于 $\bv\beta_{i,t}$ 是 $\mathbf z_{i,t-1}$ 的函数、与 $\mathbf f_t$ 独立，期望可以分开：$\E[\mathbf f_t \mathbf f_t' \bv\beta_{i,t}] = \E[\mathbf f_t \mathbf f_t']\,\E[\bv\beta_{i,t}] = (\bv\Sigma_f + \bv\mu\bv\mu')\,\E[\bv\beta_{i,t}]$，$\E[\mathbf f_t'\bv\beta_{i,t}] = \bv\mu'\E[\bv\beta_{i,t}]$。于是该项等于 $(\bv\Sigma_f + \bv\mu\bv\mu')\E[\bv\beta_{i,t}] - \bv\mu\bv\mu'\E[\bv\beta_{i,t}] = \bv\Sigma_f\, \E[\bv\beta_{i,t}]$。
+
+  逐个分量看：$\E[\mathbf f_t\mathbf f_t'\bv\beta_{i,t}]$ 的第 $k$ 个分量是 $\sum_l \E[f_{k,t}f_{l,t}]\,\E[\beta_{l,i,t}]$，其中 $\E[f_{k,t}f_{l,t}] = \Sigma_{kl} + \mu_k\mu_l$（$\Sigma_{kl}$ 是 $\bv\Sigma_f$ 的 $(k, l)$ 元素）；减去 $\E[f_{k,t}]\,\E[\mathbf f_t'\bv\beta_{i,t}] = \mu_k\sum_l \mu_l\,\E[\beta_{l,i,t}]$ 后，剩下 $\sum_l \Sigma_{kl}\,\E[\beta_{l,i,t}]$，即 $\bv\Sigma_f\E[\bv\beta_{i,t}]$ 的第 $k$ 个分量。
 
 因此 $\mathbf h_i = \bv\Sigma_f^{-1}\bv\Sigma_f\,\E[\bv\beta_{i,t}] = \E[\bv\beta_{i,t}]$。
 
@@ -161,9 +166,23 @@ assert abs(slope - 1) < 0.1 and abs(intercept) < 0.002 and corr_ts > 0.9
 
 最后一步用到 $\mathbf b'\bv\Sigma_f = (\bv\Sigma_f\mathbf b)' = \bv\mu'$（$\bv\Sigma_f$ 对称）。代入分解式：$\alpha_{i,t} = 1 \cdot \E[r_{i,t} \mid \mathbf z] - \bv\mu'\bv\beta_{i,t}$，即 $\E[r_{i,t} \mid \mathbf z] = \alpha_{i,t} + \bv\beta_{i,t}'\bv\mu$。
 
+(ch0-unpack-covmr)=
+**拆开讲条件协方差这一步。** 两个标量之积的期望写成矩阵形式，是为了把期望移到中间：$-\mathbf b'(\mathbf f_t - \bv\mu)(\mathbf f_t - \bv\mu)'\bv\beta_{i,t}$ 是 $1\times K$、$K\times K$、$K\times 1$ 三者之积（外积的写法见[拆解](#ch0-unpack-outer)）。逐项展开，
+
+```{math}
+:enumerated: false
+\Cov(m_t, r_{i,t} \mid \mathbf z) = -\sum_{k=1}^{K}\sum_{l=1}^{K} b_k\,\Sigma_{kl}\,\beta_{l,i,t} = -\sum_{l=1}^{K}\Bigl(\sum_{k=1}^{K} \Sigma_{lk}\, b_k\Bigr)\beta_{l,i,t} = -\sum_{l=1}^{K}\mu_l\,\beta_{l,i,t} ,
+```
+
+其中 $\Sigma_{kl}$ 是 $\bv\Sigma_f$ 的 $(k, l)$ 元素，第二步用到对称性 $\Sigma_{kl} = \Sigma_{lk}$，括号里正是 $\bv\Sigma_f\mathbf b = \bv\mu$ 的第 $l$ 个方程（[拆解](#ch0-unpack-sdfb)）；因子互不相关时更直接，$b_k\sigma_k^2 = \mu_k$。所以 $-\Cov(m_t, r_{i,t} \mid \mathbf z) = \sum_l \beta_{l,i,t}\mu_l$：载荷乘以因子均值再加总，就是风险补偿 $\bv\beta_{i,t}'\bv\lambda$（[拆解](#ch0-unpack-lambda)）。$\mathbf b'\E[(\mathbf f_t-\bv\mu)\varepsilon_{i,t}]$ 一项为 0，因为 $K\times 1$ 的 $\E[(\mathbf f_t-\bv\mu)\varepsilon_{i,t}]$ 的每个分量都是 $\E[f_{k,t}-\mu_k]\,\E[\varepsilon_{i,t}] = 0$。
+
 一般地，β 定价中的风险溢价为 $\bv\lambda = -\Cov(\mathbf f_t, m_t)/\E[m_t] = \bv\Sigma_f \mathbf b / \E[m_t]$（$K\times 1$）。当因子本身是超额收益、且被 $m_t$ 正确定价时，把这一关系用于因子自身（其对自己的载荷矩阵为 $\mathbf I_K$、定价误差为 $\mathbf 0$），立即得到 $\bv\lambda = \E[\mathbf f_t] = \bv\mu$。第 4 章会在更一般的条件下讨论 SDF 表示与 β 表示的等价性。
 
+这里 $\Cov(\mathbf f_t, m_t)$ 是 $K\times 1$，第 $k$ 个分量为 $\Cov(f_{k,t}, m_t) = -\sum_l \Sigma_{kl}\, b_l$，所以 $\lambda_k = \sum_l \Sigma_{kl}\, b_l/\E[m_t]$；因子互不相关时 $\lambda_k = \sigma_k^2 b_k/\E[m_t] = \mu_k$（$\E[m_t] = 1$）。$K = 1$ 时 $\lambda = -\Cov(f_t, m_t)/\E[m_t]$，与 0.2 节的 $\E[R^e] = -\Cov(m, R^e)/\E[m]$ 用于因子自身是同一个式子（[拆解](#ch0-unpack-sdf)）。
+
 验证：由 $\E[r_{i,t} \mid \mathbf z] = \bv\theta'\mathbf z + \tilde{\mathbf z}'\bv\Gamma\bv\mu = \tilde{\mathbf z}'\left[\bv\Gamma\bv\mu + (0, \bv\theta')'\right]$ 与 $\E[\tilde{\mathbf z}\tilde{\mathbf z}'] = \mathbf I_{L+1}$，混合回归 $r_{i,t}$ 对 $\tilde{\mathbf z}_{i,t-1}$ 的总体系数为 $\E[\tilde{\mathbf z}\tilde{\mathbf z}']^{-1}\E[\tilde{\mathbf z} r_{i,t}] = \bv\Gamma\bv\mu + (0, \bv\theta')'$，是 $L+1$ 维向量。
+
+写出分量：$\bv\Gamma\bv\mu$ 见“常见误区”一页误区四的[拆解](#ch0-unpack-gmu)；$(0, \bv\theta')'$ 是在 $\bv\theta$ 上面补一个 0，与 $\tilde{\mathbf z}$ 的常数 1 对齐（见[拆解](#ch0-unpack-g)，二者之和正是横截面回归系数 $\mathbf g_t$ 的均值）。$\E[\tilde{\mathbf z}\tilde{\mathbf z}']$ 是 $(L+1)\times(L+1)$：左上角是 $\E[1] = 1$，第 0 行、第 0 列的其余元素是特征的均值 0，右下角的 $L\times L$ 块是 $\E[\mathbf z\mathbf z'] = \mathbf I_L$，合起来是单位矩阵。代码取 $\bv\theta = (0.01, -0.005, 0, 0, 0)'$，于是理论值为 $(0.6\%,\ 0.15\% + 1\%,\ 0.2\% - 0.5\%,\ 0,\ 0,\ 0)' = (0.6\%, 1.15\%, -0.3\%, 0, 0, 0)'$。
 
 ```{code-cell} python
 bp_params = MarketParams(n_stocks=100, n_periods=5_000, alpha_coef=(0.01, -0.005, 0.0, 0.0, 0.0))
@@ -185,6 +204,12 @@ assert np.all(np.abs(coef_b - truth_b) < 2 * se_b)
 ```
 
 各系数与理论值的偏离都在两倍逐期回归标准误以内（由 `assert` 保证，标准化偏差见上表）。
+
+```{code-cell} python
+# 拆开讲理论值 Γμ + (0, θ')'：默认 Γ、μ 与 θ = (0.01, -0.005, 0, 0, 0)' 下逐分量核对
+assert np.allclose(truth_b, [0.006, 0.003 * 0.5 + 0.01, 0.004 * 0.5 - 0.005, 0, 0, 0])
+assert np.allclose(truth_b, [0.006, 0.0115, -0.003, 0, 0, 0])
+```
 :::{solution-end}
 :::
 
@@ -226,7 +251,9 @@ e0, e99 = small_n["平均 RMSE"].iloc[0], small_n["平均 RMSE"].iloc[-1]
 assert e99 > 1.15 * e0 and e99 - e0 > 3 * np.hypot(*small_n["其标准误"].iloc[[0, -1]])
 ```
 
-$N = 200$ 时，四种持续性下的平均误差几乎相同：最大值与最小值相差不到 5%，也小于两倍蒙特卡洛标准误（由 `assert` 保证）。原因是：在 $\varepsilon_{i,t}$ 与解释变量独立的条件下，最小二乘估计的条件协方差为 $\sigma_\varepsilon^2 (\mathbf X'\mathbf X)^{-1}$，而由式 {eq}`eq-ch0-kron` 与混合乘积规则，$\mathbf X'\mathbf X = \sum_t \left(\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'\right) \otimes \mathbf f_t\mathbf f_t'$，这是 $(L+1)\times(L+1)$ 矩阵与 $K\times K$ 矩阵的 Kronecker 积之和，为 $(L+1)K\times(L+1)K$ 矩阵。特征的边际分布始终是 $N(\mathbf 0, \mathbf I_L)$，与 $\phi$ 无关；$\phi$ 只决定同一只股票的特征在不同期之间是否相似。当 $N$ 足够大时，每一期的横截面矩 $N^{-1}\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'$ 都接近 $\mathbf I_{L+1}$，$\mathbf X'\mathbf X$ 也就几乎不受 $\phi$ 影响。
+**拆开讲均方根误差。** $\hat\Gamma_{j,k} - \Gamma_{j,k}$ 是 $(L+1)K$ 个系数（默认 18 个）各自的估计误差，单位与 $\Gamma$ 相同，即“特征每高 1 个标准差，载荷变化多少”；平方后对全部 $(j, k)$ 平均、再开平方，得到“典型的一个系数差多少”。代码中的 `np.sqrt(np.mean((g_hat - rep.gamma) ** 2))` 对 $(L+1)\times K$ 矩阵的全部元素求平均；这里的 `g_hat` 是 $\hat{\bv\Gamma}$，不是横截面回归的 $\hat{\mathbf g}_t$。**特例**：只有一个系数时，它就是这个系数估计误差的绝对值。
+
+$N = 200$ 时，四种持续性下的平均误差几乎相同：最大值与最小值相差不到 5%，也小于两倍蒙特卡洛标准误（由 `assert` 保证）。原因是：在 $\varepsilon_{i,t}$ 与解释变量独立的条件下，最小二乘估计的条件协方差为 $\sigma_\varepsilon^2 (\mathbf X'\mathbf X)^{-1}$，而由式 {eq}`eq-ch0-kron` 与混合乘积规则，$\mathbf X'\mathbf X = \sum_t \left(\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'\right) \otimes \mathbf f_t\mathbf f_t'$，这是 $(L+1)\times(L+1)$ 矩阵与 $K\times K$ 矩阵的 Kronecker 积之和，为 $(L+1)K\times(L+1)K$ 矩阵（各部分的拆解见[推导要用到的几个矩阵](#ch0-unpack-ovb)与[拆解](#ch0-unpack-xtx)）。特征的边际分布始终是 $N(\mathbf 0, \mathbf I_L)$，与 $\phi$ 无关；$\phi$ 只决定同一只股票的特征在不同期之间是否相似。当 $N$ 足够大时，每一期的横截面矩 $N^{-1}\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'$ 都接近 $\mathbf I_{L+1}$，$\mathbf X'\mathbf X$ 也就几乎不受 $\phi$ 影响。
 
 $N = 10$ 时，$\phi = 0.99$ 的误差明显变大：比 $\phi = 0$ 时高出 15% 以上，差值超过三倍蒙特卡洛标准误（由 `assert` 保证）。此时每一期只有 10 个特征观测，而且它们在整个样本期内几乎不变，样本矩 $\sum_t\sum_i \tilde{\mathbf z}_{i,t-1}\tilde{\mathbf z}_{i,t-1}'$ 实际上只由少数几个独立抽样决定，可能明显偏离 $TN \cdot \mathbf I_{L+1}$，某些特征方向上的信息很少；$(\mathbf X'\mathbf X)^{-1}$ 的期望因此变大。换句话说，持续性降低的是“有效样本量”，当横截面足够大时这一影响被横截面上的独立变化所弥补。
 
@@ -244,6 +271,16 @@ $N = 10$ 时，$\phi = 0.99$ 的误差明显变大：比 $\phi = 0$ 时高出 15
 :::
 
 先对每一期计算横截面平均 $\mathbf g_t = N^{-1}\sum_i m_t r_{i,t} \mathbf z_{i,t-1} \in \Real^L$，再对 $\mathbf g_t$ 求时间序列均值。由于因子冲击在同一期内影响所有股票，$\mathbf g_t$ 已经把同期相关“吸收”进去了，而不同期的 $\mathbf g_t$ 近似独立：$\mathbf f_t$、$\varepsilon_{i,t}$ 跨期独立；$\mathbf g_t$ 的条件均值 $N^{-1}\sum_i \mathbf z_{i,t-1} \mathbf z_{i,t-1}'\bv\theta$（$L\times L$ 乘 $L\times 1$）随特征缓慢变化，但其波动只有 $N^{-1/2}$ 的量级，远小于因子冲击带来的波动。所以第 $j$ 个分量的标准误可用 $\text{Std}(g_{j,t})/\sqrt{T}$，代码中同时计算 $g_{1,t}$ 的一阶自相关加以确认；单个样本的自相关本身有约 $1/\sqrt{T}$ 的抽样误差，所以再用 100 个种子重复，看其平均值是否接近 0。把 $NT$ 个观测当作独立样本计算的标准误，会低估同期相关较强的那些矩的不确定性。
+
+(ch0-unpack-thetahat)=
+**拆开讲 $\hat{\bv\theta}$ 与 $\mathbf g_t$。** $\hat{\bv\theta}$ 是[推论 %s](#cor-ch0-managed) 中 $L\times 1$ 矩向量的样本版本（各分量的含义见[拆解](#ch0-unpack-managed)），第 $j$ 个分量 $\hat\theta_j = (NT)^{-1}\sum_t\sum_i m_t r_{i,t} z_{j,i,t-1}$ 是按特征 $j$ 加权的管理组合的样本定价误差。两步算法就是把双重求和拆开：$\hat{\bv\theta} = T^{-1}\sum_t \mathbf g_t$，其中
+
+```{math}
+:enumerated: false
+\underbrace{\mathbf g_t}_{L\times 1} = \begin{pmatrix} g_{1,t} \\ \vdots \\ g_{L,t} \end{pmatrix} , \qquad g_{j,t} = \frac{1}{N}\sum_{i=1}^{N} m_t r_{i,t} z_{j,i,t-1} .
+```
+
+注意这里的 $\mathbf g_t$ 是 $L$ 维的管理组合矩，与 0.2 节横截面回归中 $L+1$ 维的系数向量 $\mathbf g_t$（[拆解](#ch0-unpack-g)）不是同一个量，只是沿用了代码中的名字 `g`。$\mathbf g_t$ 的条件均值 $N^{-1}\sum_i \mathbf z_{i,t-1}\mathbf z_{i,t-1}'\bv\theta$ 中，$N^{-1}\sum_i \mathbf z_{i,t-1}\mathbf z_{i,t-1}'$ 是 $L\times L$ 的横截面二阶矩，接近 $\mathbf I_L$，所以条件均值接近 $\bv\theta$。**特例**：$L = 1$ 时 $\mathbf g_t$ 只有一个分量 $g_{1,t}$；下面的代码检查序列相关时，也只用第一个分量 $g_{1,t}$。**数据矩阵**：代码中 `g` 的形状为 `(T, L)`，第 $t$ 行是 $\mathbf g_t'$；按期标准误 $\text{Std}(g_{j,t})/\sqrt{T}$ 用的是这 $T$ 个数的波动，同一期的 $N$ 只股票先在 $\mathbf g_t$ 中平均。
 
 ```{code-cell} python
 th_params = MarketParams(alpha_coef=(0.01, -0.005, 0.0, 0.0, 0.0))

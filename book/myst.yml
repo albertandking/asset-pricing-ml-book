@@ -39,7 +39,9 @@ project:
             - file: part0/ch00-concepts-sdf.md
             - file: part0/ch00-relations.md
             - file: part0/ch00-model.md
+            - file: part0/ch00-pricing.md
             - file: part0/ch00-experiments.md
+            - file: part0/ch00-pitfalls.md
             - file: part0/ch00-exercises.md
         # 导读页：第二部分的预习，不属于第 0 章，不编号
         - file: part0/primer-regressions.md

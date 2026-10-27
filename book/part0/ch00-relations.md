@@ -193,7 +193,7 @@ $z_3$～$z_5$ 的系数真值为 0（假定 $\bv\theta$ 也只作用于 $z_1$、
 # 逐期横截面回归：r_t 对 (1, z1, z2)，与 (f1, 0.5 f2, 0.5 f3) 比较（默认 Γ、θ = 0）
 X_cs = np.concatenate([np.ones((T_f, N_f, 1)),
                        fcl.panel[["z1", "z2"]].to_numpy().reshape(T_f, N_f, 2)], axis=2)   # (T, N, 3)：第 t 期为 [1_N, z1, z2]
-g_hat = np.array([np.linalg.lstsq(X_cs[t], exret_f[t], rcond=None)[0] for t in range(T_f)])  # (T, 3)：第 t 行为 ĝ_t'
+g_hat = np.array([np.linalg.lstsq(X_cs[t], exret_f[t], rcond=None)[0] for t in range(T_f)])  # (T, 3)：g_hat[t-1] 为第 t 期缩减回归的 3 个系数，估计 g_t 的前三个分量
 g_true = F_f * np.array([1.0, 0.5, 0.5])                                  # 广播 (T, 3) * (3,) -> (T, 3)：(f1, 0.5 f2, 0.5 f3)
 err_cs = g_hat - g_true                                                   # (T, 3)：横截面噪声
 corr_cs = np.array([np.corrcoef(g_hat[:, k], g_true[:, k])[0, 1] for k in range(3)])

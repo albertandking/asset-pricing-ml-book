@@ -50,7 +50,9 @@
 │   │   ├── ch00-concepts-sdf.md
 │   │   ├── ch00-relations.md
 │   │   ├── ch00-model.md
+│   │   ├── ch00-pricing.md
 │   │   ├── ch00-experiments.md
+│   │   ├── ch00-pitfalls.md
 │   │   ├── ch00-exercises.md
 │   │   └── primer-regressions.md   导读：几种回归（第二部分的预习，不属于第 0 章，不编号）
 │   ├── part1/ch01-euler-sdf.md

@@ -11,7 +11,7 @@
 - `book/glossary.md:525` — 无套利是资产定价的基本假设，由它可以推出存在为正的 SDF（第 2 章）。
 - `book/part0/ch00-concepts-sdf.md:168` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
-- `book/part0/ch00-model.md:284` — 这本身并不意味着这些因子之间存在套利：无套利等价于存在某个严格为正的 SDF（第 2 章），而一个特定的线性 $m_t$ 取负值，并不排除另有一个正的 ……
+- `book/part0/ch00-pricing.md:174` — 这本身并不意味着这些因子之间存在套利：无套利等价于存在某个严格为正的 SDF（第 2 章），而一个特定的线性 $m_t$ 取负值，并不排除另有一个正的 ……
 - `book/part1/ch01-lucas.md:328` — 更一般的理论在后面几章展开：第 2 章说明无套利等价于存在严格为正的 SDF；
 
 ## 第 3 章（10 条）
@@ -21,8 +21,8 @@
 - `book/glossary.md:222` — ……收益与 SDF 的协方差决定，$\E[R^e] = -\Cov(m, R^e)/\E[m]$（随机贴现因子，第 1、3 章）；
 - `book/part0/ch00-concepts-sdf.md:168` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
-- `book/part0/ch00-exercises.md:296` — ……DF 波动率与最大夏普比率的关系，即 Hansen–Jagannathan 界，原始文献为 @hansen1991implications，第 3 章详细讨论。
-- `book/part0/ch00-model.md:284` — 第 3 章将详细讨论。
+- `book/part0/ch00-exercises.md:333` — ……DF 波动率与最大夏普比率的关系，即 Hansen–Jagannathan 界，原始文献为 @hansen1991implications，第 3 章详细讨论。
+- `book/part0/ch00-pricing.md:174` — 第 3 章将详细讨论。
 - `book/part1/ch01-euler-sdf.md:41` — ……第 0 章的线性 SDF 是消费 SDF 的一阶近似（1.6 节），由此可以看清“因子是超额收益”与“因子是消费增长”的区别，为第 3、4 章的一般理论做准备。
 - `book/part1/ch01-exercises.md:250` — SDF 的波动与 Hansen–Jagannathan 界见 @hansen1991implications，第 3 章展开。
 - `book/part1/ch01-lucas.md:328` — 第 3 章讨论均值—方差前沿、把 SDF 投影到资产收益张成的空间，以及 Hansen–Jagannathan 界；
@@ -37,7 +37,7 @@
 - `book/part0/ch00-concepts.md:24` — 本节只求建立直觉：模型的方程在 0.4 节，定理与证明在 0.5 节，系统的理论在第 1～4 章展开。
 - `book/part0/ch00-concepts.md:61` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
 - `book/part0/ch00-concepts.md:250` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
-- `book/part0/ch00-exercises.md:164` — 第 4 章会在更一般的条件下讨论 SDF 表示与 β 表示的等价性。
+- `book/part0/ch00-exercises.md:179` — 第 4 章会在更一般的条件下讨论 SDF 表示与 β 表示的等价性。
 - `book/part1/ch01-euler-sdf.md:41` — ……第 0 章的线性 SDF 是消费 SDF 的一阶近似（1.6 节），由此可以看清“因子是超额收益”与“因子是消费增长”的区别，为第 3、4 章的一般理论做准备。
 - `book/part1/ch01-experiments.md:168` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
 - `book/part1/ch01-lognormal.md:239` — ……构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
@@ -47,7 +47,7 @@
 ## 第 5 章（2 条）
 
 - `book/part0/ch00-exercises.md:63` — 这正是第 5 章“条件模型与管理组合”的核心思想：条件矩 $\E[m_t r_{i,t} \mid \mathbf z_{i,t-1}] = 0$ 等价于对所有……
-- `book/part0/ch00-model.md:258` — 这正是第 5 章条件模型要处理的问题。
+- `book/part0/ch00-pricing.md:136` — 这正是第 5 章条件模型要处理的问题。
 
 ## 第 6 章（13 条）
 
@@ -86,15 +86,15 @@
 - `book/glossary.md:486` — 可预测性来自风险补偿还是错误定价，是第 8 章的主题。
 - `book/glossary.md:525` — ……利限制”（limits to arbitrage）中的套利也取学术含义，讨论的是现实中的套利需要资本、要承担风险与成本，所以错误定价可以持续存在（第 8 章）。
 - `book/part0/ch00-concepts-sdf.md:108` — 区分这两种解释往往很难，是第 8 章的主题。
-- `book/part0/ch00-experiments.md:43` — A 股融券规模小、成本高，许多“空头腿”在现实中难以实现，这既影响因子收益的可实现性（第 26 章），也是错误定价能够持续存在的一个原因（第 8 章）。
-- `book/part0/ch00-experiments.md:284` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
+- `book/part0/ch00-experiments.md:37` — A 股融券规模小、成本高，许多“空头腿”在现实中难以实现，这既影响因子收益的可实现性（第 26 章），也是错误定价能够持续存在的一个原因（第 8 章）。
+- `book/part0/ch00-pitfalls.md:122` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
 
 ## 第 9 章（6 条）
 
 - `book/glossary.md:606` — 一是两种回归：时间序列回归对每只资产沿时间回归，得到载荷与截距（第 9 章）；
 - `book/index.md:106` — 导读：几种回归是第二部分的预习，读到第 9 章之前读即可。
-- `book/part0/ch00-exercises.md:109` — 也就是说，即使存在错误定价，每只股票时间序列回归的截距在总体上也是 0，GRS 一类的时间序列检验（第 9 章）检验的只是平均定价误差，看不到这里的条件错误定价……
-- `book/part0/ch00-guide.md:96` — 它是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
+- `book/part0/ch00-exercises.md:114` — 也就是说，即使存在错误定价，每只股票时间序列回归的截距在总体上也是 0，GRS 一类的时间序列检验（第 9 章）检验的只是平均定价误差，看不到这里的条件错误定价……
+- `book/part0/ch00-guide.md:98` — 它是第二部分（实证计量）的预习，不属于本章，第一次阅读可以跳过，读到第 9 章之前再回来。
 - `book/part0/primer-regressions.md:11` — 本页是第二部分（实证计量）的预习，不属于第 0 章的必读内容，第一次阅读可以跳过，读到第 9 章之前再回来。
 - `book/part0/primer-regressions.md:65` — 检验全部 $N$ 个截距同时为 0 的 GRS 检验 [@gibbons1989test]，见第 9 章。
 
@@ -106,7 +106,7 @@
 - `book/glossary.md:606` — 横截面回归每期沿资产回归，得到风险溢价或特征的补偿（横截面回归与 Fama–MacBeth，第 10 章）。
 - `book/part0/ch00-concepts.md:61` — 但并非所有因子都是资产收益：第 1、4、10 章会遇到消费增长、宏观变量这类不可交易的因子，它们的风险溢价 $\bv\lambda$ 不等于因子的均值。
 - `book/part0/ch00-concepts.md:250` — 不可交易的因子（例如消费增长、宏观变量）不是资产收益，不能套用这一推理，$\bv\lambda$ 一般不等于因子的均值，需要另行估计（第 1、4、10 章）。
-- `book/part0/ch00-experiments.md:311` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
+- `book/part0/ch00-pitfalls.md:159` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
 - `book/part0/primer-regressions.md:102` — 这些都在第 10 章展开。
 - `book/part0/primer-regressions.md:103` — 估计风险溢价 $\bv\lambda$（第 10 章）；
 - `book/part0/primer-regressions.md:367` — 处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
@@ -129,7 +129,7 @@
 - `book/glossary.md:202` — 夏普比率的估计误差很大：样本只有几年时，年化 1 与 0.5 往往难以在统计上区分（标准误见第 12 章）。
 - `book/glossary.md:248` — $t$ 值依赖标准误的算法，要考虑自相关、截面相关与估计误差（第 12 章）；
 - `book/glossary.md:439` — 按时间聚类的标准误见第 12 章。
-- `book/part0/ch00-experiments.md:311` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
+- `book/part0/ch00-pitfalls.md:159` — ……接近真实的抽样误差，这就是 Fama–MacBeth 标准误（导读：几种回归，第 10、12 章）：常数项与 $z_1$、$z……
 - `book/part0/primer-regressions.md:104` — ……t$ 在时间上相关时（例如用月度数据计算未来 12 个月的收益，相邻各期的收益期限重叠），标准误会偏小，需要 Newey–West 一类的调整，见第 12 章。
 - `book/part0/primer-regressions.md:137` — 允许同一期残差任意相关的“按时间聚类”（clustered by time）标准误，见第 12 章。
 
@@ -138,8 +138,8 @@
 - `book/glossary.md:479` — 样本外检验的计量见第 13、19 章）。
 - `book/glossary.md:499` — 若改用历史均值作基准，所有方法的 $R^2$ 约高 3 个百分点（第 13、22 章）。
 - `book/glossary.md:512` — 样本外表现普遍不如样本内（第 6、13 章）。
-- `book/part0/ch00-exercises.md:233` — 第 13 章讨论这一问题。
-- `book/part0/ch00-exercises.md:297` — 持续回归变量的小样本偏误见 @stambaugh1999predictive，第 13 章详细讨论。
+- `book/part0/ch00-exercises.md:260` — 第 13 章讨论这一问题。
+- `book/part0/ch00-exercises.md:334` — 持续回归变量的小样本偏误见 @stambaugh1999predictive，第 13 章详细讨论。
 
 ## 第 14 章（4 条）
 
@@ -155,9 +155,9 @@
 - `book/glossary.md:310` — Jegadeesh 与 Titman 发现，这样的组合在随后 3～12 个月有显著的正收益 [@jegadeesh1993returns]（第 15 章）。
 - `book/glossary.md:362` — ……Frazzini 与 Pedersen 的 QMJ（quality minus junk）因子 [@asness2019quality]（第 15、16 章）。
 - `book/part0/ch00-concepts.md:69` — 因子的具体构造见第 15、16 章。
-- `book/part0/ch00-experiments.md:41` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
-- `book/part0/ch00-experiments.md:42` — 月度数据中如何处理停牌股票的收益与特征，会直接影响组合收益，详见第 15 章。
-- `book/part0/ch00-experiments.md:45` — 正式研究必须使用带有公告日期的时点数据，第 15 章给出对齐规则。
+- `book/part0/ch00-experiments.md:35` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
+- `book/part0/ch00-experiments.md:36` — 月度数据中如何处理停牌股票的收益与特征，会直接影响组合收益，详见第 15 章。
+- `book/part0/ch00-experiments.md:39` — 正式研究必须使用带有公告日期的时点数据，第 15 章给出对齐规则。
 
 ## 第 16 章（7 条）
 
@@ -166,16 +166,16 @@
 - `book/glossary.md:362` — ……Frazzini 与 Pedersen 的 QMJ（quality minus junk）因子 [@asness2019quality]（第 15、16 章）。
 - `book/part0/ch00-concepts-sdf.md:108` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
 - `book/part0/ch00-concepts.md:69` — 因子的具体构造见第 15、16 章。
-- `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
-- `book/part0/ch00-experiments.md:44` — 第 16、17 章讨论这一处理。
+- `book/part0/ch00-exercises.md:335` — 它们分别是第 22 章与第 16、17 章的主要文献。
+- `book/part0/ch00-experiments.md:38` — 第 16、17 章讨论这一处理。
 
 ## 第 17 章（5 条）
 
 - `book/glossary.md:349` — CH3 因此剔除市值最小的 30% 的股票后再构造因子 [@liu2019size]（第 17 章）。
 - `book/part0/ch00-concepts-sdf.md:108` — ……行上市管制，是一种与基本面无关的价值成分，既不是普通的风险补偿，也不能简单看作错误定价（见“A 股视角”一节、@liu2019size 与第 16、17 章）。
-- `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
-- `book/part0/ch00-experiments.md:41` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
-- `book/part0/ch00-experiments.md:44` — 第 16、17 章讨论这一处理。
+- `book/part0/ch00-exercises.md:335` — 它们分别是第 22 章与第 16、17 章的主要文献。
+- `book/part0/ch00-experiments.md:35` — 第 15 章在 `apsim.frictions` 中加入这一机制，第 17 章讨论它对资产定价检验的影响。
+- `book/part0/ch00-experiments.md:38` — 第 16、17 章讨论这一处理。
 
 ## 第 18 章（3 条）
 
@@ -192,13 +192,13 @@
 
 - `book/glossary.md:184` — 业界意义上的多因子选股，本书称为“多信号选股”或“基于特征的收益预测”，它正是第四部分收益预测（第 22 章）与可实施性（第 26 章）研究的对象。
 - `book/glossary.md:499` — 若改用历史均值作基准，所有方法的 $R^2$ 约高 3 个百分点（第 13、22 章）。
-- `book/part0/ch00-exercises.md:298` — 它们分别是第 22 章与第 16、17 章的主要文献。
+- `book/part0/ch00-exercises.md:335` — 它们分别是第 22 章与第 16、17 章的主要文献。
 
 ## 第 23 章（3 条）
 
 - `book/glossary.md:421` — 统计因子与协方差结构见第 23 章，组合构造中的风险约束见第 26 章。
-- `book/part0/ch00-exercises.md:295` — ……“载荷是特征的线性函数”与“特征驱动的截距”的设定，来自 IPCA 模型 @kelly2019characteristics，第 23 章将完整介绍其估计方法。
-- `book/part0/ch00-experiments.md:284` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
+- `book/part0/ch00-exercises.md:332` — ……“载荷是特征的线性函数”与“特征驱动的截距”的设定，来自 IPCA 模型 @kelly2019characteristics，第 23 章将完整介绍其估计方法。
+- `book/part0/ch00-pitfalls.md:122` — 判断一个能预测收益的特征是风险补偿还是错误定价，要看它的预测力能否被载荷与因子风险溢价解释，而不能只看预测力本身（第 8、23 章）。
 
 ## 第 26 章（10 条）
 
@@ -211,7 +211,7 @@
 - `book/glossary.md:421` — 统计因子与协方差结构见第 23 章，组合构造中的风险约束见第 26 章。
 - `book/glossary.md:464` — 可实施性与交易成本在第 26 章讨论。
 - `book/glossary.md:555` — 二者都与策略容量和交易成本有关（第 18、26 章）。
-- `book/part0/ch00-experiments.md:43` — A 股融券规模小、成本高，许多“空头腿”在现实中难以实现，这既影响因子收益的可实现性（第 26 章），也是错误定价能够持续存在的一个原因（第 8 章）。
+- `book/part0/ch00-experiments.md:37` — A 股融券规模小、成本高，许多“空头腿”在现实中难以实现，这既影响因子收益的可实现性（第 26 章），也是错误定价能够持续存在的一个原因（第 8 章）。
 
 ## 第 27 章（1 条）
 
@@ -222,4 +222,4 @@
 - `book/glossary.md:453` — ……–Waugh–Lovell 定理，收益对“信号与控制变量”做多元回归时信号的系数，等于收益对“残差化后的信号”做一元回归的系数（附录 A 讨论投影时给出证明）。
 - `book/index.md:21` — 附录 A 汇总数学工具
 - `book/notation.md:83` — 更多的矩阵代数与矩阵微积分工具见附录 A。
-- `book/part0/ch00-exercises.md:298` — vec 算子、Kronecker 积与矩阵求导的系统介绍见附录 A。
+- `book/part0/ch00-exercises.md:335` — vec 算子、Kronecker 积与矩阵求导的系统介绍见附录 A。
