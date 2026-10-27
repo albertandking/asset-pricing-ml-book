@@ -39,7 +39,7 @@
 - `book/part0/ch00-concepts.md:289` — SDF 与 β 定价之间的关系，在模拟市场中由 0.5 节的定理与习题 %s 严格证明，一般理论在第 1～4 章展开。
 - `book/part0/ch00-exercises.md:164` — 第 4 章会在更一般的条件下讨论 SDF 表示与 β 表示的等价性。
 - `book/part1/ch01-euler-sdf.md:41` — ……第 0 章的线性 SDF 是消费 SDF 的一阶近似（1.6 节），由此可以看清“因子是超额收益”与“因子是消费增长”的区别，为第 3、4 章的一般理论做准备。
-- `book/part1/ch01-experiments.md:168` — 不可交易因子的风险溢价要另行估计（实验三、第 4 章与第 10 章）。
+- `book/part1/ch01-experiments.md:168` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
 - `book/part1/ch01-lognormal.md:239` — ……构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
 - `book/part1/ch01-lucas.md:291` — 不是，则需要另行估计（第 4、10 章）。
 - `book/part1/ch01-lucas.md:328` — 第 4 章讨论 SDF 表示与 β 表示的一般等价性，以及包括不可交易因子与模拟组合在内的因子模型。
@@ -111,7 +111,7 @@
 - `book/part0/primer-regressions.md:103` — 估计风险溢价 $\bv\lambda$（第 10 章）；
 - `book/part0/primer-regressions.md:367` — 处理办法，包括用组合代替个股、Shanken 修正以及直接用特征的方法，见第 10 章。
 - `book/part1/ch01-experiments.md:155` — 考虑这一误差的 Shanken 修正见第 10 章。
-- `book/part1/ch01-experiments.md:168` — 不可交易因子的风险溢价要另行估计（实验三、第 4 章与第 10 章）。
+- `book/part1/ch01-experiments.md:168` — 对消费增长、宏观变量一类的不可交易因子，风险溢价要用横截面回归或模拟组合另行估计（上一节的实验三、第 4 章与第 10 章）。
 - `book/part1/ch01-lognormal.md:239` — ……构造一个尽量贴近消费增长的组合（模拟组合，factor-mimicking portfolio），可以把不可交易因子转为可交易因子，这是第 4、10 章的内容。
 - `book/part1/ch01-lucas.md:291` — 不是，则需要另行估计（第 4、10 章）。
 
